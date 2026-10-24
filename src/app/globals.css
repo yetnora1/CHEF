@@ -1,0 +1,323 @@
+@import "tailwindcss";
+
+/*
+ * Chief Harena design tokens
+ * ---------------------------------------------------------------------------
+ * Brand palette (raw) → semantic tokens (role-based) → Tailwind utilities.
+ * Components use semantic utilities (bg-background, text-muted-foreground…),
+ * never raw hex values, so palette changes and theming happen here only.
+ *
+ * Theming: every semantic token is defined once with light-dark(light, dark).
+ * Which half applies is decided by `color-scheme` on <html>:
+ *   - no data-theme       → follows the operating system (first visit default)
+ *   - data-theme="light"  → explicit light (set before paint by ThemeScript)
+ *   - data-theme="dark"   → explicit dark
+ * tests/unit/design-tokens.test.ts parses this file and checks WCAG contrast.
+ */
+
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+@theme {
+  /* Brand palette */
+  --color-highland-forest: #173d32;
+  --color-ceremonial-gold: #d3a45b;
+  --color-berbere-terracotta: #9d4135;
+  --color-injera-ivory: #f5f0e6;
+  --color-coffee-charcoal: #171d1a;
+
+  --breakpoint-xs: 26rem;
+
+  /* Motion: short and subtle; disabled under prefers-reduced-motion (below). */
+  --animate-fade-in: fade-in 200ms ease-out;
+  --animate-slide-in-right: slide-in-right 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-slide-in-left: slide-in-left 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-menu-in: menu-in 160ms ease-out;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+    }
+  }
+}
+
+:root {
+  color-scheme: light dark;
+
+  /* Surfaces */
+  --background: light-dark(#f5f0e6, #171d1a);
+  --foreground: light-dark(#171d1a, #f2ece0);
+  --surface: light-dark(#fbf8f1, #1f2723);
+  --surface-foreground: light-dark(#171d1a, #f2ece0);
+  --surface-muted: light-dark(#ece4d4, #27312c);
+  --muted-foreground: light-dark(#5a5950, #b4ad9f);
+  --border: light-dark(#ddd3c0, #323c37);
+  --border-strong: light-dark(#8c7f69, #6b776f);
+
+  /* Actions and accents */
+  --primary: light-dark(#173d32, #d3a45b);
+  --primary-hover: light-dark(#0f2c24, #e2b56c);
+  --primary-foreground: light-dark(#f5f0e6, #171d1a);
+  --accent: light-dark(#d3a45b, #d3a45b);
+  --accent-ink: light-dark(#7e5a1c, #e2b56c);
+  --terracotta: light-dark(#9d4135, #e3907f);
+  --ring: light-dark(#9d4135, #e2b56c);
+
+  /* Deep brand band (hero accents, inquiry call to action) */
+  --band: light-dark(#173d32, #143a2f);
+  --band-foreground: light-dark(#f5f0e6, #f5f0e6);
+  --band-muted: light-dark(#c9d2c9, #c9d2c9);
+  --band-accent: light-dark(#d3a45b, #d3a45b);
+
+  /* Feedback */
+  --success: light-dark(#2b6649, #7cc4a0);
+  --warning: light-dark(#7f4f00, #e8b866);
+  --danger: light-dark(#a3262a, #f2938a);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-surface-muted: var(--surface-muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-terracotta: var(--terracotta);
+  --color-ring: var(--ring);
+  --color-band: var(--band);
+  --color-band-foreground: var(--band-foreground);
+  --color-band-muted: var(--band-muted);
+  --color-band-accent: var(--band-accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  /* Latin faces first; browsers fall through to the Ethiopic face per glyph. */
+  --font-sans: var(--font-manrope), var(--font-noto-sans-ethiopic), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), var(--font-noto-serif-ethiopic), ui-serif, Georgia, serif;
+}
+
+@layer base {
+  html {
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Ethiopic script needs more vertical room than Latin. */
+  :lang(am) {
+    line-height: 1.85;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Layout and typography utilities
+ * ------------------------------------------------------------------------- */
+
+@utility page-container {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  &:lang(am) {
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+  }
+}
+
+@utility display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 1.5rem + 4.6vw, 5.5rem);
+  font-weight: 400;
+  font-variation-settings: "SOFT" 50;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+
+  &:lang(am) {
+    font-size: clamp(2.1rem, 1.35rem + 3.2vw, 4rem);
+    font-weight: 500;
+    line-height: 1.32;
+    letter-spacing: 0;
+  }
+}
+
+@utility display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.35rem + 2.4vw, 3.5rem);
+  font-weight: 400;
+  font-variation-settings: "SOFT" 50;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+
+  &:lang(am) {
+    font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.75rem);
+    font-weight: 500;
+    line-height: 1.38;
+    letter-spacing: 0;
+  }
+}
+
+@utility display-md {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 1.2rem + 0.6vw, 1.75rem);
+  font-weight: 450;
+  font-variation-settings: "SOFT" 50;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+
+  &:lang(am) {
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Ethiopian textile-inspired motifs
+ * Geometric bands in the spirit of woven tilet borders, drawn as CSS masks so
+ * they take any token colour via `background-color` (set with text/bg utilities).
+ * ------------------------------------------------------------------------- */
+
+@utility tilet-band {
+  display: block;
+  height: 1.25rem;
+  background-color: currentColor;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='20' viewBox='0 0 28 20'%3E%3Crect width='28' height='1.25'/%3E%3Crect y='18.75' width='28' height='1.25'/%3E%3Cpath d='M14 4.5 19.5 10 14 15.5 8.5 10Z M14 7.6 11.6 10 14 12.4 16.4 10Z' fill-rule='evenodd'/%3E%3Cpath d='M0 7.5 2.5 10 0 12.5Z M28 7.5 25.5 10 28 12.5Z'/%3E%3Cpath d='M4 3.5 7 3.5 5.5 5.5Z M21 3.5 24 3.5 22.5 5.5Z M4 16.5 7 16.5 5.5 14.5Z M21 16.5 24 16.5 22.5 14.5Z'/%3E%3C/svg%3E");
+  mask-repeat: repeat-x;
+  mask-position: center;
+  mask-size: auto 100%;
+}
+
+@utility tilet-rule {
+  display: block;
+  height: 0.5rem;
+  background-color: currentColor;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' viewBox='0 0 16 8'%3E%3Cpath d='M8 1 11 4 8 7 5 4Z'/%3E%3Crect y='3.5' width='4' height='1'/%3E%3Crect x='12' y='3.5' width='4' height='1'/%3E%3C/svg%3E");
+  mask-repeat: repeat-x;
+  mask-position: center;
+  mask-size: auto 100%;
+}
+
+@utility lattice-backdrop {
+  background-image:
+    linear-gradient(45deg, currentColor 1px, transparent 1px),
+    linear-gradient(-45deg, currentColor 1px, transparent 1px);
+  background-size: 2.5rem 2.5rem;
+}
+
+/* Fine dotted texture used by photography placeholders. */
+@utility dot-texture {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--foreground) 14%, transparent) 1px,
+    transparent 1.6px
+  );
+  background-size: 0.875rem 0.875rem;
+}

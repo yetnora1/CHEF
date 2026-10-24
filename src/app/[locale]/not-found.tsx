@@ -1,0 +1,19 @@
+import { getTranslations } from "next-intl/server";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
+
+export default async function LocalizedNotFound() {
+  const t = await getTranslations("Common");
+
+  return (
+    <section className="page-container flex flex-col items-start py-24 md:py-32">
+      <p className="eyebrow text-accent-ink">404</p>
+      <h1 className="mt-5 max-w-2xl display-lg">{t("notFoundTitle")}</h1>
+      <p className="mt-5 max-w-xl text-lg text-muted-foreground">{t("notFoundBody")}</p>
+      <span aria-hidden className="mt-8 tilet-rule w-28 text-accent" />
+      <Button asChild className="mt-10">
+        <Link href="/">{t("backHome")}</Link>
+      </Button>
+    </section>
+  );
+}

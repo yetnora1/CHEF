@@ -1,0 +1,136 @@
+{
+  "Metadata": {
+    "siteName": "Chief Harena",
+    "homeTitle": "Chief Harena · ለሠርግ፣ ለዝግጅቶችና ለግል ግብዣዎች የኢትዮጵያ ምግብ",
+    "homeDescription": "ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች የኢትዮጵያ ምግብ የሚያዘጋጁ ሼፍ።",
+    "notFoundTitle": "ገጹ አልተገኘም"
+  },
+  "Common": {
+    "skipToContent": "ወደ ዋናው ይዘት ይዝለሉ",
+    "previewNotice": "ቅድመ እይታ፦ ጽሑፎቹና ፎቶዎቹ ጊዜያዊ ናቸው፤ የChief Harena የመጨረሻ ይዘት ይጠበቃል።",
+    "placeholderBadge": "ጊዜያዊ",
+    "photoPlaceholder": "ጊዜያዊ የፎቶ ቦታ",
+    "photoPlaceholderIntended": "የሚገባው ፎቶ፦ {subject}",
+    "loading": "በመጫን ላይ…",
+    "errorTitle": "ችግር ተፈጥሯል",
+    "errorBody": "ይህ ገጽ ሊታይ አልቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "tryAgain": "እንደገና ይሞክሩ",
+    "notFoundTitle": "ገጹን ማግኘት አልቻልንም",
+    "notFoundBody": "የሚፈልጉት ገጽ የለም ወይም ተዛውሯል።",
+    "backHome": "ወደ መነሻ ገጽ ይመለሱ"
+  },
+  "Brand": {
+    "tagline": "የኢትዮጵያ ምግብ",
+    "homeLink": "Chief Harena፣ መነሻ ገጽ"
+  },
+  "Navigation": {
+    "primaryLabel": "ዋና ማውጫ",
+    "about": "ስለ ሼፉ",
+    "services": "አገልግሎቶች",
+    "planEvent": "ዝግጅት ያቅዱ",
+    "openMenu": "ማውጫውን ይክፈቱ",
+    "closeMenu": "ማውጫውን ይዝጉ",
+    "menuTitle": "ማውጫ"
+  },
+  "Language": {
+    "label": "ቋንቋ",
+    "switchTo": "ወደ {language} ይቀይሩ"
+  },
+  "Theme": {
+    "label": "ገጽታ",
+    "trigger": "ገጽታ፦ {theme}",
+    "light": "ብሩህ",
+    "dark": "ጨለማ",
+    "system": "እንደ መሣሪያው"
+  },
+  "Home": {
+    "heroPrimaryCta": "ዝግጅት ያቅዱ",
+    "heroSecondaryCta": "አገልግሎቶችን ይመልከቱ",
+    "servicesEyebrow": "አገልግሎቶች",
+    "serviceToBeConfirmed": "አገልግሎቱ ገና አልተረጋገጠም",
+    "aboutEyebrow": "ስለ ሼፉ",
+    "aboutPending": "የሼፉ የራሳቸው የሕይወት ታሪክ ይጠበቃል",
+    "inquiryEyebrow": "የዝግጅት ጥያቄዎች",
+    "inquiryStatus": "የመስመር ላይ የጥያቄ ቅጹ በሚቀጥለው ልቀት ይከፈታል።"
+  },
+  "Footer": {
+    "navigationLabel": "የግርጌ ማውጫ",
+    "contactPending": "የመገኛ አድራሻዎች በChief Harena ሲረጋገጡ ይታተማሉ።",
+    "photoCredit": "የሚታዩት ፎቶዎች ጊዜያዊ ምስሎች ናቸው፤ በChief Harena የራሳቸው ፎቶዎች ይተካሉ።",
+    "copyright": "© {year} Chief Harena። መብቱ በሕግ የተጠበቀ ነው።"
+  },
+  "Admin": {
+    "appName": "አስተዳደር",
+    "navigationLabel": "የአስተዳደር ማውጫ",
+    "mainMenu": "ዋና",
+    "plannedModules": "የታቀዱ ክፍሎች",
+    "plannedBadge": "የታቀደ",
+    "openNavigation": "ማውጫውን ይክፈቱ",
+    "closeNavigation": "ማውጫውን ይዝጉ",
+    "userMenu": "የመለያ ምናሌ",
+    "signedInAs": "የገቡበት መለያ",
+    "yourRoles": "ሚናዎችዎ",
+    "noRoles": "የሠራተኛ ሚና የለም",
+    "viewSite": "የሕዝብ ድረ-ገጹን ይመልከቱ",
+    "modules": {
+      "overview": "አጠቃላይ እይታ",
+      "bookings": "የተያዙ ዝግጅቶች",
+      "inquiries": "ጥያቄዎች",
+      "services": "አገልግሎቶች",
+      "menu": "ምናሌ",
+      "gallery": "ፎቶዎች",
+      "journal": "ጽሑፎች",
+      "media": "የሚዲያ ማከማቻ",
+      "translations": "ትርጉሞች",
+      "users": "ሠራተኞችና ሚናዎች",
+      "settings": "ቅንብሮች",
+      "auditLog": "የኦዲት መዝገብ"
+    },
+    "moduleDescriptions": {
+      "bookings": "የተረጋገጡ ዝግጅቶችን ከዋጋ ግምት እስከ ፍጻሜ ይከታተሉ።",
+      "inquiries": "አዳዲስ የዝግጅት ጥያቄዎችን ይገምግሙና ምላሽ ይስጡ።",
+      "services": "የአገልግሎት ገጾችን በእንግሊዝኛና በአማርኛ ያርትዑ።",
+      "menu": "በሕዝብ ድረ-ገጹ ላይ የሚታየውን ምናሌ ያዘጋጁ።",
+      "gallery": "የዝግጅት ስብስቦችንና ፎቶዎችን ያደራጁ።",
+      "journal": "ጽሑፎችን ይጻፉና ያትሙ።",
+      "media": "ምስሎችንና ፋይሎችን ይጫኑና ያስተዳድሩ።",
+      "translations": "የአማርኛና የእንግሊዝኛ ትርጉሞችን ይከታተሉና ያጠናቅቁ።",
+      "users": "ሠራተኞችን ይጋብዙና ሚናዎቻቸውን ያስተዳድሩ።",
+      "settings": "የሕዝብ ድረ-ገጹን ቅንብሮች ያስተዳድሩ።",
+      "auditLog": "ደኅንነትን የሚመለከቱ የአስተዳደር ድርጊቶችን ይገምግሙ።"
+    },
+    "overview": {
+      "title": "አጠቃላይ እይታ",
+      "welcome": "እንኳን ደህና መጡ",
+      "intro": "ይህ ዳሽቦርድ የChief Harena ድረ-ገጽንና የዝግጅት ጥያቄዎችን ለማስተዳደር መሠረት ነው። ክፍሎቹ ሲገነቡ ከታች ይታያሉ፤ እያንዳንዱ ክፍል የሚታየው ሊጠቀሙበት ለሚፈቀድላቸው ሚናዎች ብቻ ነው።",
+      "modulesHeading": "ለሚናዎ የሚገኙ ክፍሎች",
+      "noModules": "ለሚናዎ እስካሁን የሚገኝ ክፍል የለም።"
+    }
+  },
+  "Auth": {
+    "loginTitle": "ይግቡ",
+    "loginSubtitle": "ለChief Harena አስተዳደር የሠራተኞች መግቢያ።",
+    "email": "ኢሜይል",
+    "password": "የይለፍ ቃል",
+    "submit": "ይግቡ",
+    "submitting": "በመግባት ላይ…",
+    "invalidCredentials": "ኢሜይሉ ወይም የይለፍ ቃሉ ትክክል አይደለም።",
+    "rateLimited": "በጣም ብዙ ሙከራዎች ተደርገዋል። ጥቂት ደቂቃዎች ጠብቀው እንደገና ይሞክሩ።",
+    "genericError": "መግባት አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "emailInvalid": "ትክክለኛ የኢሜይል አድራሻ ያስገቡ።",
+    "passwordRequired": "የይለፍ ቃልዎን ያስገቡ።",
+    "noPublicSignup": "የሠራተኛ መለያዎች የሚፈጠሩት በባለቤቱ ነው። ለሕዝብ ክፍት የሆነ ምዝገባ የለም።",
+    "signOut": "ይውጡ",
+    "configRequiredTitle": "ማረጋገጫ አልተዋቀረም",
+    "configRequiredBody": "በ<code>.env.local</code> ፋይል ውስጥ <code>NEXT_PUBLIC_SUPABASE_URL</code> እና <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> ያዘጋጁ፤ ከዚያም አገልጋዩን እንደገና ያስጀምሩ። README የአካባቢ ዝግጅቱን ያብራራል።",
+    "accessDeniedTitle": "ወደዚህ ክፍል የመግባት ፈቃድ የለዎትም",
+    "accessDeniedBody": "ገብተዋል፤ ነገር ግን መለያዎ ይህን የሚፈቅድ የሠራተኛ ሚና የለውም። ባለቤቱ ፈቃድ እንዲሰጥዎ ይጠይቁ።"
+  },
+  "Roles": {
+    "owner": "ባለቤት",
+    "admin": "አስተዳዳሪ",
+    "content_editor": "የይዘት አርታዒ",
+    "event_manager": "የዝግጅት አስተባባሪ",
+    "analyst": "ተንታኝ"
+  }
+}

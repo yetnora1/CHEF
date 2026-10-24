@@ -26,7 +26,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AdminRootLayout({ children }: LayoutProps<"/admin">) {
   const locale = await getLocale();
   const t = await getTranslations("Common");
-  // Admin labels reach Client Components as props; only these namespaces are used client-side.
+  // Admin labels mostly reach Client Components as props; only these namespaces are used
+  // client-side everywhere. CMS screens add their own (features/cms/components/admin/cms-messages.tsx).
   const messages = await getClientMessages(["Common", "Theme", "Language", "Auth"]);
 
   return (

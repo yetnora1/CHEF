@@ -9,28 +9,34 @@ It is two connected applications in one Next.js codebase:
 - **Admin application** (`/admin/…`): staff-only, role-based management of content, inquiries,
   media, translations, users and settings.
 
-> **Status: Stage 2 (event inquiries).** On top of the Stage 1 foundation, visitors can send event
-> inquiries (`/en/book`, `/am/book`) and staff can review, assign, annotate and progress them in
-> `/admin/bookings`. The CMS and remaining admin modules are **not built yet** (see [Roadmap](#roadmap)).
-> Placeholder copy and photography are clearly labelled; no business details have been invented.
+> **Status: Stage 3 (content management).** On top of event inquiries (Stage 2), staff edit the
+> homepage, About page, services, menu, gallery and journal in English and Amharic in the admin, with
+> an audited draft → review → publish workflow, a review gate for Amharic, previews and a media
+> library on Supabase Storage ([docs/CMS.md](docs/CMS.md), [docs/MEDIA.md](docs/MEDIA.md)). Staff
+> management, settings and the audit-log viewer are **not built yet** (see [Roadmap](#roadmap)).
+> Until content is published the site shows clearly labelled placeholders; no business details have
+> been invented.
 >
-> **Not yet verified against Supabase itself** (no Supabase project, and Docker is unavailable). Stage
-> 2.5 verified the migrations, RLS, grants and concurrency on real PostgreSQL 17 (applied with the
-> Supabase CLI) and the Data API through real PostgREST. See [Verification status](#verification-status)
-> and [docs/VERIFICATION.md](docs/VERIFICATION.md), which lists what the owner must still set up.
+> **Not yet verified against Supabase itself** (no dedicated Supabase project, and Docker is
+> unavailable). The migrations, RLS, grants and Storage policies were verified on PGlite and real
+> PostgreSQL 17, and the app end to end against a test double. See
+> [Verification status](#verification-status) and [docs/VERIFICATION.md](docs/VERIFICATION.md), which
+> lists what the owner must still set up.
 
 ## Documentation
 
-| Document                                         | Contents                                                                    |
-| ------------------------------------------------ | --------------------------------------------------------------------------- |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)     | Structure, route map, rendering model, request flow                         |
-| [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md) | Roles, permission matrix, authorization layers, known gaps                  |
-| [docs/DATABASE.md](docs/DATABASE.md)             | Schema, migrations, local Supabase workflow, DB tests                       |
-| [docs/LOCALIZATION.md](docs/LOCALIZATION.md)     | Locale strategy, fallback policy, fonts, translation review                 |
-| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)   | Tokens, themes, typography, motifs, components                              |
-| [docs/INQUIRIES.md](docs/INQUIRIES.md)           | Inquiry form, abuse controls, workflow, email, operations                   |
-| [docs/VERIFICATION.md](docs/VERIFICATION.md)     | Stage 2.5 verification evidence, findings, owner checklist                  |
-| [docs/adr/](docs/adr/)                           | Architecture decisions (0001 foundation, 0002 inquiries, 0003 verification) |
+| Document                                         | Contents                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)     | Structure, route map, rendering model, request flow                                   |
+| [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md) | Roles, permission matrix, authorization layers, known gaps                            |
+| [docs/DATABASE.md](docs/DATABASE.md)             | Schema, migrations, local Supabase workflow, DB tests                                 |
+| [docs/LOCALIZATION.md](docs/LOCALIZATION.md)     | Locale strategy, fallback policy, fonts, translation review                           |
+| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)   | Tokens, themes, typography, motifs, components                                        |
+| [docs/INQUIRIES.md](docs/INQUIRIES.md)           | Inquiry form, abuse controls, workflow, email, operations                             |
+| [docs/CMS.md](docs/CMS.md)                       | Content model, workflow, Amharic review, safe rendering, caching, preview             |
+| [docs/MEDIA.md](docs/MEDIA.md)                   | Media uploads, Storage bucket and policies, image delivery, hosted checks             |
+| [docs/VERIFICATION.md](docs/VERIFICATION.md)     | Verification evidence (Stages 2.5 and 3), findings, owner checklist                   |
+| [docs/adr/](docs/adr/)                           | Architecture decisions (0001 foundation, 0002 inquiries, 0003 verification, 0004 CMS) |
 
 ## Tech stack
 
@@ -83,7 +89,8 @@ Create the first staff account (public sign-up is disabled by design):
    ```
 
 Further roles are granted by an owner/admin with `public.assign_role` (the admin UI for this
-arrives in a later stage).
+arrives in a later stage). Content staff need the `content_editor` role (or owner/admin); the CMS
+starts at `/admin/pages`.
 
 ### Option B — hosted Supabase project (no Docker)
 
@@ -172,11 +179,13 @@ src/
     [locale]/            public site (root layout per locale: /en, /am)
     admin/               admin app (separate root layout, no locale prefix)
       login/             sign-in
-      (protected)/       everything behind authorization (overview, bookings inbox, future modules)
+      (protected)/       everything behind authorization (overview, inquiries, CMS, media, preview)
+    api/admin/media/     media upload (Route Handler)
     api/internal/        server-to-server endpoints (email outbox retries)
+    media/               public delivery of images used by published content
     globals.css          design tokens, themes, typography, motifs
   components/            ui/ (primitives) · layout/ · public/ · admin/ · brand/ · theme/
-  features/              feature logic: admin modules, auth, bookings (inquiries), content, localization
+  features/              feature logic: admin modules, auth, bookings (inquiries), cms, media, content (placeholders)
   i18n/                  next-intl routing, request config, navigation helpers
   lib/                   auth (DAL), permissions, supabase clients, localization, theme, fonts
   messages/              interface translations (en.json, am.json)
@@ -187,35 +196,36 @@ supabase/
   seed.sql               local development placeholders (no users, no customers)
 tests/
   unit/                  pure logic, catalogues, design tokens
-  integration/db/        migrations + RLS on Postgres (PGlite) with a Supabase auth shim
-  e2e/                   Playwright, incl. a Supabase test double (fake Auth, real SQL on PGlite)
+  integration/db/        migrations + RLS on Postgres (PGlite) with a Supabase auth and Storage shim
+  e2e/                   Playwright, incl. a Supabase test double (fake Auth, real SQL and Storage rows on PGlite)
 scripts/                 check-client-bundle.mjs
 docs/                    architecture, security, database, localization, design, ADRs
 ```
 
 ## Roadmap
 
-| Stage                                | Scope                                                                                                                                                            |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 — Foundation                       | Architecture, design system, EN/AM routing, themes, schema + RLS for identity, roles, services, bookings; admin authentication and shell                         |
-| **2 — Event inquiries (this stage)** | Public inquiry form (validated server action, rate limits, Turnstile), admin inbox, lifecycle, assignment, notes, history, optional email outbox, privacy notice |
-| 3 — CMS                              | Pages, services, menu, gallery, journal with per-locale editing and publishing; media library on Supabase Storage                                                |
-| 4 — Staff & settings                 | Invitations, role management UI, site settings, audit-log viewer, MFA for privileged roles                                                                       |
-| 5 — Hardening & launch               | Real-Supabase verification, nonce-based CSP, monitoring, SEO (sitemap, structured data), deployment                                                              |
+| Stage                    | Scope                                                                                                                                                            |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 — Foundation           | Architecture, design system, EN/AM routing, themes, schema + RLS for identity, roles, services, bookings; admin authentication and shell                         |
+| 2 — Event inquiries      | Public inquiry form (validated server action, rate limits, Turnstile), admin inbox, lifecycle, assignment, notes, history, optional email outbox, privacy notice |
+| **3 — CMS (this stage)** | Pages, services, menu, gallery, journal with per-locale editing, review and publishing; preview; media library on Supabase Storage                               |
+| 4 — Staff & settings     | Invitations, role management UI, site settings, audit-log viewer, MFA for privileged roles                                                                       |
+| 5 — Hardening & launch   | Real-Supabase verification, nonce-based CSP, monitoring, SEO (sitemap, structured data), deployment                                                              |
 
 ## Verification status
 
-| Layer                                  | What runs                                                                                                                                     | Real Supabase?                                        |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| Unit (Vitest)                          | validation, config fail-closed rules, CAPTCHA verifier, rate-limit buckets, submission pipeline, email templates/outbox, contrast, catalogues | n/a                                                   |
-| Database (Vitest + PGlite)             | every migration; RLS, grants and SQL functions as `anon`/`authenticated`/`service_role`                                                       | **No**: Postgres 18 in WASM with a Supabase auth shim |
-| Browser (Playwright)                   | public site; fail-closed admin and inquiry form; sign-in, roles, inquiry submission and staff workflow                                        | **No**: a test double (fake Auth; real SQL on PGlite) |
-| Real PostgreSQL 17 (`test:db:pg`)      | the database suites, plus concurrency (rate limits, idempotency, outbox, role and status races); migrations applied with `supabase db push`   | **No**: plain PostgreSQL with Supabase-like roles     |
-| Real PostgREST 14 (opt-in suite)       | the Data API over HTTP as anon, service_role and every staff role                                                                             | **No**: standalone PostgREST, simulated Auth          |
-| Real local Supabase (`supabase start`) | not run: Docker unavailable                                                                                                                   | —                                                     |
-| Deployed Supabase project              | none exists                                                                                                                                   | —                                                     |
-| Cloudflare Turnstile                   | siteverify and the browser widget with Cloudflare's **test** keys; no real widget                                                             | —                                                     |
-| Resend                                 | failure handling against the real API (invalid key); **no real delivery**                                                                     | —                                                     |
+| Layer                                  | What runs                                                                                                                                                                                                        | Real Supabase?                                                         |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Unit (Vitest)                          | validation, config fail-closed rules, CAPTCHA verifier, rate-limit buckets, submission pipeline, email templates/outbox, contrast, catalogues; CMS formatting, form parsing, image validation, upload CSRF guard | n/a                                                                    |
+| Database (Vitest + PGlite)             | every migration; RLS, grants and SQL functions as `anon`/`authenticated`/`service_role`; CMS workflow, Amharic review, media and `storage.objects` policies                                                      | **No**: Postgres 18 in WASM with a Supabase auth and Storage shim      |
+| Browser (Playwright)                   | public site; fail-closed admin and inquiry form; sign-in, roles, inquiry submission and staff workflow; CMS editing, publishing, preview, uploads and image visibility                                           | **No**: a test double (fake Auth; real SQL and Storage rows on PGlite) |
+| Real PostgreSQL 17 (`test:db:pg`)      | the database suites, plus concurrency (rate limits, idempotency, outbox, role and status races); migrations applied with `supabase db push`                                                                      | **No**: plain PostgreSQL with Supabase-like roles                      |
+| Real PostgREST 14 (opt-in suite)       | the Data API over HTTP as anon, service_role and every staff role                                                                                                                                                | **No**: standalone PostgREST, simulated Auth                           |
+| Real local Supabase (`supabase start`) | not run: Docker unavailable                                                                                                                                                                                      | —                                                                      |
+| Deployed Supabase project              | none dedicated to this app; nothing deployed                                                                                                                                                                     | —                                                                      |
+| Supabase Storage                       | not run: the bucket and policies are tested only against a reduced `storage.objects` table and the test double                                                                                                   | —                                                                      |
+| Cloudflare Turnstile                   | siteverify and the browser widget with Cloudflare's **test** keys; no real widget                                                                                                                                | —                                                                      |
+| Resend                                 | failure handling against the real API (invalid key); **no real delivery**                                                                                                                                        | —                                                                      |
 
 Before launch, complete the owner checklist in [docs/VERIFICATION.md](docs/VERIFICATION.md#8-what-the-owner-must-do):
 a real Supabase environment, its dashboard settings, the HTTP suite against it, real Turnstile keys
@@ -225,4 +235,8 @@ and a verified email domain.
 
 No testimonials, awards, clients, statistics, biography or contact details are invented. Placeholder
 text and photography are labelled as such on the page and in `src/features/content/home-content.ts`.
-All Amharic is a draft pending native-speaker review ([docs/LOCALIZATION.md](docs/LOCALIZATION.md)).
+Migrations publish no content. The local development seed adds placeholder services (three
+published in English, for local testing) and is never pushed to a hosted project, so on a real
+project everything visitors see beyond the placeholders is written and published by staff. All
+Amharic is a draft pending native-speaker review, and Amharic CMS content can be published only
+after staff confirm such a review ([docs/LOCALIZATION.md](docs/LOCALIZATION.md)).

@@ -21,21 +21,35 @@ messages file, and font coverage if the script differs.
 1. **Interface messages** (`src/messages/en.json`, `am.json`): labels, navigation, form errors,
    accessibility text, empty states. Static and versioned with the code. Client Components receive
    only the namespaces they use.
-2. **Business content** (services, pages, menu, journal, biography): managed by staff, stored per
-   locale in the database (`*_translations` tables) from Stage 3. Until then the homepage reads
-   placeholders from `src/features/content/home-content.ts`.
+2. **Business content** (pages, services, menu, gallery, journal, image descriptions): managed by
+   staff in the CMS and stored per locale in the database (`*_translations` tables;
+   [CMS.md](CMS.md)). Homepage sections without published content keep the labelled placeholders
+   from `src/features/content/home-content.ts`.
 
 Interface text never lives in content tables, and business claims never live in message files.
 
 ## Fallback policy
 
-| Text type                  | Policy                                                                                                                                                                              |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Interface messages         | No fallback needed: a unit test requires `am.json` to have exactly the same keys, placeholders and rich-text tags as `en.json`, and every Amharic string to contain Ethiopic script |
-| Business content           | Requested locale → English → nothing. English shown on an Amharic page is rendered with `lang="en"` (`resolveLocalized()` in `src/lib/localization/translations.ts`)                |
-| English page, Amharic only | Not shown. Amharic is never presented as English, and English must exist before publication                                                                                         |
+| Text type                  | Policy                                                                                                                                                                                                                                               |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Interface messages         | No fallback needed: a unit test requires `am.json` to have exactly the same keys, placeholders and rich-text tags as `en.json`, and every Amharic string to contain Ethiopic script                                                                  |
+| Business content           | Requested locale → English → nothing. English shown on an Amharic page is rendered with `lang="en"` (article pages add an "Available in English only" note; `resolveLocalized()` / `resolveTranslation()` in `src/lib/localization/translations.ts`) |
+| English page, Amharic only | Not shown. Amharic is never presented as English                                                                                                                                                                                                     |
+| Image descriptions         | Amharic alt text only once its review is confirmed; otherwise English, marked `lang="en"`                                                                                                                                                            |
 
 Content is never machine-translated or relabelled automatically.
+
+## Amharic review before publication
+
+Each language version of CMS content is written, reviewed and published separately. An Amharic
+version can be published only after a staff member ticks "Reviewed by a fluent Amharic speaker"
+for that exact text; the database records who confirmed it and when, clears the confirmation when
+the text changes, and refuses publication without it. The same applies to Amharic alt text, which
+visitors see only once confirmed. This is an attestation by staff: nothing checks the language
+itself. See [CMS.md](CMS.md#amharic-review-gate).
+
+The admin marks content with its own language (`lang="en"` / `lang="am"` on titles, fields and
+previews), while its interface labels follow the admin's interface language.
 
 ## Fonts and Ethiopic typography
 
@@ -56,7 +70,9 @@ Content is never machine-translated or relabelled automatically.
   wordmark tagline are enlarged to 12.5–14px for Ethiopic. Footer fine print and the preview bar
   remain 12px in both scripts; revisit with the native-speaker review.
 
-**Verification performed:** a unit test checks that every character in `am.json` falls within the
+**Verification performed:** the message test parses every message with the ICU grammar next-intl
+uses and requires the same arguments (including those inside plural branches) and rich-text tags in
+both languages; a unit test checks that every character in `am.json` falls within the
 Ethiopic blocks or basic Latin/punctuation covered by the fonts; an e2e test asserts that both Noto
 Ethiopic faces actually load and are used on `/am`; full-page screenshots in light/dark, desktop
 and mobile were reviewed during Stage 1.
@@ -71,13 +87,13 @@ model needs no change for it.
 All Amharic in this repository was drafted without a native-speaker review. It is labelled as
 draft and must be reviewed before launch:
 
-| Location                                                | What                                                                              |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `src/messages/am.json`                                  | All interface strings, incl. Stage 2: inquiry form, errors, statuses, admin inbox |
-| `src/features/content/home-content.ts` (`am` fields)    | Homepage placeholder copy                                                         |
-| `src/features/content/privacy-content.ts` (`am`)        | Privacy notice: needs native-speaker **and legal** review; the page says so       |
-| `src/features/bookings/server/email.ts` (`ACK_COPY.am`) | Customer acknowledgement email                                                    |
-| `supabase/seed.sql`                                     | Amharic service rows (seeded as `draft`, so they are never public)                |
+| Location                                                | What                                                                                                                                                                                  |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/messages/am.json`                                  | All interface strings, incl. Stage 2 (inquiry form, errors, statuses, admin inbox) and Stage 3 (CMS admin, publication statuses, dietary tags, public content pages and empty states) |
+| `src/features/content/home-content.ts` (`am` fields)    | Homepage placeholder copy                                                                                                                                                             |
+| `src/features/content/privacy-content.ts` (`am`)        | Privacy notice: needs native-speaker **and legal** review; the page says so                                                                                                           |
+| `src/features/bookings/server/email.ts` (`ACK_COPY.am`) | Customer acknowledgement email                                                                                                                                                        |
+| `supabase/seed.sql`                                     | Amharic service rows (seeded as `draft`, so they are never public)                                                                                                                    |
 
 Staff alert emails are English-only for now (the business has not chosen a staff language).
 

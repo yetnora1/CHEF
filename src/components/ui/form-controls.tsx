@@ -70,7 +70,10 @@ export function Field({ id, label, required, optionalLabel, hint, error, classNa
             *
           </span>
         ) : optionalLabel ? (
-          <span className="ml-1.5 text-xs font-normal text-muted-foreground">({optionalLabel})</span>
+          <>
+            {" "}
+            <span className="ml-1 text-xs font-normal text-muted-foreground">({optionalLabel})</span>
+          </>
         ) : null}
       </label>
       {children}

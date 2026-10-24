@@ -178,6 +178,67 @@ test.describe("accessibility basics", () => {
   });
 });
 
+test.describe("content pages without a content database", () => {
+  test("list pages show an empty state and ask not to be indexed", async ({ page }) => {
+    for (const [path, heading] of [
+      ["/en/services", "Culinary services"],
+      ["/en/menu", "The menu"],
+      ["/en/gallery", "Gallery"],
+      ["/en/journal", "Journal"],
+      ["/am/services", "የምግብ አገልግሎቶች"],
+    ] as const) {
+      const response = await page.goto(path);
+      expect(response?.status(), path).toBe(200);
+      await expect(page.getByRole("heading", { level: 1 }), path).toHaveText(heading);
+      await expect(page.locator('meta[name="robots"]'), path).toHaveAttribute("content", /noindex/);
+    }
+    await expect(page.getByRole("link", { name: "ዝግጅት ያቅዱ" }).last()).toHaveAttribute("href", "/am/book");
+  });
+
+  test("the About page and unknown entries show the not-found page and are never indexed", async ({
+    page,
+  }) => {
+    // Prerendered at build time: a real 404.
+    for (const path of ["/en/about", "/am/about", "/en/services/__none__"]) {
+      expect((await page.goto(path))?.status(), path).toBe(404);
+    }
+    // A slug without a prerendered page streams from the shell on its first request, so the
+    // status may be 200 ("soft 404", docs/CMS.md#caching); Next.js then caches the 404.
+    for (const [path, heading] of [
+      ["/en/services/wedding-feasts", "We couldn't find that page"],
+      ["/am/journal/first-post", "ገጹን ማግኘት አልቻልንም"],
+    ] as const) {
+      const response = await page.goto(path);
+      expect([200, 404], path).toContain(response?.status());
+      await expect(page.getByRole("heading", { level: 1 }), path).toHaveText(heading);
+      await expect(page.locator('meta[name="robots"]').first(), path).toHaveAttribute("content", /noindex/);
+      await expect.poll(async () => (await page.request.get(path)).status(), { message: path }).toBe(404);
+    }
+  });
+
+  test("navigation links homepage sections until pages are published", async ({ page }) => {
+    await page.goto("/en");
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    await expect(nav.getByRole("link", { name: "The chef" })).toHaveAttribute("href", "/en#about");
+    await expect(nav.getByRole("link", { name: "Services" })).toHaveAttribute("href", "/en#services");
+    for (const hidden of ["Menu", "Gallery", "Journal"]) {
+      await expect(nav.getByRole("link", { name: hidden, exact: true })).toHaveCount(0);
+    }
+  });
+
+  test("no image is served, and nothing outside generated names", async ({ request }) => {
+    const image = await request.get(
+      "/media/assets/0b9f4a8e-5c1d-4f3a-9e2b-7d6c5b4a3f21/0123456789abcdef0123456789abcdef.jpg",
+    );
+    expect(image.status()).toBe(404);
+    expect(image.headers()["cache-control"]).toBe("no-store");
+    expect(image.headers()["x-content-type-options"]).toBe("nosniff");
+    for (const path of ["/media/..%2F..%2Fpackage.json", "/media/assets/x/y.svg", "/media/robots.txt"]) {
+      expect((await request.get(path)).status(), path).toBe(404);
+    }
+  });
+});
+
 test.describe("security headers", () => {
   test("are sent with public pages", async ({ request }) => {
     const response = await request.get("/en");

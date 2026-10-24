@@ -8,6 +8,7 @@ import type { AppPermission } from "@/lib/permissions/matrix";
 export type AdminModuleKey =
   | "overview"
   | "bookings"
+  | "pages"
   | "services"
   | "menu"
   | "gallery"
@@ -31,16 +32,17 @@ const READ_BOOKINGS = ["bookings.read_all", "bookings.read_assigned"] as const;
 export const ADMIN_MODULES: readonly AdminModule[] = [
   { key: "overview", href: "/admin/overview", permissions: ["admin.access"], status: "available" },
   { key: "bookings", href: "/admin/bookings", permissions: READ_BOOKINGS, status: "available" },
-  { key: "services", href: "/admin/services", permissions: ["content.read"], status: "planned" },
-  { key: "menu", href: "/admin/menu", permissions: ["content.read"], status: "planned" },
-  { key: "gallery", href: "/admin/gallery", permissions: ["content.read"], status: "planned" },
-  { key: "journal", href: "/admin/journal", permissions: ["content.read"], status: "planned" },
-  { key: "media", href: "/admin/media", permissions: ["media.write"], status: "planned" },
+  { key: "pages", href: "/admin/pages", permissions: ["content.read"], status: "available" },
+  { key: "services", href: "/admin/services", permissions: ["content.read"], status: "available" },
+  { key: "menu", href: "/admin/menu", permissions: ["content.read"], status: "available" },
+  { key: "gallery", href: "/admin/gallery", permissions: ["content.read"], status: "available" },
+  { key: "journal", href: "/admin/journal", permissions: ["content.read"], status: "available" },
+  { key: "media", href: "/admin/media", permissions: ["media.write"], status: "available" },
   {
     key: "translations",
     href: "/admin/translations",
     permissions: ["translations.write"],
-    status: "planned",
+    status: "available",
   },
   { key: "users", href: "/admin/users", permissions: ["users.read"], status: "planned" },
   { key: "settings", href: "/admin/settings", permissions: ["settings.manage"], status: "planned" },

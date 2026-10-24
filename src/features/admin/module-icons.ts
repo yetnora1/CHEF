@@ -1,5 +1,6 @@
 import {
   ConciergeBell,
+  FileText,
   FolderOpen,
   Images,
   Inbox,
@@ -18,6 +19,7 @@ import type { AdminModuleKey } from "./modules";
 export const ADMIN_MODULE_ICONS: Record<AdminModuleKey, LucideIcon> = {
   overview: LayoutDashboard,
   bookings: Inbox,
+  pages: FileText,
   services: ConciergeBell,
   menu: UtensilsCrossed,
   gallery: Images,

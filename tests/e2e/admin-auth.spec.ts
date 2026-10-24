@@ -100,6 +100,9 @@ test.describe("role-based admin access", () => {
     await signIn(page, TEST_USERS.editor.email);
     await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 3, name: "Translations" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 3, name: "Translations" }).getByRole("link"),
+    ).toHaveAttribute("href", "/admin/translations");
     const nav = adminNav(page);
     await expect(nav.getByText("Services")).toBeVisible();
     await expect(nav.getByText("Translations")).toBeVisible();

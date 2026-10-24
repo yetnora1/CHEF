@@ -31,7 +31,10 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "menuTitle": "Menu",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "menu": "Menu",
+    "gallery": "Gallery",
+    "journal": "Journal"
   },
   "Language": {
     "label": "Language",
@@ -53,7 +56,8 @@
     "aboutPending": "Awaiting the chef's own biography",
     "inquiryEyebrow": "Event inquiries",
     "inquiryCta": "Start your inquiry",
-    "inquiryNote": "Sending an inquiry does not reserve a date."
+    "inquiryNote": "Sending an inquiry does not reserve a date.",
+    "aboutMore": "More about the chef"
   },
   "Footer": {
     "navigationLabel": "Footer",
@@ -85,7 +89,8 @@
       "translations": "Translations",
       "users": "Staff & roles",
       "settings": "Settings",
-      "auditLog": "Audit log"
+      "auditLog": "Audit log",
+      "pages": "Pages"
     },
     "moduleDescriptions": {
       "bookings": "Review website inquiries and follow events through to completion.",
@@ -97,7 +102,8 @@
       "translations": "Track and complete Amharic and English translations.",
       "users": "Invite staff and manage their roles.",
       "settings": "Manage public website settings.",
-      "auditLog": "Review security-sensitive administrative events."
+      "auditLog": "Review security-sensitive administrative events.",
+      "pages": "Edit the homepage and the About page in English and Amharic."
     },
     "overview": {
       "title": "Overview",
@@ -331,6 +337,480 @@
       "awaitingReview": "Awaiting review",
       "open": "Open inquiries",
       "openInbox": "Open the inbox"
+    }
+  },
+  "PublicationStatus": {
+    "draft": "Draft",
+    "in_review": "Ready for review",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "DietaryTag": {
+    "vegetarian": "Vegetarian",
+    "vegan": "Vegan",
+    "fasting": "Suitable for fasting",
+    "spicy": "Spicy"
+  },
+  "PublicContent": {
+    "credit": "Photo",
+    "englishOnly": "Available in English only",
+    "planEvent": "Plan an event",
+    "dietaryLabel": "Dietary information",
+    "services": {
+      "eyebrow": "Services",
+      "title": "Culinary services",
+      "intro": "Ethiopian cuisine for weddings, organisations, summits and private occasions.",
+      "more": "Read more",
+      "emptyTitle": "Service descriptions are on their way",
+      "emptyBody": "You can already tell Chief Harena about your event.",
+      "back": "All services",
+      "inquire": "Ask about this service"
+    },
+    "menu": {
+      "eyebrow": "Menu",
+      "title": "The menu",
+      "intro": "A selection of dishes. Menus for each event are agreed with Chief Harena.",
+      "emptyTitle": "The menu will be published soon",
+      "emptyBody": "Tell us about your event and Chief Harena will suggest dishes."
+    },
+    "gallery": {
+      "eyebrow": "Gallery",
+      "title": "Gallery",
+      "intro": "Food and events by Chief Harena.",
+      "emptyTitle": "Photographs are on their way",
+      "emptyBody": "In the meantime, you can tell us about your event."
+    },
+    "journal": {
+      "eyebrow": "Journal",
+      "title": "Journal",
+      "intro": "Stories and notes from Chief Harena's kitchen.",
+      "read": "Read the article",
+      "emptyTitle": "No articles yet",
+      "emptyBody": "Articles will appear here once published.",
+      "back": "All articles"
+    },
+    "about": {
+      "eyebrow": "The chef"
+    }
+  },
+  "AdminCms": {
+    "optional": "optional",
+    "characterCount": "{count} of {max} characters",
+    "save": "Save",
+    "saved": "Saved.",
+    "unsaved": "Unsaved changes",
+    "unsavedChanges": "You have unsaved changes. Leave this page and lose them?",
+    "statusChanged": "Status changed.",
+    "deleted": "Deleted.",
+    "cancel": "Cancel",
+    "createLanguage": "Create this language version",
+    "createDraft": "Create draft",
+    "createHint": "You can add the Amharic version after creating the draft.",
+    "createIntro": "New entries start as drafts. Visitors see nothing until you publish.",
+    "needCategory": "Create a menu category first.",
+    "untitled": "Untitled",
+    "missing": "Missing",
+    "preview": "Preview ({language})",
+    "previewTitle": "Preview",
+    "viewOnSite": "View on the website",
+    "chooseCategory": "Choose a category…",
+    "notSpecified": "Not specified",
+    "errorSummary": "{count, plural, one {# field needs attention.} other {# fields need attention.}}",
+    "deleteLanguage": "Delete the {language} version",
+    "markup": {
+      "edit": "Edit",
+      "preview": "Preview formatting",
+      "empty": "Nothing to preview yet.",
+      "help": "Blank line = new paragraph · ## heading · - list item · **bold** · *italic* · [link text](https://…)"
+    },
+    "picker": {
+      "title": "Choose an image",
+      "description": "Images from the media library. Upload new images there first.",
+      "close": "Close",
+      "search": "Search",
+      "searchPlaceholder": "Title or description",
+      "error": "Images could not be loaded. Please try again.",
+      "empty": "No images found.",
+      "openLibrary": "Open the media library",
+      "missingAlt": "No description yet",
+      "more": "Show more",
+      "loading": "Loading images…"
+    },
+    "image": {
+      "none": "No image",
+      "choose": "Choose image",
+      "change": "Change image",
+      "remove": "Remove image"
+    },
+    "fieldErrors": {
+      "required": "This field is required.",
+      "tooLong": "Use at most {max} characters.",
+      "invalidSlug": "Use lowercase letters a–z, numbers and single hyphens, for example wedding-feasts.",
+      "invalidChoice": "Choose one of the options.",
+      "invalidNumber": "Enter a whole number.",
+      "taken": "This web address is already used."
+    },
+    "errors": {
+      "forbidden": "Your role does not allow this change. Published content needs publishing rights.",
+      "notFound": "This entry no longer exists. Reload the page.",
+      "conflict": "Someone else changed this since you opened it. Copy your text, reload the page and apply your changes again.",
+      "slugTaken": "This web address is already used. Choose another.",
+      "translationExists": "This language version already exists. Reload the page.",
+      "reviewRequired": "Amharic text can only be published after you confirm that a fluent speaker reviewed it.",
+      "inUse": "This is still used elsewhere. Remove it from there first.",
+      "unpublishFirst": "Unpublish it before deleting it.",
+      "invalid": "Some details are not valid. Check the highlighted fields.",
+      "uploadMissing": "The uploaded file was not found. Upload it again.",
+      "notConfigured": "The content database is not connected.",
+      "generic": "The change could not be saved. Please reload the page and try again."
+    },
+    "review": {
+      "label": "Reviewed by a fluent Amharic speaker",
+      "help": "Tick only when someone fluent in Amharic has read this exact text. Your name and the time are recorded. Amharic cannot be published without it.",
+      "cleared": "The text changed, so the review confirmation will be cleared when you save.",
+      "reviewed": "Reviewed",
+      "notReviewed": "Not reviewed"
+    },
+    "confirm": {
+      "liveEditTitle": "Change published text?",
+      "liveEditBody": "This version is on the website. Your changes appear to visitors as soon as you save.",
+      "liveEditConfirm": "Save and update the website",
+      "publishTitle": "Publish?",
+      "publishBody": "Visitors will see it once both the entry and a language version are published.",
+      "unpublishTitle": "Unpublish?",
+      "unpublishBody": "It disappears from the website and returns to draft. Nothing is deleted.",
+      "archiveTitle": "Archive?",
+      "archiveBody": "It is hidden from the website and kept for reference. You can restore it later.",
+      "restoreTitle": "Restore as draft?",
+      "restoreBody": "It becomes a draft again. Publish it when it is ready.",
+      "deleteLanguageBody": "This language version is deleted permanently. The other language is not affected.",
+      "deleteEntryBody": "The entry and all its language versions are deleted permanently. Images stay in the media library."
+    },
+    "actions": {
+      "toDraft": "Return to draft",
+      "submit": "Mark ready for review",
+      "publish": "Publish",
+      "archive": "Archive",
+      "restore": "Restore as draft",
+      "unpublish": "Unpublish"
+    },
+    "languages": {
+      "en": "English",
+      "am": "Amharic",
+      "title": "Language versions",
+      "description": "Each language is written, reviewed and published on its own. Pages show English when there is no published Amharic version, marked as English.",
+      "amharicMissing": "There is no Amharic version yet. Until there is, the Amharic site shows the English text, marked as English."
+    },
+    "publication": {
+      "title": "Publication",
+      "rule": "Visitors see this only when it is published and at least one language version is published too.",
+      "ruleMenuItem": "Visitors see this dish only when it, its category and a language version are published.",
+      "needsPublish": "Changing published or archived content needs publishing rights."
+    },
+    "details": {
+      "title": "Details",
+      "description": "Shared by both languages.",
+      "images": "Images",
+      "imagesDescription": "Shared by both languages. Images are saved as soon as you choose them."
+    },
+    "danger": {
+      "title": "Delete",
+      "description": "Deleting cannot be undone.",
+      "unpublishFirst": "Unpublish this entry before deleting it.",
+      "delete": "Delete this {item}"
+    },
+    "list": {
+      "title": "Title",
+      "status": "Status",
+      "updated": "Updated",
+      "filters": "Filter entries",
+      "search": "Search",
+      "searchPlaceholder": "Title or web address",
+      "type": "Kind of content",
+      "anyType": "All kinds",
+      "anyStatus": "Any status",
+      "translation": "Languages",
+      "anyTranslation": "Any",
+      "translationFilters": {
+        "missing_am": "No Amharic version",
+        "unreviewed_am": "Amharic not reviewed",
+        "missing_en": "No English version",
+        "unpublished": "A language not published"
+      },
+      "anyCategory": "Any category",
+      "sort": "Order",
+      "sorts": {
+        "updated_desc": "Recently updated",
+        "title_asc": "Title A–Z",
+        "order_asc": "Display order"
+      },
+      "apply": "Apply",
+      "reset": "Clear filters",
+      "count": "{count, plural, =0 {No entries} one {# entry} other {# entries}}",
+      "noMatches": "Nothing matches these filters.",
+      "pagination": "Pages",
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {page} of {pages}"
+    },
+    "types": {
+      "page": {
+        "singular": "Page",
+        "plural": "Pages",
+        "intro": "The homepage and the About page. Each section is edited per language; empty sections keep their labelled placeholders.",
+        "new": "New page",
+        "edit": "Edit page",
+        "empty": "No pages."
+      },
+      "service": {
+        "singular": "Service",
+        "plural": "Services",
+        "intro": "Services shown on the homepage and on their own pages.",
+        "new": "New service",
+        "edit": "Edit service",
+        "empty": "No services yet."
+      },
+      "menu_category": {
+        "singular": "Menu category",
+        "plural": "Menu categories",
+        "intro": "Groups of dishes, such as starters or mains, in display order.",
+        "new": "New category",
+        "edit": "Edit category",
+        "empty": "No categories yet."
+      },
+      "menu_item": {
+        "singular": "Dish",
+        "plural": "Dishes",
+        "intro": "Dishes on the public menu. Describe only what Chief Harena has confirmed.",
+        "new": "New dish",
+        "edit": "Edit dish",
+        "empty": "No dishes yet."
+      },
+      "gallery_item": {
+        "singular": "Gallery photo",
+        "plural": "Gallery",
+        "intro": "Photographs shown in the public gallery, with captions per language.",
+        "new": "Add photo",
+        "edit": "Edit photo",
+        "empty": "No photos in the gallery yet."
+      },
+      "journal_post": {
+        "singular": "Article",
+        "plural": "Journal",
+        "intro": "Articles for the journal.",
+        "new": "New article",
+        "edit": "Edit article",
+        "empty": "No articles yet."
+      }
+    },
+    "fields": {
+      "slug": {
+        "label": "Web address",
+        "hint": "Shared by both languages, e.g. wedding-feasts gives /en/services/wedding-feasts. Changing it breaks old links."
+      },
+      "sort_order": {
+        "label": "Display order",
+        "hint": "Lower numbers come first."
+      },
+      "image_id": {
+        "label": "Image",
+        "hint": "The image becomes visible to visitors only while this is published."
+      },
+      "cover_image_id": {
+        "label": "Cover image",
+        "hint": "The image becomes visible to visitors only while the article is published."
+      },
+      "asset_id": {
+        "label": "Photo",
+        "hint": "Add a description in the media library: it is read out to visitors who cannot see the image."
+      },
+      "category_id": {
+        "label": "Category"
+      },
+      "dietary_tags": {
+        "label": "Dietary information",
+        "hint": "Tick only what Chief Harena has confirmed for this dish."
+      },
+      "event_type": {
+        "label": "Kind of event pictured"
+      },
+      "title": {
+        "label": "Title"
+      },
+      "summary": {
+        "label": "Summary",
+        "hint": "One or two sentences for cards and search results."
+      },
+      "body": {
+        "label": "Text"
+      },
+      "seo_title": {
+        "label": "Title for search engines",
+        "hint": "Leave empty to use the title."
+      },
+      "seo_description": {
+        "label": "Description for search engines",
+        "hint": "Leave empty to use the summary."
+      },
+      "name": {
+        "label": "Name"
+      },
+      "description": {
+        "label": "Description"
+      },
+      "caption": {
+        "label": "Caption",
+        "hint": "Shown under the photo."
+      },
+      "excerpt": {
+        "label": "Excerpt",
+        "hint": "Shown in the article list."
+      }
+    },
+    "pageNames": {
+      "home": "Homepage",
+      "about": "About the chef"
+    },
+    "pageSections": {
+      "home": {
+        "hero": {
+          "title": "Opening section",
+          "eyebrow": "Small line above the headline",
+          "headline": "Headline",
+          "lede": "Introduction"
+        },
+        "about": {
+          "title": "About the chef",
+          "heading": "Heading",
+          "body": "Text"
+        },
+        "services": {
+          "title": "Services",
+          "heading": "Heading",
+          "lede": "Introduction"
+        },
+        "inquiry": {
+          "title": "Event inquiries",
+          "heading": "Heading",
+          "body": "Text"
+        },
+        "images": {
+          "hero": "Opening image",
+          "about": "Image beside About the chef"
+        }
+      },
+      "about": {
+        "intro": {
+          "title": "Introduction",
+          "heading": "Heading",
+          "body": "Text"
+        },
+        "story": {
+          "title": "Story",
+          "heading": "Heading",
+          "body": "Text"
+        },
+        "philosophy": {
+          "title": "Philosophy",
+          "heading": "Heading",
+          "body": "Text"
+        },
+        "images": {
+          "portrait": "Portrait",
+          "story": "Image beside the story"
+        }
+      }
+    },
+    "translations": {
+      "title": "Translations",
+      "intro": "Everything that still needs a language version, a review or publication. Amharic is published only after a fluent speaker's review is confirmed.",
+      "empty": "Nothing needs attention."
+    },
+    "media": {
+      "title": "Media library",
+      "detailTitle": "Image",
+      "intro": "Images are private until published content uses them. Then visitors can see them, and only for as long as that content stays published.",
+      "searchPlaceholder": "Title, credit or description",
+      "show": "Show",
+      "filters": {
+        "all": "All images",
+        "ready": "Ready to use",
+        "unused": "Not used anywhere",
+        "missing_alt": "No English description",
+        "incomplete": "Unfinished uploads"
+      },
+      "count": "{count, plural, =0 {No images} one {# image} other {# images}}",
+      "empty": "No images yet. Upload the first one above.",
+      "incomplete": "Upload not finished",
+      "incompleteExplained": "This upload did not finish. Upload the file again, or delete this entry.",
+      "public": "On the website",
+      "private": "Private",
+      "publicExplained": "Visible to visitors: published content uses this image.",
+      "privateExplained": "Private: only staff can see this image until published content uses it.",
+      "usedIn": "{count, plural, =0 {Not used} one {Used in # place} other {Used in # places}}",
+      "missingAlt": "No English description",
+      "cleanupIntro": "Some uploads did not finish or left files behind. They are private; you can remove them.",
+      "cleanup": "{count, plural, one {Clean up # leftover file} other {Clean up # leftover files}}",
+      "cleaned": "{count, plural, =0 {Nothing needed cleaning.} one {# file removed.} other {# files removed.}}",
+      "cleanupFailed": "The cleanup could not run. Please try again.",
+      "type": "File type",
+      "dimensions": "Size in pixels",
+      "size": "File size",
+      "details": "Details",
+      "titleLabel": "Title",
+      "titleHint": "For staff only, to find the image again.",
+      "creditLabel": "Photo credit",
+      "creditHint": "Shown with the image. Name the photographer only with their permission.",
+      "descriptions": "Descriptions",
+      "descriptionsIntro": "Describe what the image shows, for visitors who use a screen reader. Do not start with Photo of.",
+      "altLabel": "Description ({language})",
+      "altHint": "At most 300 characters.",
+      "altRequiredHint": "This image is on the website without an English description: please add one.",
+      "altReviewHelp": "Until this is ticked, visitors on the Amharic site hear the English description.",
+      "usages": "Where this image is used ({count})",
+      "unused": "This image is not used anywhere.",
+      "delete": "Delete image",
+      "deleteBody": "The image and its file are deleted permanently.",
+      "deleteInUse": "This image is in use and cannot be deleted. Choose another image where it is used first."
+    },
+    "upload": {
+      "heading": "Upload an image",
+      "rules": "JPEG, PNG or WebP, up to 10 MB. Location and camera data are removed and large images are resized.",
+      "file": "Image file",
+      "fileHint": "JPEG, PNG or WebP",
+      "title": "Title",
+      "optional": "optional",
+      "altEn": "English description",
+      "submit": "Upload",
+      "uploading": "Uploading…",
+      "replaceFile": "Replace the file",
+      "replaceHint": "Everything that uses this image shows the new file. Descriptions are kept.",
+      "replaceSubmit": "Replace",
+      "replaced": "The file was replaced.",
+      "errors": {
+        "empty": "Choose an image file.",
+        "tooLarge": "The file is larger than 10 MB.",
+        "unsupportedType": "Use a JPEG, PNG or WebP image.",
+        "typeMismatch": "The file's content does not match its name or type.",
+        "unreadable": "The image could not be read. It may be damaged.",
+        "tooManyPixels": "The image is too large in pixels (at most 8000 pixels on each side).",
+        "forbidden": "Your role cannot upload images.",
+        "signedOut": "Your session ended. Sign in again.",
+        "notConfigured": "File storage is not connected.",
+        "uploadFailed": "The upload failed. Please try again.",
+        "conflict": "Someone else changed this image. Reload the page and try again.",
+        "notFound": "This image no longer exists.",
+        "invalid": "The upload was not valid.",
+        "network": "The connection was interrupted. Check whether the image appears, then try again."
+      }
+    },
+    "previewBanner": {
+      "title": "Preview in {language}",
+      "body": "This is how the current text would look. Visitors cannot see this page.",
+      "status": "Entry: {item}. This language: {language}.",
+      "fallback": "There is no Amharic version, so the English text is shown, as on the website.",
+      "noText": "There is no text in this language yet.",
+      "back": "Back to editing"
     }
   }
 }

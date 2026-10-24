@@ -32,6 +32,13 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  images: {
+    // Only CMS images (served by /media/…, published content only) are optimised.
+    localPatterns: [{ pathname: "/media/assets/**", search: "" }],
+    // The optimiser's cache cannot be purged: an unpublished image may be served
+    // from it for at most this long (seconds), matching /media's Cache-Control.
+    minimumCacheTTL: 300,
+  },
   experimental: {
     serverActions: {
       // The largest legitimate request is an inquiry (~25 KB with Amharic text

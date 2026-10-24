@@ -100,8 +100,22 @@ describe("function privileges", () => {
         and has_schema_privilege(r.rolname, n.oid, 'usage')
       order by 1, 2
     `);
+    // Visitors execute the published-content reads and the three helpers their
+    // RLS and Storage policies evaluate; nothing else.
+    const visitorAndStaff = (fn: string) => [
+      { fn, role: "anon" },
+      { fn, role: "authenticated" },
+    ];
     expect(rows).toEqual([
+      { fn: "private.cms_image", role: "authenticated" },
+      { fn: "private.cms_translations", role: "authenticated" },
       { fn: "private.has_permission", role: "authenticated" },
+      ...visitorAndStaff("private.media_asset_is_public"),
+      ...visitorAndStaff("private.media_object_is_public"),
+      { fn: "private.media_object_is_tracked", role: "authenticated" },
+      { fn: "private.media_upload_is_reserved", role: "authenticated" },
+      { fn: "private.media_usages", role: "authenticated" },
+      ...visitorAndStaff("private.public_image"),
       { fn: "private.staff_display_name", role: "authenticated" },
       { fn: "public.add_booking_note", role: "authenticated" },
       { fn: "public.assign_booking", role: "authenticated" },
@@ -110,15 +124,77 @@ describe("function privileges", () => {
       { fn: "public.booking_report", role: "authenticated" },
       { fn: "public.change_booking_status", role: "authenticated" },
       { fn: "public.claim_notifications", role: "service_role" },
+      { fn: "public.cms_get", role: "authenticated" },
+      { fn: "public.cms_list", role: "authenticated" },
       { fn: "public.complete_notification", role: "service_role" },
       { fn: "public.consume_rate_limit", role: "service_role" },
       { fn: "public.get_booking_detail", role: "authenticated" },
       { fn: "public.get_my_access", role: "authenticated" },
       { fn: "public.list_assignable_staff", role: "authenticated" },
       { fn: "public.list_bookings", role: "authenticated" },
+      { fn: "public.media_cleanup_candidates", role: "authenticated" },
+      { fn: "public.media_get", role: "authenticated" },
+      { fn: "public.media_list", role: "authenticated" },
+      ...visitorAndStaff("public.public_gallery"),
+      ...visitorAndStaff("public.public_journal"),
+      ...visitorAndStaff("public.public_journal_post"),
+      ...visitorAndStaff("public.public_menu"),
+      ...visitorAndStaff("public.public_navigation"),
+      ...visitorAndStaff("public.public_page"),
+      ...visitorAndStaff("public.public_service"),
+      ...visitorAndStaff("public.public_services"),
       { fn: "public.revoke_role", role: "authenticated" },
       { fn: "public.submit_inquiry", role: "service_role" },
     ]);
+  });
+
+  const CONTENT_TABLES = [
+    "services",
+    "service_translations",
+    "menu_categories",
+    "menu_category_translations",
+    "menu_items",
+    "menu_item_translations",
+    "gallery_items",
+    "gallery_item_translations",
+    "journal_posts",
+    "journal_post_translations",
+    "pages",
+    "page_translations",
+    "page_images",
+    "media_assets",
+    "media_asset_translations",
+  ];
+
+  it("give visitors column-level reads of content tables only, never writes or whole rows", async () => {
+    const { rows } = await db.query<{
+      t: string;
+      table_select: boolean;
+      any_write: boolean;
+      columns: number;
+    }>(
+      `select t,
+              has_table_privilege('anon', 'public.' || t, 'select') as table_select,
+              has_table_privilege('anon', 'public.' || t, 'insert,update,delete,truncate') as any_write,
+              (select count(*)::int from information_schema.column_privileges
+               where table_schema = 'public' and table_name = t and grantee = 'anon' and privilege_type = 'SELECT') as columns
+       from unnest($1::text[]) as t`,
+      [CONTENT_TABLES],
+    );
+    for (const row of rows) {
+      expect(row.table_select, row.t).toBe(false);
+      expect(row.any_write, row.t).toBe(false);
+      expect(row.columns, row.t).toBeGreaterThan(0);
+    }
+  });
+
+  it("give the server secret key no access to content or media tables", async () => {
+    const { rows } = await db.query<{ t: string; any_privilege: boolean }>(
+      `select t, has_table_privilege('service_role', 'public.' || t, 'select,insert,update,delete,truncate') as any_privilege
+       from unnest($1::text[]) as t`,
+      [CONTENT_TABLES],
+    );
+    for (const row of rows) expect(row.any_privilege, row.t).toBe(false);
   });
 
   it("reserve submission and delivery functions for the server secret key", async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { homeContent } from "@/features/content/home-content";
-import { resolveLocalized } from "@/lib/localization/translations";
+import { resolveLocalized, resolveTranslation } from "@/lib/localization/translations";
 
 const ETHIOPIC = /[ሀ-᎟ⶀ-⷟꬀-꬯]/;
 
@@ -18,6 +18,25 @@ describe("resolveLocalized (business content fallback policy)", () => {
   it("never presents Amharic as English and returns null when nothing exists", () => {
     expect(resolveLocalized({ am: "ሠርግ" }, "en")).toBeNull();
     expect(resolveLocalized({}, "am")).toBeNull();
+  });
+});
+
+describe("resolveTranslation (CMS translation rows, same policy)", () => {
+  const en = { title: "Weddings" };
+  const am = { title: "ሠርግ" };
+
+  it("returns the requested language's row without a lang override", () => {
+    expect(resolveTranslation({ en, am }, "am")).toEqual({ value: am });
+    expect(resolveTranslation({ en, am }, "en")).toEqual({ value: en });
+  });
+
+  it("falls back from Amharic to English, marked as English", () => {
+    expect(resolveTranslation({ en }, "am")).toEqual({ value: en, lang: "en" });
+  });
+
+  it("never presents Amharic as English", () => {
+    expect(resolveTranslation({ am }, "en")).toBeNull();
+    expect(resolveTranslation({}, "am")).toBeNull();
   });
 });
 

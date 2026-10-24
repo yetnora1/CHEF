@@ -1,10 +1,10 @@
 import { cacheLife } from "next/cache";
 import type { ComponentProps } from "react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/brand/wordmark";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./locale-switcher";
-import { HOME_SECTIONS } from "@/features/content/home-sections";
+import { siteNavigation } from "@/features/cms/navigation";
 
 async function currentYear() {
   "use cache";
@@ -21,8 +21,7 @@ export async function SiteFooter() {
   ]);
 
   const links: { key: string; href: ComponentProps<typeof Link>["href"]; label: string }[] = [
-    { key: "about", href: { pathname: "/", hash: HOME_SECTIONS.about }, label: tNav("about") },
-    { key: "services", href: { pathname: "/", hash: HOME_SECTIONS.services }, label: tNav("services") },
+    ...(await siteNavigation(await getLocale())).map((link) => ({ ...link, label: tNav(link.key) })),
     { key: "book", href: "/book", label: tNav("planEvent") },
     { key: "privacy", href: "/privacy", label: tNav("privacy") },
   ];

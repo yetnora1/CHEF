@@ -1,8 +1,8 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/brand/wordmark";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { HOME_SECTIONS } from "@/features/content/home-sections";
+import { siteNavigation } from "@/features/cms/navigation";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./locale-switcher";
 import { MobileNav, type NavLink } from "./mobile-nav";
@@ -11,10 +11,10 @@ export async function SiteHeader() {
   const t = await getTranslations("Navigation");
   const tBrand = await getTranslations("Brand");
 
-  const links: NavLink[] = [
-    { key: "about", href: { pathname: "/", hash: HOME_SECTIONS.about }, label: t("about") },
-    { key: "services", href: { pathname: "/", hash: HOME_SECTIONS.services }, label: t("services") },
-  ];
+  const links: NavLink[] = (await siteNavigation(await getLocale())).map((link) => ({
+    ...link,
+    label: t(link.key),
+  }));
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95">

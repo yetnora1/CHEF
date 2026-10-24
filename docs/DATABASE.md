@@ -31,6 +31,11 @@ services ──1:n── service_translations        bookings (private)
 | `20261025090000_booking_status_contacted.sql`         | Adds the `contacted` lifecycle step (own migration: a new enum value cannot be used in the transaction that adds it)                                                                                                                                                                                                                                                                                                   |
 | `20261025090100_inquiry_workflow.sql`                 | Inquiry columns, `booking_status_history`, `booking_notes`, `private.rate_limits`, `private.notification_outbox`, transition trigger, `submit_inquiry`, `consume_rate_limit`, outbox functions, admin functions (`list_bookings`, `get_booking_detail`, `booking_inbox_counts`, `booking_report`, `list_assignable_staff`, `change_booking_status`, `assign_booking`, `add_booking_note`), `service_role` restrictions |
 | `20261026090000_service_role_function_privileges.sql` | Revokes `service_role` EXECUTE on `get_my_access`, `assign_role`, `revoke_role` (left by Supabase's default privileges), so the secret key executes only the four inquiry functions                                                                                                                                                                                                                                    |
+| `20261027090000_content_review_status.sql`            | Adds `in_review` to `publication_status` (own migration, like `contacted`)                                                                                                                                                                                                                                                                                                                                             |
+| `20261027090100_cms_workflow_and_media.sql`           | Replaces the publish trigger (`in_review`; edits of live/archived rows need `content.publish`); `bump_version`, Amharic review and content-audit triggers; `media_assets`, `media_asset_translations` (+ upload lifecycle trigger); `services.image_id` and `version` columns; review columns on `service_translations`; revokes `service_role` on services                                                            |
+| `20261027090200_cms_content_types.sql`                | `dietary_tag` enum; `menu_categories`, `menu_items`, `gallery_items`, `journal_posts`, `pages` (seeded `home`, `about`), their translation tables, `page_images`; triggers, RLS, column grants for visitors                                                                                                                                                                                                            |
+| `20261027090300_cms_reads.sql`                        | Visibility helpers (`private.media_*`), staff reads (`cms_entries` view, `cms_list`, `cms_get`, `media_list`, `media_get`, `media_cleanup_candidates`), public reads (`public_page`, `public_services`, `public_service`, `public_menu`, `public_gallery`, `public_journal`, `public_journal_post`, `public_navigation`), EXECUTE grants                                                                               |
+| `20261027090400_cms_media_storage.sql`                | Private Storage bucket `media` (10 MB, JPEG/PNG/WebP) and four `storage.objects` policies ([MEDIA.md](MEDIA.md))                                                                                                                                                                                                                                                                                                       |
 
 ## Stage 2 additions
 
@@ -49,6 +54,32 @@ private.rate_limits   (bucket, window_start) → hits; hashed identifiers; expir
 - `service_role` (the secret key) has **no** table privileges on any booking table; it can only
   execute `submit_inquiry`, `consume_rate_limit`, `claim_notifications` and `complete_notification`.
 - Status and assignment cannot be updated directly by any API role; see [INQUIRIES.md](INQUIRIES.md).
+
+## Stage 3 additions (content management)
+
+```
+pages (key: home|about) ──1:n── page_translations (sections jsonb)     page_images (key, slot) → media_assets
+services ──1:n── service_translations                                  services.image_id → media_assets
+menu_categories ──1:n── menu_category_translations
+   └──1:n── menu_items (dietary_tags[], image_id) ──1:n── menu_item_translations
+gallery_items (asset_id, event_type) ──1:n── gallery_item_translations (caption)
+journal_posts (cover_image_id, published_at) ──1:n── journal_post_translations
+media_assets (storage_path, pending_path, status pending|ready, type, size, dimensions, title, credit)
+   └──1:n── media_asset_translations (alt_text)              storage.objects (bucket "media")
+```
+
+- Every content row has `status`, `version` (bumped by trigger; saves match on it), `created_at`,
+  `updated_at` and `updated_by` (stamped). Translation rows add `language_reviewed_at` /
+  `language_reviewed_by`, set only by the review trigger (Amharic) and always null for English.
+- References to media are `ON DELETE RESTRICT`: an image in use cannot be deleted. Content rows
+  cascade to their translations.
+- Staff read through `cms_list`, `cms_get`, `media_list` and `media_get` (SECURITY INVOKER, so RLS
+  applies); `media_cleanup_candidates` is SECURITY DEFINER and checks `media.write` itself. Visitors
+  read only through the `public_*` functions (also INVOKER) and column-level grants; the four
+  `private.media_*` visibility helpers are DEFINER so that policies can ask them. Details:
+  [CMS.md](CMS.md), [MEDIA.md](MEDIA.md).
+- `service_role` has no privileges on any content or media table (also revoked on `services` and
+  `service_translations`, finding F5).
 
 Conventions used by every table:
 
@@ -73,16 +104,14 @@ one is live; public reads return only published translations of published entiti
 applies the fallback policy in [LOCALIZATION.md](LOCALIZATION.md). Slugs are shared across locales
 (`/en/services/weddings`, `/am/services/weddings`).
 
-### How the remaining entities fit (later stages)
+### Remaining entities (later stages)
 
-| Entity                                   | Shape                                                                                                                                             | Stage |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `pages` / `page_translations`            | same pattern as services; structured sections as `jsonb` validated by Zod                                                                         | 3     |
-| `journal_posts` / `journal_translations` | same pattern + `published_at`, author, cover media                                                                                                | 3     |
-| `menu_items` / `menu_item_translations`  | same pattern + dietary tags, ordering, optional grouping                                                                                          | 3     |
-| `media_assets`                           | storage object path, bucket, mime type, dimensions, per-locale alt text, credit/licence, `visibility`                                             | 3     |
-| `site_settings`                          | single typed row of **non-secret** public settings (contact, social links, inquiry toggle) + translations for localized fields; `settings.manage` | 4     |
-| Storage buckets                          | `public-media` (published images, public read) and `private-media` (uploads, signed URLs); storage RLS mirrors `media.write`                      | 3     |
+| Entity          | Shape                                                                                                                                             | Stage |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `site_settings` | single typed row of **non-secret** public settings (contact, social links, inquiry toggle) + translations for localized fields; `settings.manage` | 4     |
+
+Stage 1 sketched two Storage buckets (`public-media`, `private-media`). Stage 3 uses one private
+bucket whose public read policy is derived from published usage instead ([ADR 0004](adr/0004-stage-3-cms.md) §3).
 
 ## Migration workflow
 
@@ -131,8 +160,9 @@ suite, applies `tests/integration/db/supabase-shim.sql` (API roles, `auth.uid()`
 the seed. Each query runs exactly as PostgREST would: inside a transaction, `SET LOCAL ROLE
 anon|authenticated`, with `request.jwt.claims` set.
 
-Limits: the shim is not the full Supabase platform (no GoTrue, PostgREST, Storage or Realtime), and
-production runs Postgres 17. The migrations use only SQL valid on both versions. When Docker is
+Limits: the shim is not the full Supabase platform (no GoTrue, PostgREST, Storage API or Realtime;
+`storage.buckets` and `storage.objects` are reduced copies that the Storage policies run against),
+and production runs Postgres 17. The migrations use only SQL valid on both versions. When Docker is
 available, also run the migrations on the real stack (`npm run supabase:start` / `npm run db:reset`)
 and `npm run db:lint`.
 

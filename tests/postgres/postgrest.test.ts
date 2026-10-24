@@ -70,6 +70,26 @@ const run = randomUUID().slice(0, 8);
 const U: Record<string, string> = {};
 const T: Record<string, string> = {};
 const inquiries: { reference: string; id: string; email: string }[] = [];
+const services: string[] = [];
+
+const CONTENT_TABLES = [
+  "pages",
+  "page_translations",
+  "page_images",
+  "services",
+  "service_translations",
+  "menu_categories",
+  "menu_category_translations",
+  "menu_items",
+  "menu_item_translations",
+  "gallery_items",
+  "gallery_item_translations",
+  "journal_posts",
+  "journal_post_translations",
+  "media_assets",
+  "media_asset_translations",
+];
+const representation = { Prefer: "return=representation" };
 
 async function submit(i: number) {
   const email = `customer-${run}-${i}@example.test`;
@@ -168,6 +188,7 @@ describe.skipIf(!configured)("PostgREST authorization (real HTTP API)", () => {
 
   afterAll(async () => {
     if (!owner) return;
+    await owner.query("delete from public.services where id = any($1::uuid[])", [services]);
     await owner.query("delete from public.bookings where id = any($1::uuid[])", [inquiries.map((i) => i.id)]);
     await owner.query("delete from auth.users where id = any($1::uuid[])", [Object.values(U)]);
     await owner.end();
@@ -590,6 +611,142 @@ describe.skipIf(!configured)("PostgREST authorization (real HTTP API)", () => {
         (await http("PATCH", "/audit_logs?id=gt.0", T.owner!, { action: "tampered.entry" })).body.code,
       ).toBe("42501");
       expect((await http("DELETE", "/audit_logs?id=gt.0", T.owner!)).body.code).toBe("42501");
+    });
+  });
+
+  describe("content (Stage 3)", () => {
+    it.each(CONTENT_TABLES)("visitors cannot read whole rows of %s", async (table) => {
+      const r = await http("GET", `/${table}?select=*`, ANON);
+      expect([r.status, r.body.code]).toEqual([401, "42501"]);
+    });
+
+    it.each(CONTENT_TABLES)("the server secret key has no access to %s", async (table) => {
+      const r = await http("GET", `/${table}?select=*`, SERVICE);
+      expect([r.status, r.body.code]).toEqual([403, "42501"]);
+    });
+
+    it("visitors call only the public read functions, and never write", async () => {
+      for (const [fn, fnArgs] of [
+        ["public_services", {}],
+        ["public_menu", {}],
+        ["public_gallery", {}],
+        ["public_navigation", {}],
+        ["public_page", { p_key: "home" }],
+        ["public_journal", { p_locale: "en", p_limit: 5, p_offset: 0 }],
+      ] as const)
+        expect((await rpc(fn, ANON, fnArgs)).status, fn).toBe(200);
+      for (const [fn, fnArgs] of [
+        ["cms_list", { p_type: "service" }],
+        ["cms_get", { p_type: "page", p_id: "home" }],
+        ["media_list", {}],
+        ["media_cleanup_candidates", {}],
+      ] as const) {
+        const r = await rpc(fn, ANON, fnArgs);
+        expect([r.status, r.body.code], fn).toEqual([401, "42501"]);
+      }
+      // Private helpers are not part of the Data API at all.
+      expect((await rpc("media_object_is_public", ANON, { p_name: "x" })).status).toBe(404);
+      for (const r of [
+        await http("POST", "/services", ANON, { slug: `anon-${run}` }),
+        await http("PATCH", "/pages?key=eq.home", ANON, { status: "published" }),
+        await http("POST", "/media_assets", ANON, { title: "x", pending_path: "x" }),
+      ])
+        expect([r.status, r.body.code]).toEqual([401, "42501"]);
+    });
+
+    it("an editor drafts and publishes with versioned writes; visitors see only the published result", async () => {
+      const slug = `http-${run}`;
+      const created = await http(
+        "POST",
+        "/services?select=id,version",
+        T.editor!,
+        { slug },
+        {
+          ...representation,
+          Accept: "application/vnd.pgrst.object+json",
+        },
+      );
+      expect(created.status, created.raw).toBe(201);
+      const id = created.body.id as string;
+      services.push(id);
+      const english = await http("POST", "/service_translations", T.editor!, {
+        service_id: id,
+        locale: "en",
+        title: `HTTP ${run}`,
+      });
+      expect(english.status, english.raw).toBe(201);
+
+      expect((await http("GET", `/services?select=id&slug=eq.${slug}`, ANON)).body).toEqual([]);
+      expect((await rpc("public_service", ANON, { p_slug: slug })).body).toBeNull();
+
+      const publishText = await http(
+        "PATCH",
+        `/service_translations?service_id=eq.${id}&locale=eq.en&version=eq.1&select=version`,
+        T.editor!,
+        { status: "published" },
+        representation,
+      );
+      expect(publishText.body).toEqual([{ version: 2 }]);
+      const publish = await http(
+        "PATCH",
+        `/services?id=eq.${id}&version=eq.${created.body.version}&select=version`,
+        T.editor!,
+        { status: "published" },
+        representation,
+      );
+      expect(publish.body).toEqual([{ version: created.body.version + 1 }]);
+      const stale = await http(
+        "PATCH",
+        `/services?id=eq.${id}&version=eq.${created.body.version}&select=version`,
+        T.editor!,
+        { sort_order: 5 },
+        representation,
+      );
+      expect(stale.body).toEqual([]);
+
+      expect((await http("GET", `/services?select=id,slug&slug=eq.${slug}`, ANON)).body).toEqual([
+        { id, slug },
+      ]);
+      expect((await rpc("public_service", ANON, { p_slug: slug })).body).toMatchObject({ slug });
+
+      const amharic = await http("POST", "/service_translations", T.editor!, {
+        service_id: id,
+        locale: "am",
+        title: "ሙከራ",
+        status: "published",
+      });
+      expect([amharic.status, amharic.body.code, amharic.body.hint]).toEqual([
+        400,
+        "P0001",
+        "review_required",
+      ]);
+    });
+
+    it("event managers and analysts see no drafts and cannot write content", async () => {
+      const draft = await http(
+        "POST",
+        "/services?select=id",
+        T.editor!,
+        { slug: `draft-${run}` },
+        {
+          ...representation,
+          Accept: "application/vnd.pgrst.object+json",
+        },
+      );
+      expect(draft.status, draft.raw).toBe(201);
+      services.push(draft.body.id);
+      for (const token of [T.manager1!, T.analyst!]) {
+        // Like visitors: signed-in accounts share the public read policy, so published entries only.
+        const list = await rpc("cms_list", token, { p_type: "service", p_limit: 100 });
+        expect(list.status, list.raw).toBe(200);
+        expect(list.body.map((row: { id: string }) => row.id)).not.toContain(draft.body.id);
+        expect(list.body.every((row: { status: string }) => row.status === "published")).toBe(true);
+        expect((await rpc("cms_get", token, { p_type: "service", p_id: draft.body.id })).body).toBeNull();
+        const write = await http("POST", "/services", token, { slug: `staff-${run}` });
+        expect([write.status, write.body.code]).toEqual([403, "42501"]);
+        const media = await http("POST", "/media_assets", token, { title: "x", pending_path: "x" });
+        expect([media.status, media.body.code]).toEqual([403, "42501"]);
+      }
     });
   });
 });

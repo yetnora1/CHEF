@@ -59,3 +59,41 @@ as $$
     nullif(current_setting('request.jwt.claims', true), '')
   )::jsonb
 $$;
+
+-- Supabase Storage tables our policies apply to (a subset of the real columns).
+-- The Storage API inserts, reads and deletes these rows as the caller's role,
+-- so RLS on storage.objects decides who may upload, read and remove files;
+-- tests do the same SQL directly.
+create schema storage;
+grant usage on schema storage to anon, authenticated, service_role;
+
+create table storage.buckets (
+  id text primary key,
+  name text not null unique,
+  owner uuid,
+  public boolean not null default false,
+  file_size_limit bigint,
+  allowed_mime_types text[],
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table storage.objects (
+  id uuid primary key default gen_random_uuid(),
+  bucket_id text references storage.buckets (id),
+  name text,
+  owner uuid,
+  owner_id text,
+  metadata jsonb,
+  user_metadata jsonb,
+  version text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  last_accessed_at timestamptz default now(),
+  path_tokens text[] generated always as (string_to_array(name, '/')) stored,
+  constraint bucketid_objname unique (bucket_id, name)
+);
+
+alter table storage.buckets enable row level security;
+alter table storage.objects enable row level security;
+grant all on table storage.buckets, storage.objects to anon, authenticated, service_role;

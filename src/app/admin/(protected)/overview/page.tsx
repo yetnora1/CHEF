@@ -24,7 +24,8 @@ export default async function AdminOverviewPage() {
 
   const { session } = decision;
   const [t, tRoles] = await Promise.all([getTranslations("Admin"), getTranslations("Roles")]);
-  const modules = modulesFor(session.permissions).filter((module) => module.status === "planned");
+  // Every module this role can use (built ones link to it), except this page itself.
+  const modules = modulesFor(session.permissions).filter((module) => module.key !== "overview");
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -60,23 +61,37 @@ export default async function AdminOverviewPage() {
           <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {modules.map((module) => {
               const Icon = ADMIN_MODULE_ICONS[module.key];
+              const planned = module.status === "planned";
+              const description = module.key === "overview" ? null : t(`moduleDescriptions.${module.key}`);
               return (
                 <li
                   key={module.key}
-                  className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5"
+                  className="relative flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 transition-colors has-[a:hover]:border-border-strong"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="inline-flex size-10 items-center justify-center rounded-xl bg-surface-muted text-accent-ink">
                       <Icon aria-hidden className="size-5" />
                     </span>
-                    <span className="rounded-full border border-border px-2 py-0.5 text-xs font-semibold text-muted-foreground">
-                      {t("plannedBadge")}
-                    </span>
+                    {planned && (
+                      <span className="rounded-full border border-border px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+                        {t("plannedBadge")}
+                      </span>
+                    )}
                   </div>
-                  <h3 className="font-semibold">{t(`modules.${module.key}`)}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {module.key === "overview" ? null : t(`moduleDescriptions.${module.key}`)}
-                  </p>
+                  <h3 className="font-semibold">
+                    {planned ? (
+                      t(`modules.${module.key}`)
+                    ) : (
+                      // The whole card is the link's target area.
+                      <Link
+                        href={module.href}
+                        className="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ring"
+                      >
+                        {t(`modules.${module.key}`)}
+                      </Link>
+                    )}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{description}</p>
                 </li>
               );
             })}

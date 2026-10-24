@@ -1,3 +1,4 @@
+import { parse, TYPE, type MessageFormatElement } from "@formatjs/icu-messageformat-parser";
 import { describe, expect, it } from "vitest";
 import am from "@/messages/am.json";
 import en from "@/messages/en.json";
@@ -24,8 +25,27 @@ const SAME_IN_BOTH = new Set(["Metadata.siteName"]);
 // punctuation the Amharic catalogue legitimately contains (brand name, env vars).
 const SUPPORTED_AMHARIC_CHARS = /^[ሀ-፿ᎀ-᎟ⶀ-⷟꬀-꬯ -~ ©–—’…·]*$/u;
 
-const placeholders = (s: string) => [...s.matchAll(/\{(\w+)[^}]*\}/g)].map((m) => m[1]).sort();
-const tags = (s: string) => [...s.matchAll(/<(\w+)>/g)].map((m) => m[1]).sort();
+// Parsed with the ICU grammar next-intl uses, so plural/select branch text such
+// as `{Used in # places}` is not mistaken for an argument, arguments and tags
+// nested inside branches are compared too, and a malformed message fails here.
+function icuParts(message: string) {
+  const parts = { placeholders: [] as string[], tags: [] as string[] };
+  const walk = (elements: MessageFormatElement[]) => {
+    for (const element of elements) {
+      if (element.type === TYPE.tag) {
+        parts.tags.push(element.value);
+        walk(element.children);
+      } else if (element.type === TYPE.plural || element.type === TYPE.select) {
+        parts.placeholders.push(element.value);
+        for (const option of Object.values(element.options)) walk(option.value);
+      } else if ("value" in element && element.type !== TYPE.literal) {
+        parts.placeholders.push(element.value);
+      }
+    }
+  };
+  walk(parse(message));
+  return { placeholders: [...new Set(parts.placeholders)].sort(), tags: parts.tags.sort() };
+}
 
 describe("interface messages", () => {
   it("define exactly the same keys in English and Amharic", () => {
@@ -38,9 +58,10 @@ describe("interface messages", () => {
 
   it("use the same ICU placeholders and rich-text tags in both languages", () => {
     for (const [key, value] of enMessages) {
-      const translated = amMessages.get(key)!;
-      expect(placeholders(translated), key).toEqual(placeholders(value));
-      expect(tags(translated), key).toEqual(tags(value));
+      const source = icuParts(value);
+      const translated = icuParts(amMessages.get(key)!);
+      expect(translated.placeholders, key).toEqual(source.placeholders);
+      expect(translated.tags, key).toEqual(source.tags);
     }
   });
 

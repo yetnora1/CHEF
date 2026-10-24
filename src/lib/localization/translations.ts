@@ -31,3 +31,18 @@ export function resolveLocalized(values: Localized<string>, requested: AppLocale
   }
   return null;
 }
+
+/**
+ * The same policy for a whole translation record (e.g. a published service in
+ * each language): the requested language, else English, else nothing.
+ */
+export function resolveTranslation<T>(
+  values: Partial<Record<AppLocale, T>>,
+  requested: AppLocale,
+): { value: T; lang?: AppLocale } | null {
+  for (const locale of [requested, ...FALLBACKS[requested]]) {
+    const value = values[locale];
+    if (value) return locale === requested ? { value } : { value, lang: locale };
+  }
+  return null;
+}

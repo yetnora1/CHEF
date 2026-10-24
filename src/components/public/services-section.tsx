@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-image";
+import { Link } from "@/i18n/navigation";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { PhotoSlot } from "./photo-slot";
@@ -9,6 +11,9 @@ export type ServiceCard = {
   summary: ResolvedText;
   photoSubject: ResolvedText;
   confirmed: boolean;
+  /** Published services link to their page and may have an image. */
+  href?: string;
+  image?: ImageView | null;
 };
 
 type ServicesSectionProps = {
@@ -39,16 +44,31 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
           </p>
         </div>
 
-        {/* Service detail pages arrive with the CMS stage; cards are not links until then. */}
+        {/* Placeholder cards are not links; published services link to their page. */}
         <ul className="mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service, index) => (
-            <li key={service.slug} className="flex flex-col">
-              <PhotoSlot subject={service.photoSubject} className="aspect-[4/3] w-full" />
+            <li key={service.slug} className="relative flex flex-col">
+              {service.image ? (
+                <div className="aspect-[4/3] w-full overflow-hidden rounded-[1.75rem] bg-surface-muted">
+                  <CmsImage
+                    image={service.image}
+                    sizes="(min-width: 64rem) 18rem, (min-width: 40rem) 50vw, 100vw"
+                  />
+                </div>
+              ) : (
+                <PhotoSlot subject={service.photoSubject} className="aspect-[4/3] w-full" />
+              )}
               <p aria-hidden className="mt-6 font-display text-sm text-accent-ink tabular-nums">
                 {String(index + 1).padStart(2, "0")}
               </p>
               <h3 className="mt-2 display-md" lang={service.title.lang}>
-                {service.title.text}
+                {service.href ? (
+                  <Link href={service.href} className="after:absolute after:inset-0 hover:underline">
+                    {service.title.text}
+                  </Link>
+                ) : (
+                  service.title.text
+                )}
               </h3>
               <p className="mt-3 text-sm text-muted-foreground" lang={service.summary.lang}>
                 {service.summary.text}

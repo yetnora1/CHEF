@@ -1,4 +1,7 @@
-# Stage 2.5 verification: real database and integration gate
+# Verification: real database and integration gates
+
+Sections 1–10 record the Stage 2.5 gate (inquiries). Section [11](#11-stage-3-cms) records Stage 3
+(content management and media).
 
 Date: 2026-10-24 · Baseline: `48ad955` (Stage 2) · Branch: `stage-2.5-verification`
 
@@ -286,12 +289,96 @@ were narrow and are fixed. Supabase Auth, the hosted project's settings, Storage
 Turnstile and real email delivery have **not** been verified. They are launch blockers, and Storage is
 a blocker for the media part of Stage 3.
 
+## 11. Stage 3 (CMS)
+
+Date: 2026-10-24 · Baseline: `6cf5b4b` (Stage 2.5) · Branch: `stage-3-cms` · Design: [CMS.md](CMS.md),
+[MEDIA.md](MEDIA.md), [ADR 0004](adr/0004-stage-3-cms.md)
+
+**Conditions C1 and C4 (§8) were still not met**: there is no Supabase project dedicated to this
+application, and Docker is not installed. A database offered during this stage turned out to hold
+another application's live data; it was inspected read-only, nothing was applied or written, and it
+is not used or referenced anywhere in this repository. Everything below therefore ran on PGlite, the throwaway PostgreSQL
+17 cluster and PostgREST 14 of §2, and the Supabase test double. **Nothing was verified against
+Supabase Auth, the Storage API or a hosted project.**
+
+### Integration matrix
+
+| Area                                                                                     | Real Supabase | Local real                                                                          | Mocked                                           |
+| ---------------------------------------------------------------------------------------- | :-----------: | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Stage 3 migrations apply with the Supabase CLI as a non-superuser                        |  not tested   | ✅ Real PG17 (`supabase db push`, with a Supabase-like `storage` schema, see below) | ✅ PGlite                                        |
+| Deployed catalog equals the repository (now including Storage)                           |  not tested   | ✅ Real PG17 (`npm run db:compare`)                                                 | —                                                |
+| Workflow, publish rules per role, Amharic review gate, audit, staff and public reads     |  not tested   | ✅ Real PG17                                                                        | ✅ PGlite                                        |
+| Content and media tables, CMS functions over HTTP (visitor, secret key, staff roles)     |  not tested   | ✅ Real PostgREST                                                                   | ✅ test double                                   |
+| `storage.objects` policies (reserved uploads, no overwrite, public only while published) |  not tested   | ✅ Real PG17 with a reduced `storage.objects`                                       | ✅ PGlite, test double                           |
+| Storage API (upload, download, remove, bucket limits)                                    |  not tested   | not tested                                                                          | ✅ test double (rows under the real policies)    |
+| Policy creation on hosted `storage.objects` (platform policy grants)                     |  not tested   | approximated (owner role membership)                                                | —                                                |
+| Admin UI flows (editing, review gate, conflicts, uploads, image visibility, preview)     |  not tested   | —                                                                                   | ✅ e2e on the dev server against the test double |
+| Public CMS pages without a database (empty states, 404s, `noindex`, navigation)          |       —       | ✅ production build                                                                 | —                                                |
+| Image optimiser and caches with real Storage                                             |  not tested   | —                                                                                   | dev server only                                  |
+
+The `storage` schema on Real PG17 is a reduced copy of Supabase's (`buckets`, `objects` with the
+columns the policies use), owned by `supabase_storage_admin` as on hosted projects. There `postgres`
+creates policies through the platform's policy grants; on Real PG17 it is a member of
+`supabase_storage_admin` instead, so policy creation on hosted Supabase remains a manual check
+([MEDIA.md](MEDIA.md#hosted-supabase-checklist)).
+
+### Results
+
+| Command                                                       | Outcome                                                                                                                                                                |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run format:check`                                        | pass                                                                                                                                                                   |
+| `npm run verify`                                              | pass: lint, typecheck, **438/438** Vitest (25 files), client-bundle secret scan (430 browser files)                                                                    |
+| `npm run test:e2e`                                            | **65/65** (13 new CMS specs, 4 new public-page specs)                                                                                                                  |
+| `supabase db push --db-url <Real PG17>` (dry run, then apply) | exactly the 5 Stage 3 migrations, applied in order                                                                                                                     |
+| `npm run db:compare` (Real PG17)                              | matches: 11 migrations, 24 tables, 85 policies, 81 table and 217 column privileges, 58 functions, 76 triggers, 9 enums; Storage RLS, 4 policies and the `media` bucket |
+| `npm run test:db:pg` with the PostgREST suite (Real PG17)     | **249/249**: DB suites 160, concurrency 9, PostgREST HTTP 80 (47 before this stage)                                                                                    |
+| PostgREST OpenAPI as a visitor                                | 24 paths; no `private` objects; of the CMS functions only the eight `public_*` reads                                                                                   |
+
+### Findings
+
+| #   | Severity            | Finding                                                                                                                                                                                                                                                    | Status                                                                                 |
+| --- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| F13 | Low                 | Admin forms remounted after every save (keyed by version), dropping the "Saved." confirmation; a form could also keep an older version after a status change and report a false conflict                                                                   | **Fixed** before commit (newest known version is sent); e2e covers saves and conflicts |
+| F14 | Low (accessibility) | The image picker button took its accessible name from the field label ("Image") instead of its action; interface labels were marked `lang="am"`; English titles in the Amharic admin were not marked `lang="en"`; optional labels read "Summary(optional)" | **Fixed** before commit                                                                |
+| F15 | Low                 | Media cleanup counted Storage removals that RLS had skipped                                                                                                                                                                                                | **Fixed**: counts the objects Storage reports as removed                               |
+| F16 | Informational       | First request for a slug without a prerendered page returns `200` with the not-found page and `noindex` (the prerendered shell streams first); later requests get `404`                                                                                    | Accepted and documented (CMS.md); a real 404 would need a proxy lookup                 |
+| F17 | Informational       | Images may stay in browser, CDN or image-optimiser caches for up to 5 minutes after unpublishing                                                                                                                                                           | Accepted and documented; replacement gives a new name (MEDIA.md)                       |
+| F18 | Informational       | Visitors (`anon`) need USAGE on the `private` schema for the Storage and visibility policies; EXECUTE is limited to four helpers and the Data API does not expose `private` (confirmed over HTTP)                                                          | By design; pinned by `schema.test.ts`                                                  |
+| F19 | Informational       | Signed-in accounts without content permissions read published entries through the staff list function, with their timestamps and versions (the public read policy applies to `authenticated`; same class as the `updated_by` gap in SECURITY_MODEL.md)     | Acceptable while sign-up is disabled                                                   |
+| F20 | Test infrastructure | The message-parity test read plural-branch text such as `{Used in # places}` as a placeholder                                                                                                                                                              | Test now parses ICU messages (stricter: nested arguments, malformed messages)          |
+
+F5 (`service_role` table privileges) is resolved for every content table; `profiles` remains (work
+item W10).
+
+### What the owner must do (Stage 3)
+
+- **S1.** Meet C1 (a dedicated dev project or the local stack), then `supabase db push` (dry run
+  first: the 11 migrations, or the 5 Stage 3 ones on top of an existing Stage 2.5 project) and
+  `npm run db:compare`; it now also checks Storage policies and the bucket.
+- **S2.** Run C2 (the HTTP suite now includes the CMS checks) against that project.
+- **S3.** Work through [MEDIA.md](MEDIA.md#hosted-supabase-checklist) (bucket, policies, behaviour).
+- **S4.** Sign in as a `content_editor` test account and try the editorial flow: draft, Amharic review
+  gate, publish, preview, upload, unpublish (the image must stop being served).
+- **S5.** Native-speaker review of the Amharic interface strings (about 340 new in this stage) and
+  of any Amharic content before it is confirmed as reviewed.
+
+### Work items
+
+| ID  | Item                                                                                                    | When           |
+| --- | ------------------------------------------------------------------------------------------------------- | -------------- |
+| W9  | Run the CMS e2e specs against a real Supabase environment (Auth and Storage) instead of the test double | After S1       |
+| W10 | Revoke `service_role` on `profiles` once nothing server-side needs it                                   | Stage 4        |
+| W11 | Optional: a proxy-level slug check if first-request soft 404s matter for analytics (F16)                | Only if needed |
+
 ## Reproducing the local verification
 
 - `npm run test:db:pg` needs `TEST_POSTGRES_URL`: a superuser URL of a disposable local PostgreSQL
   15+ server (17 recommended). It creates and drops its own `chief_test_*` databases and runs
   migrations as a non-superuser owner. Add the `TEST_POSTGREST_*` variables to include the HTTP suite.
 - `npm run db:compare` with `DEPLOYED_DATABASE_URL` is read-only.
+- Stage 3 on Real PG17: create the reduced `storage` schema (the `storage` part of
+  `tests/integration/db/supabase-shim.sql`, owned by a `supabase_storage_admin` role that `postgres`
+  is a member of) before `supabase db push`; a Supabase project already has it.
 - The real-stack app runs (gateway with simulated Auth, Playwright configurations) were throwaway
   tooling outside the repository; with a Supabase environment, the repository's own e2e specs can
   instead run against real Auth.

@@ -4,17 +4,18 @@
 
 One Next.js 16 application serves two products with separate root layouts:
 
-|                 | Public website                                                                         | Admin application                                                  |
-| --------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| URL space       | `/en/…`, `/am/…`                                                                       | `/admin/…`                                                         |
-| Root layout     | `src/app/[locale]/layout.tsx`                                                          | `src/app/admin/layout.tsx`                                         |
-| Language source | URL segment (`next/root-params`)                                                       | `NEXT_LOCALE` cookie                                               |
-| Rendering       | Static prerender (Cache Components); CMS pages will use `use cache` + tag revalidation | Dynamic, per request; blocks until authorized (`instant = false`)  |
-| Data access     | Public reads only (published content)                                                  | Signed-in staff, permission-checked on the server, enforced by RLS |
-| Design language | Expressive, editorial                                                                  | Restrained, operational                                            |
+|                 | Public website                                                             | Admin application                                                  |
+| --------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| URL space       | `/en/…`, `/am/…`                                                           | `/admin/…`                                                         |
+| Root layout     | `src/app/[locale]/layout.tsx`                                              | `src/app/admin/layout.tsx`                                         |
+| Language source | URL segment (`next/root-params`)                                           | `NEXT_LOCALE` cookie                                               |
+| Rendering       | Cache Components; CMS content read in `'use cache'` functions tagged `cms` | Dynamic, per request; blocks until authorized (`instant = false`)  |
+| Data access     | Published content only, through a session-less publishable-key client      | Signed-in staff, permission-checked on the server, enforced by RLS |
+| Design language | Expressive, editorial                                                      | Restrained, operational                                            |
 
 There is no separate backend service. Trusted logic runs in Server Components, Server Actions and
-(later) Route Handlers; Postgres Row Level Security is the final authority over data.
+Route Handlers (media upload and delivery, the email-retry job); Postgres Row Level Security and
+Storage policies are the final authority over data and files.
 
 ## Request flow
 
@@ -51,42 +52,50 @@ Supabase (PostgREST + Postgres)
 
 ## Route map
 
-Implemented in Stage 1 are marked ✅. Planned routes are documented here and are **not** stubbed
-with placeholder pages; unknown paths return a localized 404.
+Implemented routes are marked ✅. Planned routes are documented here and are **not** stubbed with
+placeholder pages; unknown paths return a localized 404.
 
 ### Public (`/[locale]`, locale ∈ `en`, `am`)
 
-| Route                                    | Purpose                       | Status                                                       |
-| ---------------------------------------- | ----------------------------- | ------------------------------------------------------------ |
-| `/[locale]`                              | Homepage                      | ✅ (placeholder content)                                     |
-| `/[locale]/about`                        | Chef biography and philosophy | Stage 3 (homepage `#about` for now)                          |
-| `/[locale]/services`, `/services/[slug]` | Service overview and details  | Stage 3 (homepage `#services` for now)                       |
-| `/[locale]/menu`                         | Curated menu                  | Stage 3                                                      |
-| `/[locale]/gallery`                      | Culinary and event portfolio  | Stage 3                                                      |
-| `/[locale]/journal`, `/journal/[slug]`   | Articles                      | Stage 3                                                      |
-| `/[locale]/book`                         | Event inquiry form            | ✅ Stage 2 (fails closed until configured; see INQUIRIES.md) |
-| `/[locale]/contact`                      | Contact page                  | Stage 3 (needs confirmed contact details)                    |
-| `/[locale]/privacy`                      | Privacy notice                | ✅ Stage 2 (draft for owner and legal review)                |
-| `/[locale]/terms`                        | Terms                         | Later stage (needs business terms)                           |
-| `/`                                      | Redirect to preferred locale  | ✅                                                           |
+| Route                                    | Purpose                       | Status                                                                  |
+| ---------------------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
+| `/[locale]`                              | Homepage                      | ✅ published CMS sections and services; labelled placeholders otherwise |
+| `/[locale]/about`                        | Chef biography and philosophy | ✅ Stage 3 (404 until published)                                        |
+| `/[locale]/services`, `/services/[slug]` | Service overview and details  | ✅ Stage 3                                                              |
+| `/[locale]/menu`                         | Curated menu                  | ✅ Stage 3                                                              |
+| `/[locale]/gallery`                      | Culinary and event portfolio  | ✅ Stage 3                                                              |
+| `/[locale]/journal`, `/journal/[slug]`   | Articles                      | ✅ Stage 3                                                              |
+| `/[locale]/book`                         | Event inquiry form            | ✅ Stage 2 (fails closed until configured; see INQUIRIES.md)            |
+| `/[locale]/contact`                      | Contact page                  | Later stage (needs confirmed contact details)                           |
+| `/[locale]/privacy`                      | Privacy notice                | ✅ Stage 2 (draft for owner and legal review)                           |
+| `/[locale]/terms`                        | Terms                         | Later stage (needs business terms)                                      |
+| `/`                                      | Redirect to preferred locale  | ✅                                                                      |
+| `/media/assets/<id>/<file>`              | Images of published content   | ✅ Stage 3 ([MEDIA.md](MEDIA.md))                                       |
 
-Navigation only links to destinations that exist. Until the dedicated pages ship, the header and
-footer link to homepage sections (`src/features/content/home-sections.ts`).
+Navigation only links to destinations that have something to show (`src/features/cms/navigation.ts`):
+About and Services link to their pages once published content exists, otherwise to the homepage
+sections; Menu, Gallery and Journal appear only once something is published. Empty list pages show
+an empty state and are `noindex`.
 
 ### Admin (`/admin`, no locale prefix)
 
-| Route                                              | Required permission                             | Status                                           |
-| -------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------ |
-| `/admin`                                           | → `/admin/overview`                             | ✅                                               |
-| `/admin/login`                                     | public                                          | ✅                                               |
-| `/admin/overview`                                  | `admin.access`                                  | ✅                                               |
-| `/admin/bookings`, `/admin/bookings/[reference]`   | `bookings.read_all` or `bookings.read_assigned` | ✅ Stage 2 (inquiries and bookings in one inbox) |
-| `/admin/services`, `/menu`, `/gallery`, `/journal` | `content.read` (+ `content.write` to edit)      | Stage 3                                          |
-| `/admin/media`                                     | `media.write`                                   | Stage 3                                          |
-| `/admin/translations`                              | `translations.write`                            | Stage 3                                          |
-| `/admin/users`                                     | `users.read` (+ `users.manage[_privileged]`)    | Stage 4                                          |
-| `/admin/settings`                                  | `settings.manage`                               | Stage 4                                          |
-| `/admin/audit-log`                                 | `audit.read`                                    | Stage 4                                          |
+| Route                                                        | Required permission                                             | Status                                           |
+| ------------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------ |
+| `/admin`                                                     | → `/admin/overview`                                             | ✅                                               |
+| `/admin/login`                                               | public                                                          | ✅                                               |
+| `/admin/overview`                                            | `admin.access`                                                  | ✅                                               |
+| `/admin/bookings`, `/admin/bookings/[reference]`             | `bookings.read_all` or `bookings.read_assigned`                 | ✅ Stage 2 (inquiries and bookings in one inbox) |
+| `/admin/pages`, `/services`, `/menu`, `/gallery`, `/journal` | `content.read` (create: `content.write` + `translations.write`) | ✅ Stage 3 ([CMS.md](CMS.md))                    |
+| `/admin/preview/[type]/[id]`                                 | `content.read`                                                  | ✅ Stage 3 (drafts, never cached or indexed)     |
+| `/admin/media`, `/admin/media/[id]`                          | `media.write`                                                   | ✅ Stage 3                                       |
+| `/admin/media/[id]/file` (Route Handler)                     | `content.read` or `media.write`                                 | ✅ Stage 3                                       |
+| `/admin/translations`                                        | `translations.write`                                            | ✅ Stage 3                                       |
+| `/admin/users`                                               | `users.read` (+ `users.manage[_privileged]`)                    | Stage 4                                          |
+| `/admin/settings`                                            | `settings.manage`                                               | Stage 4                                          |
+| `/admin/audit-log`                                           | `audit.read`                                                    | Stage 4                                          |
+
+Route Handlers under `/api` (outside the proxy): `POST /api/admin/media` (upload; same-origin check,
+then `media.write`) and `/api/internal/notifications` (email retries, `CRON_SECRET`).
 
 The registry in `src/features/admin/modules.ts` drives navigation; planned modules render as
 non-interactive "Planned" items for roles that will be able to use them.
@@ -98,9 +107,11 @@ becomes the default in the next major. Consequences:
 
 - Public pages prerender to static HTML per locale (`generateStaticParams` in the locale layout).
   Request-time APIs (`cookies()`, `headers()`) are not used on public pages.
-- The CMS stage will read published content inside `use cache` functions tagged per entity and
-  call `updateTag()`/`revalidateTag()` from admin server actions, so editors' changes appear
-  without redeploying.
+- Published content is read inside `'use cache'` functions (`src/features/cms/public-data.ts`)
+  tagged `cms`. Admin server actions call `updateTag('cms')` and the upload route
+  `revalidateTag('cms', { expire: 0 })`, so editors' changes appear on the next request without a
+  redeploy; otherwise entries refresh hourly, and failed reads are retried within minutes. Pages
+  with slugs render on demand and are cached the same way. Details: [CMS.md](CMS.md#caching).
 - Admin routes read the session and language cookie on every request and set
   `export const instant = false` (blocking by design: nothing renders before authorization).
   `getStaffSession()` calls `connection()` to opt out of prerendering explicitly.
@@ -114,20 +125,22 @@ becomes the default in the next major. Consequences:
 - `src/lib/**` holds framework-agnostic infrastructure (auth, Supabase clients, permissions).
   Modules that must never reach the browser import `server-only`.
 - Business content is separate from interface strings: `src/messages/*.json` is interface text
-  only; business copy lives in the database (Stage 3) or, for now, `src/features/content/`.
+  only; business copy lives in the database (CMS). `src/features/content/` keeps the labelled
+  homepage placeholders shown until a section is published.
 
 ## Testing strategy
 
-| Layer         | Tool                                                               | What it proves                                                                                                                                                                                                                                                                                                                                            |
-| ------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit          | Vitest                                                             | Redirect safety, access decisions, config/secret-key guard, fallback policy, message parity and Ethiopic coverage, WCAG contrast of tokens, theme script, module visibility; inquiry validation, fail-closed configuration, Turnstile verifier, rate-limit buckets, submission pipeline, email templates and outbox delivery                              |
-| Database      | Vitest + PGlite (Postgres 18 in-process) + Supabase auth shim      | Every migration applies; RLS is enabled everywhere; grants are least-privilege; each role's reads/writes; role-management rules; audit log immutability; DB permission matrix equals `src/lib/permissions/matrix.ts`; inquiry submission, idempotency, rate limits, lifecycle (DB rules equal `status.ts`), assignment, notes, reporting, outbox, erasure |
-| End-to-end    | Playwright                                                         | Locale routing, Amharic fonts, theme, keyboard/mobile, security headers, admin and inquiry form fail closed when unconfigured; with the Supabase test double (simulated Auth, **real SQL on PGlite**): sign-in and roles, inquiry submission, validation, retries, rate limiting, inert markup, staff workflow per role                                   |
-| Real database | Vitest + PostgreSQL 15+ (`npm run test:db:pg`), optional PostgREST | The database suites on a real server with migrations run by a non-superuser; concurrency (rate limits, idempotency, outbox, role and status races); opt-in: the Data API over HTTP per role                                                                                                                                                               |
-| Build output  | `scripts/check-client-bundle.mjs`                                  | Server-only secrets never appear in browser-delivered files                                                                                                                                                                                                                                                                                               |
+| Layer         | Tool                                                                      | What it proves                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit          | Vitest                                                                    | Redirect safety, access decisions, config/secret-key guard, fallback policy, message parity (ICU-parsed) and Ethiopic coverage, WCAG contrast of tokens, theme script, module visibility; inquiry validation, fail-closed configuration, Turnstile verifier, rate-limit buckets, submission pipeline, email templates and outbox delivery; CMS formatting parser and link safety, form parsing, error mapping, registry labels, public view fallback, image validation and re-encoding, upload CSRF guard |
+| Database      | Vitest + PGlite (Postgres 18 in-process) + Supabase auth and Storage shim | Every migration applies; RLS is enabled everywhere; grants are least-privilege; each role's reads/writes; role-management rules; audit log immutability; DB permission matrix equals `src/lib/permissions/matrix.ts`; inquiry submission, idempotency, rate limits, lifecycle (DB rules equal `status.ts`), assignment, notes, reporting, outbox, erasure; CMS workflow, Amharic review, visitor isolation, media lifecycle and `storage.objects` policies, content audit, registry ↔ schema              |
+| End-to-end    | Playwright                                                                | Locale routing, Amharic fonts, theme, keyboard/mobile, security headers, admin, inquiry form and CMS pages without a database; with the Supabase test double (simulated Auth, **real SQL on PGlite**, Storage rows under real policies): sign-in and roles, inquiry submission and staff workflow, CMS editing, publishing, preview, Amharic review, conflicts, inert markup, uploads and image visibility                                                                                                |
+| Real database | Vitest + PostgreSQL 15+ (`npm run test:db:pg`), optional PostgREST        | The database suites on a real server with migrations run by a non-superuser; concurrency (rate limits, idempotency, outbox, role and status races); opt-in: the Data API over HTTP per role                                                                                                                                                                                                                                                                                                               |
+| Build output  | `scripts/check-client-bundle.mjs`                                         | Server-only secrets never appear in browser-delivered files                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 None of these layers is a real Supabase stack: PGlite, plain PostgreSQL, standalone PostgREST and
-the test double do not prove GoTrue, Supabase's gateway, Storage or hosted-project configuration.
+the test double do not prove GoTrue, Supabase's gateway, the Storage API or hosted-project
+configuration (the double reproduces Storage's `storage.objects` row checks, not the service).
 Real-Supabase integration tests are pending until Docker (or a hosted test project) is available;
 see [VERIFICATION.md](VERIFICATION.md).
 

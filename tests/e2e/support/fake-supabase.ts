@@ -5,11 +5,15 @@
  *
  *  - Auth (GoTrue): password sign-in, refresh, user lookup and sign-out for a
  *    fixed set of test accounts.
- *  - Data API (PostgREST): RPC calls only, executed against PGlite (real
- *    Postgres) with every migration and the seed applied. Each call runs, as
- *    PostgREST would, in its own transaction as `anon`, `authenticated` (with
- *    JWT claims) or `service_role` (secret key). RLS, grants, triggers and the
- *    SQL functions are therefore the real ones.
+ *  - Data API (PostgREST): RPC calls, and inserts, updates and deletes on
+ *    tables filtered by equality (all the CMS uses), executed against PGlite
+ *    (real Postgres) with every migration and the seed applied. Each call runs,
+ *    as PostgREST would, in its own transaction as `anon`, `authenticated`
+ *    (with JWT claims) or `service_role` (secret key). RLS, grants, triggers
+ *    and the SQL functions are therefore the real ones.
+ *  - Storage: upload, download and remove. Like the Storage API, it writes,
+ *    reads and deletes storage.objects rows as the caller's role, so the
+ *    bucket's RLS policies decide; file bytes are kept in memory.
  *
  * It is NOT GoTrue or PostgREST: token formats, headers and error shapes are
  * simplified. Nothing in src/ knows it exists; the app reaches it only through
@@ -19,7 +23,7 @@ import { createHmac, randomBytes } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import path from "node:path";
-import { PGlite } from "@electric-sql/pglite";
+import { PGlite, type Transaction } from "@electric-sql/pglite";
 
 export const FAKE_SUPABASE_PORT = 54399;
 export const FAKE_SUPABASE_URL = `http://127.0.0.1:${FAKE_SUPABASE_PORT}`;
@@ -130,22 +134,48 @@ function send(res: ServerResponse, status: number, body?: unknown) {
     "X-Supabase-Api-Version": "2024-01-01",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
     // auth-js reads the API version header to interpret error codes.
     "Access-Control-Expose-Headers": "X-Supabase-Api-Version",
   });
   res.end(body === undefined ? undefined : JSON.stringify(body));
 }
 
-async function readJson(req: IncomingMessage): Promise<Record<string, unknown>> {
+async function readBody(req: IncomingMessage): Promise<Buffer> {
   const chunks: Buffer[] = [];
   for await (const chunk of req) chunks.push(chunk as Buffer);
+  return Buffer.concat(chunks);
+}
+
+async function readJson(req: IncomingMessage): Promise<Record<string, unknown>> {
   try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+    return JSON.parse((await readBody(req)).toString("utf8") || "{}");
   } catch {
     return {};
   }
 }
+
+/** Runs `work` in one transaction as the caller's database role, with JWT claims. */
+function asCaller<T>(db: PGlite, caller: Caller, work: (tx: Transaction) => Promise<T>): Promise<T> {
+  const claims =
+    caller.role === "authenticated"
+      ? { role: "authenticated", sub: caller.user.id, aud: "authenticated" }
+      : { role: caller.role };
+  return db.transaction(async (tx) => {
+    await tx.exec(`set local role ${caller.role}`);
+    await tx.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(claims)]);
+    return work(tx);
+  });
+}
+
+type PgError = { code?: string; message?: string; detail?: string; hint?: string };
+
+const pgErrorBody = (error: PgError) => ({
+  code: error.code,
+  message: error.message,
+  details: error.detail ?? null,
+  hint: error.hint ?? null,
+});
 
 /** Postgres array literal for a JS array of simple values. */
 const toPgArray = (values: unknown[]) =>
@@ -163,8 +193,11 @@ const HTTP_STATUS: Record<string, number> = {
   P0002: 404,
   "22023": 400,
   "23505": 409,
+  "23503": 409,
+  "23001": 409,
   "23514": 400,
   "22P02": 400,
+  "42P01": 404,
 };
 
 async function callRpc(
@@ -203,17 +236,10 @@ async function callRpc(
     named.push(`${key} := $${params.length}::${types[index]}`);
   }
 
-  const claims =
-    caller.role === "authenticated"
-      ? { role: "authenticated", sub: caller.user.id, aud: "authenticated" }
-      : { role: caller.role };
-
   try {
-    const result = await db.transaction(async (tx) => {
-      await tx.exec(`set local role ${caller.role}`);
-      await tx.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(claims)]);
-      return tx.query<Record<string, unknown>>(`select * from public.${fn}(${named.join(", ")})`, params);
-    });
+    const result = await asCaller(db, caller, (tx) =>
+      tx.query<Record<string, unknown>>(`select * from public.${fn}(${named.join(", ")})`, params),
+    );
     const rows = result.rows.map((row) =>
       Object.fromEntries(Object.entries(row).map(([k, v]) => [k, fromPgArray(v)])),
     );
@@ -229,16 +255,193 @@ async function callRpc(
     }
     return { status: 200, body: rows[0] ? (Object.values(rows[0])[0] ?? null) : null };
   } catch (error) {
-    const pg = error as { code?: string; message?: string };
-    return {
-      status: HTTP_STATUS[pg.code ?? ""] ?? 400,
-      body: { code: pg.code, message: pg.message, details: null, hint: null },
-    };
+    const pg = error as PgError;
+    return { status: HTTP_STATUS[pg.code ?? ""] ?? 400, body: pgErrorBody(pg) };
   }
+}
+
+const IDENTIFIER = /^[a-z_][a-z0-9_]*$/;
+
+/** Text input for a column: arrays as Postgres array literals, objects as JSON. */
+function encodeValue(dataType: string | undefined, value: unknown): unknown {
+  if (value === null || value === undefined) return null;
+  if (Array.isArray(value) && dataType === "ARRAY") return toPgArray(value);
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
+/**
+ * PostgREST table requests: POST (insert one row), PATCH and DELETE with
+ * `column=eq.value` filters, `select=` with plain columns, `Prefer:
+ * return=representation` and the single-object Accept header.
+ */
+async function callTable(
+  db: PGlite,
+  method: string,
+  table: string,
+  url: URL,
+  body: unknown,
+  caller: Caller,
+  headers: IncomingMessage["headers"],
+): Promise<{ status: number; body?: unknown }> {
+  const unsupported = (message: string) => ({ status: 400, body: { code: "PGRST100", message } });
+  const { rows: columns } = await db.query<{ column_name: string; data_type: string }>(
+    "select column_name, data_type from information_schema.columns where table_schema = 'public' and table_name = $1",
+    [table],
+  );
+  if (columns.length === 0) {
+    return { status: 404, body: { code: "42P01", message: `relation "public.${table}" does not exist` } };
+  }
+  const types = new Map(columns.map((c) => [c.column_name, c.data_type]));
+  if (Array.isArray(body)) return unsupported("fake-supabase: bulk inserts are not supported");
+  const row = (method === "DELETE" ? {} : (body ?? {})) as Record<string, unknown>;
+
+  let select: string[] = [];
+  const filters: [string, string][] = [];
+  for (const [key, value] of url.searchParams) {
+    if (key === "select") select = value.split(",").filter(Boolean);
+    else if (key === "columns") continue;
+    else if (value.startsWith("eq.")) filters.push([key, value.slice(3)]);
+    else return unsupported(`fake-supabase: unsupported filter ${key}=${value}`);
+  }
+  for (const name of [...select, ...filters.map(([column]) => column), ...Object.keys(row)]) {
+    if (!IDENTIFIER.test(name) || !types.has(name)) {
+      return { status: 400, body: { code: "PGRST204", message: `unknown column ${name} of ${table}` } };
+    }
+  }
+
+  const params: unknown[] = [];
+  const param = (column: string, value: unknown) => {
+    params.push(encodeValue(types.get(column), value));
+    return `$${params.length}`;
+  };
+  const entries = Object.entries(row);
+  const representation = String(headers.prefer ?? "").includes("return=representation");
+  const returning = representation ? ` returning ${select.length ? select.join(", ") : "*"}` : "";
+
+  let statement: string;
+  if (method === "POST") {
+    const values = entries.map(([column, value]) => param(column, value));
+    statement = `insert into public.${table} (${entries.map(([column]) => column).join(", ")}) values (${values.join(", ")})${returning}`;
+  } else if (method === "PATCH") {
+    if (entries.length === 0) return unsupported("fake-supabase: empty update");
+    const assignments = entries.map(([column, value]) => `${column} = ${param(column, value)}`);
+    const where = filters.map(([column, value]) => `${column} = ${param(column, value)}`);
+    statement = `update public.${table} set ${assignments.join(", ")}${where.length ? ` where ${where.join(" and ")}` : ""}${returning}`;
+  } else {
+    const where = filters.map(([column, value]) => `${column} = ${param(column, value)}`);
+    statement = `delete from public.${table}${where.length ? ` where ${where.join(" and ")}` : ""}${returning}`;
+  }
+
+  try {
+    const result = await asCaller(db, caller, (tx) => tx.query<Record<string, unknown>>(statement, params));
+    if (!representation) return { status: method === "POST" ? 201 : 204 };
+    const rows = result.rows.map((r) =>
+      Object.fromEntries(Object.entries(r).map(([k, v]) => [k, fromPgArray(v)])),
+    );
+    const ok = method === "POST" ? 201 : 200;
+    if (!String(headers.accept ?? "").includes("vnd.pgrst.object")) return { status: ok, body: rows };
+    return rows.length === 1
+      ? { status: ok, body: rows[0] }
+      : {
+          status: 406,
+          body: { code: "PGRST116", message: "JSON object requested, multiple (or no) rows returned" },
+        };
+  } catch (error) {
+    const pg = error as PgError;
+    const status = pg.code === "42501" && caller.role === "anon" ? 401 : (HTTP_STATUS[pg.code ?? ""] ?? 400);
+    return { status, body: pgErrorBody(pg) };
+  }
+}
+
+type StoredFile = { bytes: Buffer; contentType: string };
+
+/** Storage API errors: HTTP 400 with the meaningful status in `statusCode`. */
+const storageError = (statusCode: string, error: string, message: string) => ({
+  status: 400,
+  body: { statusCode, error, message },
+});
+
+async function storageUpload(
+  db: PGlite,
+  files: Map<string, StoredFile>,
+  bucket: string,
+  name: string,
+  req: IncomingMessage,
+  caller: Caller,
+): Promise<{ status: number; body: unknown }> {
+  const bytes = await readBody(req);
+  const contentType = String(req.headers["content-type"] ?? "application/octet-stream");
+  const { rows } = await db.query<{ file_size_limit: number | null; allowed_mime_types: unknown }>(
+    "select file_size_limit, allowed_mime_types from storage.buckets where id = $1",
+    [bucket],
+  );
+  const config = rows[0];
+  if (!config) return storageError("404", "Bucket not found", "Bucket not found");
+  if (config.file_size_limit !== null && bytes.byteLength > Number(config.file_size_limit)) {
+    return storageError("413", "Payload too large", "The object exceeded the maximum allowed size");
+  }
+  const allowed = fromPgArray(config.allowed_mime_types) as string[] | null;
+  if (allowed && !allowed.includes(contentType)) {
+    return storageError("415", "invalid_mime_type", `mime type ${contentType} is not supported`);
+  }
+  if (String(req.headers["x-upsert"]) === "true") {
+    return storageError("400", "fake-supabase", "upsert is not supported by the test double");
+  }
+  try {
+    const result = await asCaller(db, caller, (tx) =>
+      tx.query<{ id: string }>(
+        `insert into storage.objects (bucket_id, name, owner, owner_id, metadata)
+         values ($1, $2, auth.uid(), auth.uid()::text, $3::jsonb) returning id`,
+        [bucket, name, JSON.stringify({ mimetype: contentType, size: bytes.byteLength })],
+      ),
+    );
+    files.set(`${bucket}/${name}`, { bytes, contentType });
+    return { status: 200, body: { Id: result.rows[0]!.id, Key: `${bucket}/${name}` } };
+  } catch (error) {
+    const pg = error as PgError;
+    if (pg.code === "23505") return storageError("409", "Duplicate", "The resource already exists");
+    if (pg.code === "42501") {
+      return storageError("403", "Unauthorized", "new row violates row-level security policy");
+    }
+    throw error;
+  }
+}
+
+async function storageDownload(
+  db: PGlite,
+  files: Map<string, StoredFile>,
+  bucket: string,
+  name: string,
+  caller: Caller,
+): Promise<StoredFile | null> {
+  const { rows } = await asCaller(db, caller, (tx) =>
+    tx.query("select 1 from storage.objects where bucket_id = $1 and name = $2", [bucket, name]),
+  );
+  return rows.length ? (files.get(`${bucket}/${name}`) ?? null) : null;
+}
+
+async function storageRemove(
+  db: PGlite,
+  files: Map<string, StoredFile>,
+  bucket: string,
+  prefixes: unknown,
+  caller: Caller,
+): Promise<{ status: number; body: unknown }> {
+  const names = Array.isArray(prefixes) ? prefixes.map(String) : [];
+  const { rows } = await asCaller(db, caller, (tx) =>
+    tx.query<{ id: string; bucket_id: string; name: string }>(
+      "delete from storage.objects where bucket_id = $1 and name = any($2::text[]) returning id, bucket_id, name",
+      [bucket, toPgArray(names)],
+    ),
+  );
+  for (const row of rows) files.delete(`${bucket}/${row.name}`);
+  return { status: 200, body: rows };
 }
 
 export async function startFakeSupabase(): Promise<Server> {
   const { db, users } = await createDatabase();
+  const files = new Map<string, StoredFile>();
 
   async function handle(req: IncomingMessage, res: ServerResponse) {
     const url = new URL(req.url ?? "/", FAKE_SUPABASE_URL);
@@ -282,6 +485,42 @@ export async function startFakeSupabase(): Promise<Server> {
     if (req.method === "POST" && rpc) {
       const wantObject = String(req.headers.accept ?? "").includes("vnd.pgrst.object");
       const result = await callRpc(db, rpc[1]!, await readJson(req), callerFor(req), wantObject);
+      return send(res, result.status, result.body);
+    }
+
+    const table = url.pathname.match(/^\/rest\/v1\/([a-z_]+)$/);
+    if (table && ["POST", "PATCH", "DELETE"].includes(req.method ?? "")) {
+      const body = req.method === "DELETE" ? {} : JSON.parse((await readBody(req)).toString("utf8") || "{}");
+      const result = await callTable(db, req.method!, table[1]!, url, body, callerFor(req), req.headers);
+      return send(res, result.status, result.body);
+    }
+
+    const object = url.pathname.match(/^\/storage\/v1\/object\/(?:authenticated\/)?([a-z0-9_-]+)\/(.+)$/);
+    if (object && req.method === "POST") {
+      const name = decodeURIComponent(object[2]!);
+      const result = await storageUpload(db, files, object[1]!, name, req, callerFor(req));
+      return send(res, result.status, result.body);
+    }
+    if (object && req.method === "GET") {
+      const name = decodeURIComponent(object[2]!);
+      const file = await storageDownload(db, files, object[1]!, name, callerFor(req));
+      if (!file) {
+        const missing = storageError("404", "not_found", "Object not found");
+        return send(res, missing.status, missing.body);
+      }
+      res.writeHead(200, { "Content-Type": file.contentType, "Content-Length": file.bytes.byteLength });
+      return res.end(file.bytes);
+    }
+
+    const bucket = url.pathname.match(/^\/storage\/v1\/object\/([a-z0-9_-]+)$/);
+    if (bucket && req.method === "DELETE") {
+      const result = await storageRemove(
+        db,
+        files,
+        bucket[1]!,
+        (await readJson(req)).prefixes,
+        callerFor(req),
+      );
       return send(res, result.status, result.body);
     }
 

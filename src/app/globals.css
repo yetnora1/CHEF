@@ -321,3 +321,64 @@
   );
   background-size: 0.875rem 0.875rem;
 }
+
+/* Staff-written body text (src/features/cms/markup.tsx renders it as elements,
+ * never HTML). Ethiopic text gets the looser line height of :lang(am). */
+@utility cms-prose {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-muted-foreground);
+
+  & > * + * {
+    margin-top: 1.1em;
+  }
+
+  & h2 {
+    margin-top: 1.8em;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 1.2rem + 0.5vw, 1.6rem);
+    line-height: 1.25;
+    color: var(--color-foreground);
+  }
+
+  & h3,
+  & h4 {
+    margin-top: 1.5em;
+    font-weight: 600;
+    color: var(--color-foreground);
+  }
+
+  & ul {
+    list-style: disc;
+    padding-inline-start: 1.25em;
+  }
+
+  & ol {
+    list-style: decimal;
+    padding-inline-start: 1.4em;
+  }
+
+  & li + li {
+    margin-top: 0.35em;
+  }
+
+  & strong {
+    font-weight: 650;
+    color: var(--color-foreground);
+  }
+
+  & a {
+    color: var(--color-accent-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  & a:hover {
+    color: var(--color-foreground);
+  }
+
+  &:lang(am),
+  & :lang(am) {
+    line-height: 1.85;
+  }
+}

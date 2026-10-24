@@ -9,7 +9,9 @@
  *    session: RLS flags, policies, table/column/sequence privileges of anon,
  *    authenticated and service_role, function security, volatility, search_path
  *    and EXECUTE rights, triggers, enum values, schema usage and the role
- *    permission matrix, plus the Supabase CLI migration history.
+ *    permission matrix, plus the Supabase CLI migration history. For Storage:
+ *    RLS on storage.objects/buckets, every policy on them (so a policy added in
+ *    the dashboard shows up as a difference) and the "media" bucket settings.
  * 3. Prints every difference and exits non-zero if there is one.
  *
  * Nothing is written to the deployed database. Never put the URL in a file
@@ -90,9 +92,30 @@ const QUERIES = {
     "select role::text || ' ' || permission::text as name from public.role_permissions order by 1",
 };
 
+// Only when the storage schema exists; a Supabase project always has it.
+const STORAGE_QUERIES = {
+  storage_rls: `
+    select n.nspname || '.' || c.relname as name, c.relrowsecurity as rls
+    from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'storage' and c.relname in ('objects', 'buckets') order by 1`,
+  storage_policies: `
+    select tablename || ' :: ' || policyname as name, cmd, roles::text as roles,
+           regexp_replace(coalesce(qual, ''), '\\s+', ' ', 'g') as using_expr,
+           regexp_replace(coalesce(with_check, ''), '\\s+', ' ', 'g') as check_expr
+    from pg_policies where schemaname = 'storage' and tablename in ('objects', 'buckets') order by 1`,
+  storage_buckets: `
+    select id as name, public, file_size_limit::text as file_size_limit,
+           array_to_string(allowed_mime_types, ',') as allowed_mime_types
+    from storage.buckets where id = 'media' order by 1`,
+};
+
 async function fingerprint(run) {
   const out = {};
   for (const [key, sql] of Object.entries(QUERIES)) out[key] = await run(sql);
+  const [{ ok }] = await run(
+    "select to_regclass('storage.objects') is not null and to_regclass('storage.buckets') is not null as ok",
+  );
+  for (const [key, sql] of Object.entries(STORAGE_QUERIES)) out[key] = ok ? await run(sql) : [];
   return out;
 }
 
@@ -143,7 +166,7 @@ if (history === null) {
   console.log(`migration history: ${history.length} migrations, same order as the repository`);
 }
 
-for (const key of Object.keys(QUERIES)) {
+for (const key of [...Object.keys(QUERIES), ...Object.keys(STORAGE_QUERIES)]) {
   const want = new Map(expected[key].map((row) => [row.name, JSON.stringify(row)]));
   const have = new Map(deployed[key].map((row) => [row.name, JSON.stringify(row)]));
   let sectionDiffs = 0;

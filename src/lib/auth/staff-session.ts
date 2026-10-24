@@ -70,3 +70,13 @@ export async function authorizeAdmin(
   if (decision.kind === "login") redirect(ADMIN_LOGIN_PATH);
   return decision;
 }
+
+/**
+ * The same decision for Route Handlers (uploads, admin file access), which
+ * answer with a status code instead of redirecting to the login page.
+ */
+export async function authorizeAdminRequest(
+  required: Parameters<typeof decideAdminAccess>[1],
+): Promise<AccessDecision> {
+  return decideAdminAccess(await getStaffSession(), required);
+}

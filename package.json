@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:db": "vitest run tests/integration",
+    "test:db:pg": "vitest run --config vitest.postgres.config.mts",
     "test:e2e": "playwright test",
     "check:bundle": "node scripts/check-client-bundle.mjs",
     "verify": "npm run lint && npm run typecheck && npm test && npm run check:bundle",
@@ -25,6 +26,7 @@
     "db:new": "supabase migration new",
     "db:reset": "supabase db reset",
     "db:lint": "supabase db lint --level warning",
+    "db:compare": "node scripts/compare-deployed-schema.mjs",
     "db:types": "supabase gen types typescript --local > src/types/database.types.ts"
   },
   "dependencies": {
@@ -47,10 +49,12 @@
     "@playwright/test": "^1.64.1",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
+    "pg": "^8.23.1",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "supabase": "^2.122.0",

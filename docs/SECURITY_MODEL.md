@@ -137,19 +137,31 @@ schema is not exposed through the Data API.
 - `npm run test:e2e`: forged session cookies, wrong credentials, open redirect, unconfigured
   admin, and role-specific admin rendering.
 - `npm run check:bundle`: canary-secret scan of build output.
+- Stage 2.5 ([VERIFICATION.md](VERIFICATION.md)): migrations applied with `supabase db push` to real
+  PostgreSQL 17 (non-superuser owner, as on hosted Supabase); the deployed catalog equals the
+  repository build; the DB suites and a multi-connection concurrency suite pass there
+  (`npm run test:db:pg`); the Data API was exercised over HTTP through real PostgREST 14 as anon,
+  service_role and every staff role. Not yet against Supabase itself (Auth, gateway, hosted settings).
+  Fixed with regression tests: CAPTCHA tokens could be replayed through Turnstile's idempotency key
+  (now accepted once); production skipped the CAPTCHA hostname check without `NEXT_PUBLIC_SITE_URL`
+  (now closed); `service_role` kept EXECUTE on `assign_role`, `revoke_role` and `get_my_access`
+  (migration `20261026090000`; the privilege test covers `service_role`).
 
 ## Known gaps (planned)
 
 | Gap                                                                                                               | Plan                                                                                                          |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | No `script-src` CSP yet (baseline CSP covers framing, `<base>`, plugins, form targets)                            | Nonce-based CSP in the hardening stage                                                                        |
-| Inquiry form: Turnstile and Resend integrations tested only with mocked HTTP                                      | Test with real (test-mode) credentials before launch                                                          |
+| Turnstile verified only with Cloudflare's test keys; Resend only for failure handling (no real delivery)          | Real widget and verified sending domain before launch (VERIFICATION.md L1–L3)                                 |
+| CAPTCHA accepts a response without `action` (test responses have none)                                            | Require `action === "inquiry"` in production once a real response is confirmed to carry it (W2)               |
+| Fixed-window rate limits allow up to 2× a limit across a window boundary                                          | Sliding windows in the hardening stage (W1); CAPTCHA and shared limits still apply                            |
+| `service_role` keeps Supabase's default table privileges on `profiles`, `services`, `service_translations`        | Revoke in the CMS stage for new and existing content tables (VERIFICATION.md C3)                              |
 | Per-IP limits are only as good as the `CLIENT_IP_HEADER` choice (required in production)                          | Confirm the header on the chosen platform before launch (INQUIRIES.md); CAPTCHA and shared limits still apply |
 | Admin sign-in has no CAPTCHA; Supabase Auth per-IP limits only                                                    | Enable Supabase Auth CAPTCHA (Turnstile) in the hardening stage                                               |
 | MFA not enforced for owners/admins                                                                                | Enable TOTP and require AAL2 for privileged roles (Stage 4)                                                   |
-| RLS verified on PGlite with an auth shim, not yet on the real Supabase stack                                      | Run `supabase db reset` + tests against the local stack once Docker is available                              |
+| RLS verified on PGlite and real PostgreSQL 17 + PostgREST, not yet on Supabase (Auth, gateway, hosted settings)   | Owner checklist C1–C2 in VERIFICATION.md (local stack or a hosted dev project)                                |
 | Session revocation lag in the proxy (JWT validity ≤ 1 h)                                                          | Mitigated: the DAL calls `getUser()` on every admin render; data requests re-check roles in RLS               |
 | Staff cannot correct a submitted inquiry (no direct UPDATE on `bookings`)                                         | Add an audited, field-limited edit function if the business needs corrections                                 |
 | Privacy erasure exists in the database (owner `DELETE`, audited) but has no admin UI                              | Add an owner-only, confirmed erasure action (Stage 4)                                                         |
-| Concurrency of role changes reasoned about, not load-tested (PGlite is single-connection)                         | Add a two-connection test against the real local stack                                                        |
+| Concurrency verified with multiple connections on PostgreSQL 17 (`tests/postgres`), not load-tested               | Load test on a dedicated environment before launch; run `test:db:pg` in CI (W7)                               |
 | A signed-in account with no role can read `updated_by` on published content (column grants are per database role) | Acceptable while sign-up is disabled; move public reads to a view if self-service accounts are ever added     |

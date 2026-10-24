@@ -2,14 +2,21 @@ import "server-only";
 import { isSubmissionKey, parseInquiry, readLocale, type InquiryFieldErrors } from "../inquiry-schema";
 import type { CaptchaResult } from "./captcha";
 import type { InquiryConfig } from "./config";
-import { checkRateLimits, POST_CAPTCHA_LIMITS, PRE_CAPTCHA_LIMITS, type RateLimitRule } from "./rate-limit";
+import {
+  CAPTCHA_TOKEN_RULE,
+  captchaTokenBucket,
+  checkRateLimits,
+  POST_CAPTCHA_LIMITS,
+  PRE_CAPTCHA_LIMITS,
+  type RateLimitRule,
+} from "./rate-limit";
 import { InquiryKeyConflictError, type InquiryStore } from "./store";
 
 /*
  * The public inquiry pipeline, independent of Next.js so every branch is
  * unit-tested (tests/unit/inquiry-submission.test.ts):
  *
- *   configuration → honeypot → validation → IP limits → CAPTCHA → mailbox/site limits → insert → email (async)
+ *   configuration → honeypot → validation → IP limits → CAPTCHA (single use) → mailbox/site limits → insert → email (async)
  *
  * Responses never contain database errors, internal ids or user input.
  */
@@ -84,10 +91,29 @@ export async function processInquirySubmission(
   if (ipBlocked) return ipBlocked;
 
   if (config.captcha.mode === "turnstile") {
-    const captcha = await deps.verifyCaptcha(raw["cf-turnstile-response"], deps.clientIp, raw.submissionKey);
+    const token = raw["cf-turnstile-response"];
+    const captcha = await deps.verifyCaptcha(token, deps.clientIp, raw.submissionKey);
     if (!captcha.ok) {
       log("rejected", `captcha ${captcha.reason}`);
       return captcha.reason === "unavailable" ? { status: "error" } : { status: "captcha_failed" };
+    }
+
+    // A verified token is accepted once (see CAPTCHA_TOKEN_RULE); the form
+    // requests a fresh token after every attempt.
+    let firstUse;
+    try {
+      firstUse = await deps.store.consumeRateLimit(
+        captchaTokenBucket(token ?? "", config.secretKey),
+        CAPTCHA_TOKEN_RULE.limit,
+        CAPTCHA_TOKEN_RULE.windowSeconds,
+      );
+    } catch {
+      log("error", "rate limiter unavailable");
+      return { status: "error" };
+    }
+    if (!firstUse.allowed) {
+      log("rejected", "captcha token reused");
+      return { status: "captcha_failed" };
     }
   }
 

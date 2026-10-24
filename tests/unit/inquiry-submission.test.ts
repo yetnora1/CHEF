@@ -128,6 +128,7 @@ describe("processInquirySubmission", () => {
     d.store.consumeRateLimit
       .mockResolvedValueOnce({ allowed: true, retryAfterSeconds: 0 })
       .mockResolvedValueOnce({ allowed: true, retryAfterSeconds: 0 })
+      .mockResolvedValueOnce({ allowed: true, retryAfterSeconds: 0 })
       .mockResolvedValueOnce({ allowed: false, retryAfterSeconds: 3000 });
     expect(await processInquirySubmission(form(), d)).toEqual({
       status: "rate_limited",
@@ -137,10 +138,39 @@ describe("processInquirySubmission", () => {
     expect(d.store.consumeRateLimit.mock.calls.map(([bucket]) => String(bucket).split(":")[1])).toEqual([
       "ip",
       "ip",
+      "captcha",
       "email",
       "global",
     ]);
     expect(d.store.submitInquiry).not.toHaveBeenCalled();
+  });
+
+  it("accepts each solved CAPTCHA token only once", async () => {
+    // Cloudflare repeats its first answer for a token resent with the same
+    // idempotency key, so a replayed token still verifies.
+    const d = deps();
+    d.store.consumeRateLimit
+      .mockResolvedValueOnce({ allowed: true, retryAfterSeconds: 0 })
+      .mockResolvedValueOnce({ allowed: true, retryAfterSeconds: 0 })
+      .mockResolvedValueOnce({ allowed: false, retryAfterSeconds: 86000 });
+    expect(await processInquirySubmission(form(), d)).toEqual({ status: "captcha_failed" });
+    const buckets = d.store.consumeRateLimit.mock.calls.map(([bucket]) => String(bucket));
+    // The replay is refused before it can be charged to the mailbox or site-wide budgets.
+    expect(buckets.map((b) => b.split(":")[1])).toEqual(["ip", "ip", "captcha"]);
+    expect(d.store.consumeRateLimit.mock.calls[2]!.slice(1)).toEqual([1, 86400]);
+    expect(d.store.submitInquiry).not.toHaveBeenCalled();
+  });
+
+  it("keys the CAPTCHA bucket on a hash of the token, never the token itself", async () => {
+    const d = deps();
+    await processInquirySubmission(form({ "cf-turnstile-response": "XXXX.DUMMY.TOKEN.XXXX" }), d);
+    await processInquirySubmission(form({ "cf-turnstile-response": "another-token" }), d);
+    const captchaBuckets = d.store.consumeRateLimit.mock.calls
+      .map(([bucket]) => String(bucket))
+      .filter((bucket) => bucket.startsWith("inquiry:captcha:"));
+    expect(captchaBuckets).toHaveLength(2);
+    expect(captchaBuckets[0]).not.toBe(captchaBuckets[1]);
+    for (const bucket of captchaBuckets) expect(bucket).not.toMatch(/DUMMY|another-token/);
   });
 
   it("fails closed when the rate limiter is unavailable", async () => {
@@ -168,6 +198,9 @@ describe("processInquirySubmission", () => {
     const d = deps({ config: config({ captcha: { mode: "local-bypass" } }) });
     expect((await processInquirySubmission(form(), d)).status).toBe("success");
     expect(d.verifyCaptcha).not.toHaveBeenCalled();
+    expect(d.store.consumeRateLimit.mock.calls.map(([bucket]) => String(bucket).split(":")[1])).not.toContain(
+      "captcha",
+    );
   });
 
   it("returns the original reference for a retried submission and does not re-send email", async () => {

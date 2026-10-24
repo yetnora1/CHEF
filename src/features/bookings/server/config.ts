@@ -10,6 +10,8 @@ import { isPrivilegedKey, parseSupabasePublicConfig } from "@/lib/supabase/confi
  *  - Storage needs the Supabase URL and the server-only secret key.
  *  - Production needs a real Cloudflare Turnstile key pair. Cloudflare's
  *    published test keys are refused in production.
+ *  - Production needs NEXT_PUBLIC_SITE_URL: CAPTCHA tokens are checked
+ *    against its hostname.
  *  - Production needs CLIENT_IP_HEADER: a header the hosting proxy sets, so
  *    clients cannot pick their own rate-limit identity.
  *  - Outside production, a developer may opt out of CAPTCHA with
@@ -42,6 +44,7 @@ export type UnavailableReason =
   | "storage-key-not-privileged"
   | "captcha-not-configured"
   | "captcha-test-key-in-production"
+  | "site-url-not-configured"
   | "client-ip-header-not-configured";
 
 export type InquiryConfig =
@@ -122,6 +125,11 @@ export function resolveInquiryConfig(
   if (env.TURNSTILE_SECRET_KEY && env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
     if (production && isTurnstileTestSecret(env.TURNSTILE_SECRET_KEY)) {
       return { available: false, reason: "captcha-test-key-in-production" };
+    }
+    // Production tokens must have been solved on this site's hostname. Without
+    // a (valid) site URL that check would silently disappear.
+    if (production && !env.NEXT_PUBLIC_SITE_URL) {
+      return { available: false, reason: "site-url-not-configured" };
     }
     captcha = {
       mode: "turnstile",

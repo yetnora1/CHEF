@@ -142,6 +142,16 @@ test.describe("public inquiry form", () => {
   });
 
   test("rate-limits repeated submissions from one source", async ({ page }) => {
+    // The per-IP limit (5 per 10 minutes) counts in fixed windows aligned to the
+    // epoch, so a burst that crosses a boundary is split between two windows and
+    // the sixth request is allowed (a documented gap: docs/SECURITY_MODEL.md).
+    // Start the burst well inside one window.
+    const windowMs = 10 * 60 * 1000;
+    const remainingMs = windowMs - (Date.now() % windowMs);
+    if (remainingMs < 60_000) {
+      test.slow();
+      await page.waitForTimeout(remainingMs + 1_000);
+    }
     await page.setExtraHTTPHeaders({ [E2E_CLIENT_IP_HEADER]: "203.0.113.77" });
     for (let i = 0; i < 5; i++) {
       await submitInquiry(page, { name: `Burst ${i}`, email: `burst-${i}-${unique()}@example.test` });

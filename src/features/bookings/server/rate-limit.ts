@@ -27,6 +27,19 @@ export const POST_CAPTCHA_LIMITS: readonly RateLimitRule[] = [
   { scope: "global", limit: 300, windowSeconds: 60 * 60 },
 ];
 
+/**
+ * Each solved CAPTCHA token is accepted once. Cloudflare answers a token sent
+ * again with the same idempotency key (here the client's submission key) with
+ * its first result, so without this one solved challenge could pass CAPTCHA,
+ * and be charged to the shared budgets, any number of times. Tokens expire
+ * after 300 seconds; a day-long window outlives them.
+ */
+export const CAPTCHA_TOKEN_RULE = { limit: 1, windowSeconds: 24 * 60 * 60 } as const;
+
+export function captchaTokenBucket(token: string, secret: string): string {
+  return `inquiry:captcha:${CAPTCHA_TOKEN_RULE.windowSeconds}:${hashIdentifier(token, secret)}`;
+}
+
 export type RateLimitDecision = { allowed: true } | { allowed: false; retryAfterSeconds: number };
 
 export type ConsumeRateLimit = (

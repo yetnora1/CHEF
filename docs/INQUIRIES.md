@@ -17,7 +17,7 @@ Server action submitInquiryAction  (src/features/bookings/submit-action.ts)
   │    2. honeypot field
   │    3. validation + normalisation (server is authoritative)
   │    4. per-IP rate limits (Postgres, shared by all instances)
-  │    5. Turnstile verification (Cloudflare unreachable ⇒ rejected)
+  │    5. Turnstile verification (Cloudflare unreachable ⇒ rejected); each solved token is accepted once
   │    6. per-mailbox and site-wide rate limits (only verified requests count)
   │    7. public.submit_inquiry(...) with the server secret key
   │    8. email delivery queued with after() (optional)
@@ -66,14 +66,14 @@ currency, and a budget question would imply pricing the business has not set.
 
 ## Abuse protection
 
-| Control             | Detail                                                                                                                        | Status                                                      |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| CAPTCHA             | Cloudflare Turnstile, verified server-side with action `inquiry` (and, in production, the hostname of `NEXT_PUBLIC_SITE_URL`) | Integrated; **not verified with a live Cloudflare account** |
-| Rate limits         | see below                                                                                                                     | Implemented in Postgres; tested on PGlite and e2e           |
-| Honeypot            | hidden `website` field                                                                                                        | Implemented                                                 |
-| Body size           | server actions ≤ 64 KB                                                                                                        | Configured                                                  |
-| Field limits        | schema + database constraints                                                                                                 | Tested                                                      |
-| Privacy of counters | IP and email are HMAC-hashed with a key derived from the server secret; windows expire within a day                           | Tested                                                      |
+| Control             | Detail                                                                                                                                                         | Status                                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| CAPTCHA             | Cloudflare Turnstile, verified server-side with action `inquiry` (and, in production, the hostname of `NEXT_PUBLIC_SITE_URL`); each solved token accepted once | Verified with Cloudflare's **test** keys (siteverify and widget); **not with a live widget** |
+| Rate limits         | see below                                                                                                                                                      | Implemented in Postgres; tested on PGlite and e2e                                            |
+| Honeypot            | hidden `website` field                                                                                                                                         | Implemented                                                                                  |
+| Body size           | server actions ≤ 64 KB                                                                                                                                         | Configured                                                                                   |
+| Field limits        | schema + database constraints                                                                                                                                  | Tested                                                                                       |
+| Privacy of counters | IP and email are HMAC-hashed with a key derived from the server secret; windows expire within a day                                                            | Tested                                                                                       |
 
 ### Rate limits
 
@@ -87,16 +87,26 @@ Only requests that solved a challenge are charged to the mailbox and site-wide b
 traffic cannot lock a customer (or everyone) out without solving CAPTCHAs. A rejected request still
 counts against its IP.
 
+Each verified token is also recorded (a keyed hash, one day) and accepted only once. The server sends
+Cloudflare the submission key as `idempotency_key`, and Cloudflare answers a token resent with the
+same key with its first result, so without this one solved challenge could be replayed to drain the
+shared budgets. The form requests a fresh token after every attempt, so visitors never hit this.
+
+Windows are fixed and aligned to the clock, so a burst that crosses a window boundary can reach up
+to twice a limit (a known gap; sliding windows are a hardening work item in
+[VERIFICATION.md](VERIFICATION.md#7-work-items-not-done-in-this-stage)).
+
 ### CAPTCHA modes
 
-| Environment      | Turnstile keys       | `INQUIRY_LOCAL_CAPTCHA_BYPASS` | Result                                                             |
-| ---------------- | -------------------- | ------------------------------ | ------------------------------------------------------------------ |
-| production build | real pair            | any                            | verified                                                           |
-| production build | Cloudflare test keys | any                            | **form closed** (test keys refused)                                |
-| production build | missing              | any                            | **form closed**                                                    |
-| development      | real or test pair    | any                            | verified                                                           |
-| development      | missing              | `true`                         | accepted without CAPTCHA, with a visible "development mode" notice |
-| development      | missing              | unset                          | form closed                                                        |
+| Environment      | Turnstile keys                             | `INQUIRY_LOCAL_CAPTCHA_BYPASS` | Result                                                             |
+| ---------------- | ------------------------------------------ | ------------------------------ | ------------------------------------------------------------------ |
+| production build | real pair                                  | any                            | verified, including the hostname of `NEXT_PUBLIC_SITE_URL`         |
+| production build | real pair, no valid `NEXT_PUBLIC_SITE_URL` | any                            | **form closed** (`site-url-not-configured`)                        |
+| production build | Cloudflare test keys                       | any                            | **form closed** (test keys refused)                                |
+| production build | missing                                    | any                            | **form closed**                                                    |
+| development      | real or test pair                          | any                            | verified                                                           |
+| development      | missing                                    | `true`                         | accepted without CAPTCHA, with a visible "development mode" notice |
+| development      | missing                                    | unset                          | form closed                                                        |
 
 "Production" means `NODE_ENV=production`, which every `next build`/`next start` sets, so the bypass
 cannot be switched on in a deployed build.
@@ -145,8 +155,12 @@ inbox); otherwise email stays off and the server logs `site-url-required`.
 The website never says an email was sent: delivery happens after the response, so there is no
 evidence at that moment. Without email configuration, inquiries are stored and nothing is queued.
 
-**Status:** templates, outbox and delivery are unit- and DB-tested with mocked HTTP. Sending through
-a real Resend account (verified domain, deliverability) has not been tested.
+**Status:** templates, outbox and delivery are unit- and DB-tested with mocked HTTP. Stage 2.5 also
+ran the outbox, retry endpoint and failure path against real PostgreSQL 17 and the real Resend API
+with an invalid key (messages marked `failed`, retried up to 5 attempts, inquiries kept). Sending
+through a real Resend account (verified domain, deliverability) has not been tested. Messages that
+reach 5 failed attempts raise no alert: monitor them (query in
+[VERIFICATION.md](VERIFICATION.md#before-launch)).
 
 ## Lifecycle
 
@@ -179,8 +193,8 @@ Nobody edits a submitted inquiry directly: staff roles have no INSERT or UPDATE 
 customer's own fields stay exactly as submitted. Deleting an inquiry (privacy erasure) writes a
 `booking.erased` audit entry with the reference only.
 
-Missing and forbidden inquiries look the same (404-style "not found"), so references cannot be
-probed. Internal notes are visible exactly to the people who can see the inquiry and are never shown
+Missing and forbidden inquiries look the same (404-style "not found" in the admin; the database
+raises `P0002` for both, which PostgREST sends as HTTP 500), so references cannot be probed. Internal notes are visible exactly to the people who can see the inquiry and are never shown
 to customers.
 
 ## What the server secret key can do
@@ -199,7 +213,8 @@ admin rights, so it must stay in the host's secret store; rotate it if it leaks.
 3. Set `SUPABASE_SECRET_KEY` in the host's secret store (never `NEXT_PUBLIC_`).
 4. Set `CLIENT_IP_HEADER` to a header your platform sets (required; see "Client IP"), and
    `CLIENT_IP_TRUSTED_HOPS` if it is a list header behind more than one proxy you control. Set
-   `NEXT_PUBLIC_SITE_URL` to the `https` origin.
+   `NEXT_PUBLIC_SITE_URL` to the `https` origin (required: CAPTCHA tokens must match its hostname,
+   so serve the form on one hostname and redirect the other, e.g. `www`).
 5. Optional email: verify a sending domain in Resend; set `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`,
    `INQUIRY_NOTIFY_TO`; optionally `CRON_SECRET` plus a scheduled call to the retry endpoint.
 6. Have Chief Harena complete the privacy-notice review items, and get it legally reviewed.
@@ -212,3 +227,5 @@ admin rights, so it must stay in the host's secret store; rotate it if it leaks.
 - With a widget: use Cloudflare's test keys (see README) to exercise the real Turnstile flow locally.
 - Automated: `npm run test:db` (SQL and RLS), `npm test` (pipeline, CAPTCHA, email) and
   `npm run test:e2e` (form and admin workflow against the Supabase test double).
+- Real database: `npm run test:db:pg` (the same SQL suites plus concurrency on a disposable
+  PostgreSQL server) and the opt-in PostgREST HTTP suite; see [VERIFICATION.md](VERIFICATION.md).

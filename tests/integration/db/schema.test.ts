@@ -88,11 +88,13 @@ describe("table privileges for API roles", () => {
 
 describe("function privileges", () => {
   it("expose only the intended functions to API roles", async () => {
+    // service_role included: Supabase's default privileges grant it EXECUTE on
+    // every new public function unless a migration revokes it.
     const { rows } = await db.query<{ fn: string; role: string }>(`
       select n.nspname || '.' || p.proname as fn, r.rolname as role
       from pg_proc p
       join pg_namespace n on n.oid = p.pronamespace
-      cross join (values ('anon'), ('authenticated')) as r (rolname)
+      cross join (values ('anon'), ('authenticated'), ('service_role')) as r (rolname)
       where n.nspname in ('public', 'private')
         and has_function_privilege(r.rolname, p.oid, 'execute')
         and has_schema_privilege(r.rolname, n.oid, 'usage')
@@ -107,11 +109,15 @@ describe("function privileges", () => {
       { fn: "public.booking_inbox_counts", role: "authenticated" },
       { fn: "public.booking_report", role: "authenticated" },
       { fn: "public.change_booking_status", role: "authenticated" },
+      { fn: "public.claim_notifications", role: "service_role" },
+      { fn: "public.complete_notification", role: "service_role" },
+      { fn: "public.consume_rate_limit", role: "service_role" },
       { fn: "public.get_booking_detail", role: "authenticated" },
       { fn: "public.get_my_access", role: "authenticated" },
       { fn: "public.list_assignable_staff", role: "authenticated" },
       { fn: "public.list_bookings", role: "authenticated" },
       { fn: "public.revoke_role", role: "authenticated" },
+      { fn: "public.submit_inquiry", role: "service_role" },
     ]);
   });
 

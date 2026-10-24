@@ -14,21 +14,23 @@ It is two connected applications in one Next.js codebase:
 > `/admin/bookings`. The CMS and remaining admin modules are **not built yet** (see [Roadmap](#roadmap)).
 > Placeholder copy and photography are clearly labelled; no business details have been invented.
 >
-> **Not yet verified against a real Supabase instance** (Docker was unavailable during development):
-> database rules are tested on PGlite and the admin/inquiry browser flows against a Supabase test
-> double. See [Verification status](#verification-status).
+> **Not yet verified against Supabase itself** (no Supabase project, and Docker is unavailable). Stage
+> 2.5 verified the migrations, RLS, grants and concurrency on real PostgreSQL 17 (applied with the
+> Supabase CLI) and the Data API through real PostgREST. See [Verification status](#verification-status)
+> and [docs/VERIFICATION.md](docs/VERIFICATION.md), which lists what the owner must still set up.
 
 ## Documentation
 
-| Document                                         | Contents                                                    |
-| ------------------------------------------------ | ----------------------------------------------------------- |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)     | Structure, route map, rendering model, request flow         |
-| [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md) | Roles, permission matrix, authorization layers, known gaps  |
-| [docs/DATABASE.md](docs/DATABASE.md)             | Schema, migrations, local Supabase workflow, DB tests       |
-| [docs/LOCALIZATION.md](docs/LOCALIZATION.md)     | Locale strategy, fallback policy, fonts, translation review |
-| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)   | Tokens, themes, typography, motifs, components              |
-| [docs/INQUIRIES.md](docs/INQUIRIES.md)           | Inquiry form, abuse controls, workflow, email, operations   |
-| [docs/adr/](docs/adr/)                           | Architecture decisions (0001 foundation, 0002 inquiries)    |
+| Document                                         | Contents                                                                    |
+| ------------------------------------------------ | --------------------------------------------------------------------------- |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)     | Structure, route map, rendering model, request flow                         |
+| [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md) | Roles, permission matrix, authorization layers, known gaps                  |
+| [docs/DATABASE.md](docs/DATABASE.md)             | Schema, migrations, local Supabase workflow, DB tests                       |
+| [docs/LOCALIZATION.md](docs/LOCALIZATION.md)     | Locale strategy, fallback policy, fonts, translation review                 |
+| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)   | Tokens, themes, typography, motifs, components                              |
+| [docs/INQUIRIES.md](docs/INQUIRIES.md)           | Inquiry form, abuse controls, workflow, email, operations                   |
+| [docs/VERIFICATION.md](docs/VERIFICATION.md)     | Stage 2.5 verification evidence, findings, owner checklist                  |
+| [docs/adr/](docs/adr/)                           | Architecture decisions (0001 foundation, 0002 inquiries, 0003 verification) |
 
 ## Tech stack
 
@@ -99,7 +101,7 @@ otherwise `/book` says plainly that online inquiries are not open yet (fail clos
 | To enable…                     | Set                                                                                                                               |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
 | Storage (required)             | `SUPABASE_SECRET_KEY` (server-only secret key) plus the public Supabase variables                                                 |
-| CAPTCHA (required, production) | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` from a Cloudflare Turnstile widget                                      |
+| CAPTCHA (required, production) | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` from a Cloudflare Turnstile widget, and `NEXT_PUBLIC_SITE_URL`          |
 | Local testing without CAPTCHA  | `INQUIRY_LOCAL_CAPTCHA_BYPASS=true` (ignored by every production build)                                                           |
 | Rate-limit IP source           | `CLIENT_IP_HEADER` (required in production): a header your proxy sets; `CLIENT_IP_TRUSTED_HOPS`                                   |
 | Email (optional)               | `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`, `INQUIRY_NOTIFY_TO`, https `NEXT_PUBLIC_SITE_URL` in production; optionally `CRON_SECRET` |
@@ -126,7 +128,7 @@ npm run dev                # http://localhost:3000 → redirects to /en or /am
 | ----------------------------------------------------------- | ----------- | ---------------------- | ----------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SUPABASE_URL`                                  | public      | for admin              | Supabase API URL                                                              |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`                      | public      | for admin              | Supabase publishable key (RLS still applies)                                  |
-| `NEXT_PUBLIC_SITE_URL`                                      | public      | for email              | Canonical origin; email links, Turnstile hostname check (https in production) |
+| `NEXT_PUBLIC_SITE_URL`                                      | public      | inquiries (production) | Canonical origin; email links, Turnstile hostname check (https in production) |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`                            | public      | inquiries              | Cloudflare Turnstile widget                                                   |
 | `SUPABASE_SECRET_KEY`                                       | server-only | inquiries              | Calls only the inquiry/rate-limit/outbox functions                            |
 | `TURNSTILE_SECRET_KEY`                                      | server-only | inquiries              | Turnstile verification (production refuses test keys)                         |
@@ -151,6 +153,7 @@ Never commit `.env.local`; only `.env.example` (placeholders) is tracked.
 | `npm test`                                   | All Vitest suites (unit + database)                                                             |
 | `npm run test:unit`                          | Unit tests                                                                                      |
 | `npm run test:db`                            | Migrations + RLS/role tests on in-process Postgres (PGlite)                                     |
+| `npm run test:db:pg`                         | The same suites plus concurrency on a real PostgreSQL server (`TEST_POSTGRES_URL`, disposable)  |
 | `npm run test:e2e`                           | Playwright (builds, then starts its own servers on ports 3100/3101)                             |
 | `npm run check:bundle`                       | Builds with canary secrets and fails if any reach browser output (removes the build afterwards) |
 | `npm run verify`                             | lint → typecheck → tests → bundle check                                                         |
@@ -158,6 +161,7 @@ Never commit `.env.local`; only `.env.example` (placeholders) is tracked.
 | `npm run db:new <name>`                      | New timestamped migration in `supabase/migrations/`                                             |
 | `npm run db:reset`                           | Recreate the **local** database from migrations + `seed.sql` (destroys local data)              |
 | `npm run db:lint`                            | Supabase schema linter (needs the local stack)                                                  |
+| `npm run db:compare`                         | Read-only check that a deployed database (`DEPLOYED_DATABASE_URL`) matches the migrations       |
 | `npm run db:types`                           | Generate `src/types/database.types.ts` from the local schema                                    |
 
 ## Project structure
@@ -206,12 +210,16 @@ docs/                    architecture, security, database, localization, design,
 | Unit (Vitest)                          | validation, config fail-closed rules, CAPTCHA verifier, rate-limit buckets, submission pipeline, email templates/outbox, contrast, catalogues | n/a                                                   |
 | Database (Vitest + PGlite)             | every migration; RLS, grants and SQL functions as `anon`/`authenticated`/`service_role`                                                       | **No**: Postgres 18 in WASM with a Supabase auth shim |
 | Browser (Playwright)                   | public site; fail-closed admin and inquiry form; sign-in, roles, inquiry submission and staff workflow                                        | **No**: a test double (fake Auth; real SQL on PGlite) |
+| Real PostgreSQL 17 (`test:db:pg`)      | the database suites, plus concurrency (rate limits, idempotency, outbox, role and status races); migrations applied with `supabase db push`   | **No**: plain PostgreSQL with Supabase-like roles     |
+| Real PostgREST 14 (opt-in suite)       | the Data API over HTTP as anon, service_role and every staff role                                                                             | **No**: standalone PostgREST, simulated Auth          |
 | Real local Supabase (`supabase start`) | not run: Docker unavailable                                                                                                                   | —                                                     |
 | Deployed Supabase project              | none exists                                                                                                                                   | —                                                     |
-| Cloudflare Turnstile, Resend           | verified with mocked HTTP only                                                                                                                | —                                                     |
+| Cloudflare Turnstile                   | siteverify and the browser widget with Cloudflare's **test** keys; no real widget                                                             | —                                                     |
+| Resend                                 | failure handling against the real API (invalid key); **no real delivery**                                                                     | —                                                     |
 
-Before launch, run the migrations on a real Supabase stack, repeat the DB and e2e checks there, and
-test Turnstile and email with real (test-mode) credentials.
+Before launch, complete the owner checklist in [docs/VERIFICATION.md](docs/VERIFICATION.md#8-what-the-owner-must-do):
+a real Supabase environment, its dashboard settings, the HTTP suite against it, real Turnstile keys
+and a verified email domain.
 
 ## Content and claims policy
 

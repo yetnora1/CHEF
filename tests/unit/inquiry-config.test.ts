@@ -110,12 +110,27 @@ describe("resolveInquiryConfig", () => {
     ).toMatchObject({ email: null, emailProblem: "partial-configuration" });
   });
 
-  it("requires an https site URL for email in production (staff links point to it)", () => {
-    for (const NEXT_PUBLIC_SITE_URL of ["", "http://chiefharena.example"]) {
-      expect(
-        resolveInquiryConfig({ ...base, ...emailEnv, NEXT_PUBLIC_SITE_URL }, { production: true }),
-      ).toMatchObject({ available: true, email: null, emailProblem: "site-url-required" });
+  it("fails closed in production without the site URL whose hostname CAPTCHA tokens must match", () => {
+    // Otherwise the hostname check would silently be skipped.
+    for (const NEXT_PUBLIC_SITE_URL of ["", "not a url", "ftp://chiefharena.example"]) {
+      expect(resolveInquiryConfig({ ...base, NEXT_PUBLIC_SITE_URL }, { production: true })).toEqual({
+        available: false,
+        reason: "site-url-not-configured",
+      });
+      expect(resolveInquiryConfig({ ...base, NEXT_PUBLIC_SITE_URL }, { production: false })).toMatchObject({
+        available: true,
+        captcha: { mode: "turnstile", expectedHostname: null },
+      });
     }
+  });
+
+  it("requires an https site URL for email in production (staff links point to it)", () => {
+    expect(
+      resolveInquiryConfig(
+        { ...base, ...emailEnv, NEXT_PUBLIC_SITE_URL: "http://chiefharena.example" },
+        { production: true },
+      ),
+    ).toMatchObject({ available: true, email: null, emailProblem: "site-url-required" });
     expect(
       resolveInquiryConfig({ ...base, ...emailEnv, NEXT_PUBLIC_SITE_URL: "" }, { production: false }),
     ).toMatchObject({ email: { siteUrl: new URL("http://localhost:3000") }, emailProblem: null });

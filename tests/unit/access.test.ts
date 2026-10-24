@@ -35,6 +35,15 @@ describe("decideAdminAccess", () => {
     expect(decideAdminAccess(session, "bookings.read_all").kind).toBe("forbidden");
   });
 
+  it("accepts any one of several permissions", () => {
+    const anyBookings = ["bookings.read_all", "bookings.read_assigned"] as const;
+    expect(decideAdminAccess(signedIn(["event_manager"]), anyBookings).kind).toBe("allow");
+    expect(decideAdminAccess(signedIn(["admin"]), anyBookings).kind).toBe("allow");
+    expect(decideAdminAccess(signedIn(["content_editor"]), anyBookings).kind).toBe("forbidden");
+    expect(decideAdminAccess(signedIn(["analyst"]), anyBookings).kind).toBe("forbidden");
+    expect(decideAdminAccess(signedIn(["owner"]), []).kind).toBe("forbidden");
+  });
+
   it.each<[AppRole, Parameters<typeof decideAdminAccess>[1], "allow" | "forbidden"]>([
     ["owner", "users.manage_privileged", "allow"],
     ["admin", "users.manage_privileged", "forbidden"],

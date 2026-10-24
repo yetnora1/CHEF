@@ -31,7 +31,7 @@ export async function Hero({ eyebrow, headline, lede, photoSubject }: HeroProps)
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Button asChild size="lg">
-              <Link href={{ pathname: "/", hash: HOME_SECTIONS.inquire }}>
+              <Link href="/book">
                 {t("heroPrimaryCta")}
                 <ArrowRight aria-hidden />
               </Link>

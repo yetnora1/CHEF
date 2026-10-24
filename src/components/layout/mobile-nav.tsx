@@ -1,13 +1,16 @@
 "use client";
 
 import { Menu } from "lucide-react";
+import type { ComponentProps } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./locale-switcher";
 
+export type NavLink = { key: string; href: ComponentProps<typeof Link>["href"]; label: string };
+
 type MobileNavProps = {
-  links: { hash: string; label: string }[];
+  links: NavLink[];
   labels: { open: string; close: string; title: string };
 };
 
@@ -24,10 +27,10 @@ export function MobileNav({ links, labels }: MobileNavProps) {
         <nav aria-label={labels.title}>
           <ul className="flex flex-col">
             {links.map((link) => (
-              <li key={link.hash} className="border-b border-border">
+              <li key={link.key} className="border-b border-border">
                 <SheetClose asChild>
                   <Link
-                    href={{ pathname: "/", hash: link.hash }}
+                    href={link.href}
                     className="block py-4 display-md transition-colors hover:text-accent-ink"
                   >
                     {link.label}

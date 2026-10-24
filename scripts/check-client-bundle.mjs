@@ -2,8 +2,10 @@
 /**
  * Verifies that server-only secrets never reach browser-delivered output.
  *
- * 1. Builds the app with canary values: a public key (expected in client JS)
- *    and a server-only secret (must appear nowhere the browser can fetch).
+ * 1. Builds the app with canary values: public keys (expected in client JS)
+ *    and every server-only secret the app reads (must appear nowhere the
+ *    browser can fetch). The canaries form a complete configuration, so the
+ *    inquiry form and its server code paths are built as in production.
  * 2. Scans .next/static plus prerendered HTML/RSC payloads.
  * 3. Fails if the secret canary or any real-looking secret key is found, or if
  *    the public canary is missing (which would mean the scan itself is broken).
@@ -19,7 +21,14 @@ const distDir = path.join(root, ".next");
 const CANARY = {
   url: "https://canary-bundle-check.supabase.co",
   publishable: "sb_publishable_CANARYpublic0bundle0check",
-  secret: "sb_secret_CANARYserverOnly0mustNotLeak",
+  turnstileSiteKey: "0x4CANARYpublicTurnstileSiteKey",
+};
+
+const SECRETS = {
+  SUPABASE_SECRET_KEY: "sb_secret_CANARYserverOnly0mustNotLeak",
+  TURNSTILE_SECRET_KEY: "0x4CANARYturnstileSecret0mustNotLeak",
+  RESEND_API_KEY: "re_CANARYresendKey0mustNotLeak",
+  CRON_SECRET: "CANARYcronSecret0mustNotLeak0000000000000",
 };
 
 console.log("› Building with canary environment values…");
@@ -32,7 +41,12 @@ const build = spawnSync("npx next build", {
     ...process.env,
     NEXT_PUBLIC_SUPABASE_URL: CANARY.url,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: CANARY.publishable,
-    SUPABASE_SECRET_KEY: CANARY.secret,
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: CANARY.turnstileSiteKey,
+    INQUIRY_EMAIL_FROM: "Canary <canary@example.test>",
+    INQUIRY_NOTIFY_TO: "canary@example.test",
+    NEXT_PUBLIC_SITE_URL: "https://canary-bundle-check.example",
+    CLIENT_IP_HEADER: "cf-connecting-ip",
+    ...SECRETS,
   },
 });
 if (build.status !== 0) {
@@ -63,7 +77,11 @@ const secretPattern = /sb_secret_[A-Za-z0-9]{8,}|"role"\s*:\s*"service_role"/;
 for (const file of browserFiles) {
   const text = readFileSync(file, "utf8");
   if (text.includes(CANARY.publishable)) foundPublic = true;
-  if (text.includes(CANARY.secret) || secretPattern.test(text)) leaks.push(path.relative(root, file));
+  const leaked = Object.entries(SECRETS)
+    .filter(([, value]) => text.includes(value))
+    .map(([name]) => name);
+  if (secretPattern.test(text)) leaked.push("secret-key pattern");
+  if (leaked.length) leaks.push(`${path.relative(root, file)} (${leaked.join(", ")})`);
 }
 
 rmSync(distDir, { recursive: true, force: true });
@@ -81,4 +99,4 @@ if (leaks.length > 0) {
   for (const file of leaks) console.error(`  - ${file}`);
   process.exit(1);
 }
-console.log("✓ No server-only secrets in client output (public key correctly present).");
+console.log(`✓ None of ${Object.keys(SECRETS).join(", ")} in client output (public key correctly present).`);

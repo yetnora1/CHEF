@@ -68,14 +68,33 @@ grant roles outside these rules or forge/erase audit entries through the Data AP
 
 ## Table access summary
 
-| Table                              | anon                                                                                                                                                              | authenticated (by policy)                                                                                                                                                                                                           |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `profiles`                         | none                                                                                                                                                              | read own (all with `users.read`); update own `display_name`, `preferred_locale` only                                                                                                                                                |
-| `user_roles`                       | none                                                                                                                                                              | read own (all with `users.read`); **no writes**                                                                                                                                                                                     |
-| `role_permissions`                 | none                                                                                                                                                              | read with `users.read`; **no writes** (migrations only)                                                                                                                                                                             |
-| `audit_logs`                       | none                                                                                                                                                              | read with `audit.read`; **no writes**; triggers block UPDATE, DELETE and TRUNCATE even for the DB owner                                                                                                                             |
-| `services`, `service_translations` | published rows only (translation visible only if it and its service are published); **public columns only** (no `updated_by`/timestamps, so `select *` is denied) | all rows with `content.read`; write drafts with `content.write` / `translations.write`; publishing, unpublishing, editing live rows and deleting (unpublished rows only) require `content.publish`; `updated_by` stamped by trigger |
-| `bookings`                         | **none**                                                                                                                                                          | all with `bookings.read_all`; only rows assigned to them with `bookings.read_assigned`; assignee changes require `bookings.assign`; delete with `bookings.delete`                                                                   |
+| Table                                                | anon                                                                                                                                                              | authenticated (by policy)                                                                                                                                                                                                           |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `profiles`                                           | none                                                                                                                                                              | read own (all with `users.read`); update own `display_name`, `preferred_locale` only                                                                                                                                                |
+| `user_roles`                                         | none                                                                                                                                                              | read own (all with `users.read`); **no writes**                                                                                                                                                                                     |
+| `role_permissions`                                   | none                                                                                                                                                              | read with `users.read`; **no writes** (migrations only)                                                                                                                                                                             |
+| `audit_logs`                                         | none                                                                                                                                                              | read with `audit.read`; **no writes**; triggers block UPDATE, DELETE and TRUNCATE even for the DB owner                                                                                                                             |
+| `services`, `service_translations`                   | published rows only (translation visible only if it and its service are published); **public columns only** (no `updated_by`/timestamps, so `select *` is denied) | all rows with `content.read`; write drafts with `content.write` / `translations.write`; publishing, unpublishing, editing live rows and deleting (unpublished rows only) require `content.publish`; `updated_by` stamped by trigger |
+| `bookings`                                           | **none**                                                                                                                                                          | all with `bookings.read_all`; only rows assigned to them with `bookings.read_assigned`; **no direct INSERT or UPDATE** (status, assignee and notes only via audited functions); delete with `bookings.delete` (audited)             |
+| `booking_status_history`, `booking_notes`            | **none**                                                                                                                                                          | readable exactly when the parent inquiry is readable; **no direct writes** (history by trigger, notes via `add_booking_note`)                                                                                                       |
+| `private.rate_limits`, `private.notification_outbox` | **none**                                                                                                                                                          | **none** (only SECURITY DEFINER functions, executable by `service_role`)                                                                                                                                                            |
+
+### Inquiry functions (Stage 2)
+
+| Function                                                                               | Caller              | Authorization                                                                                               |
+| -------------------------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `submit_inquiry`, `consume_rate_limit`, `claim_notifications`, `complete_notification` | `service_role` only | Server-side callers only; status/assignment/source are not parameters                                       |
+| `list_bookings`, `get_booking_detail`, `booking_inbox_counts`                          | `authenticated`     | SECURITY INVOKER: RLS decides; unauthorized callers get no rows                                             |
+| `change_booking_status`, `add_booking_note`                                            | `authenticated`     | `bookings.write_all`, or `bookings.write_assigned` on own assignments; missing and forbidden look identical |
+| `assign_booking`, `list_assignable_staff`                                              | `authenticated`     | `bookings.assign`; assignee must hold a booking write permission                                            |
+| `booking_report`                                                                       | `authenticated`     | `reports.read`; aggregates only                                                                             |
+
+The server secret key (`service_role`) has **no** direct privileges on any booking table. A leaked
+key or a server bug can create inquiries, consume rate-limit counters, and claim and complete queued
+notifications (an acknowledgement includes the customer's email address); it cannot list, alter or
+delete inquiries. It still carries Supabase Auth admin rights, so it must be treated as a full
+secret and rotated if exposed. See [INQUIRIES.md](INQUIRIES.md) for abuse controls (rate limits, Turnstile,
+honeypot, body limit) and their verification status.
 
 Helper `private.has_permission(p)` is SECURITY DEFINER (so policies on `user_roles` don't recurse),
 `STABLE`, has a fixed empty `search_path`, and only ever answers for `auth.uid()`. Policies call it
@@ -101,25 +120,36 @@ schema is not exposed through the Data API.
 
 ## Verification
 
-- `npm run test:db`: 67 tests on real Postgres covering anon, roleless, editor, event manager,
-  analyst, admin, owner and service-role behaviour, privileges, definer hygiene and the matrix.
+- `npm run test:db`: 121 tests on Postgres 18 (PGlite) covering anon, roleless, editor, event
+  manager, analyst, admin, owner and service-role behaviour, privileges, definer hygiene, the matrix,
+  and the inquiry workflow (submission, limits, lifecycle, assignment, notes, outbox, erasure).
 - Independent review (Stage 1): a separate read-only security review of the migrations and
   auth code found no critical, high or medium issues. All five low-severity findings were fixed
   with regression tests: Secure cookie flag, TRUNCATE/service_role on audit and privilege
   tables, anon reading `updated_by`, the role-change race, and publish gating for translations.
+- Independent review (Stage 2): a second read-only review of the inquiry system reported one
+  medium finding (junk requests could exhaust the per-mailbox and site-wide rate-limit budgets
+  before CAPTCHA) and several low ones. All were fixed with regression tests: two-phase rate limits
+  with mailbox normalisation; a required, proxy-set client IP header read from the right; no direct
+  INSERT/UPDATE on `bookings` for staff and a stricter email constraint plus a guarded `mailto:`;
+  `method="post"` and hydration gating on forms; a name-free customer acknowledgement; an `https`
+  site URL for email in production; Turnstile hostname checking; corrected secret-key wording.
 - `npm run test:e2e`: forged session cookies, wrong credentials, open redirect, unconfigured
   admin, and role-specific admin rendering.
 - `npm run check:bundle`: canary-secret scan of build output.
 
 ## Known gaps (planned)
 
-| Gap                                                                                                               | Plan                                                                                                      |
-| ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| No `script-src` CSP yet (baseline CSP covers framing, `<base>`, plugins, form targets)                            | Nonce-based CSP in the hardening stage                                                                    |
-| No application-level rate limiting or CAPTCHA                                                                     | Turnstile/hCaptcha via Supabase Auth and on the inquiry form (Stage 2/5)                                  |
-| MFA not enforced for owners/admins                                                                                | Enable TOTP and require AAL2 for privileged roles (Stage 4)                                               |
-| RLS verified on PGlite with an auth shim, not yet on the real Supabase stack                                      | Run `supabase db reset` + tests against the local stack once Docker is available                          |
-| Session revocation lag in the proxy (JWT validity ≤ 1 h)                                                          | Mitigated: the DAL calls `getUser()` on every admin render; data requests re-check roles in RLS           |
-| `bookings` column-level edit rules for event managers (e.g. contact details)                                      | Decide with the inquiry workflow (Stage 2)                                                                |
-| Concurrency of role changes reasoned about, not load-tested (PGlite is single-connection)                         | Add a two-connection test against the real local stack                                                    |
-| A signed-in account with no role can read `updated_by` on published content (column grants are per database role) | Acceptable while sign-up is disabled; move public reads to a view if self-service accounts are ever added |
+| Gap                                                                                                               | Plan                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| No `script-src` CSP yet (baseline CSP covers framing, `<base>`, plugins, form targets)                            | Nonce-based CSP in the hardening stage                                                                        |
+| Inquiry form: Turnstile and Resend integrations tested only with mocked HTTP                                      | Test with real (test-mode) credentials before launch                                                          |
+| Per-IP limits are only as good as the `CLIENT_IP_HEADER` choice (required in production)                          | Confirm the header on the chosen platform before launch (INQUIRIES.md); CAPTCHA and shared limits still apply |
+| Admin sign-in has no CAPTCHA; Supabase Auth per-IP limits only                                                    | Enable Supabase Auth CAPTCHA (Turnstile) in the hardening stage                                               |
+| MFA not enforced for owners/admins                                                                                | Enable TOTP and require AAL2 for privileged roles (Stage 4)                                                   |
+| RLS verified on PGlite with an auth shim, not yet on the real Supabase stack                                      | Run `supabase db reset` + tests against the local stack once Docker is available                              |
+| Session revocation lag in the proxy (JWT validity ≤ 1 h)                                                          | Mitigated: the DAL calls `getUser()` on every admin render; data requests re-check roles in RLS               |
+| Staff cannot correct a submitted inquiry (no direct UPDATE on `bookings`)                                         | Add an audited, field-limited edit function if the business needs corrections                                 |
+| Privacy erasure exists in the database (owner `DELETE`, audited) but has no admin UI                              | Add an owner-only, confirmed erasure action (Stage 4)                                                         |
+| Concurrency of role changes reasoned about, not load-tested (PGlite is single-connection)                         | Add a two-connection test against the real local stack                                                        |
+| A signed-in account with no role can read `updated_by` on published content (column grants are per database role) | Acceptable while sign-up is disabled; move public reads to a view if self-service accounts are ever added     |

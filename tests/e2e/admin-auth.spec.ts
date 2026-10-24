@@ -91,7 +91,7 @@ test.describe("role-based admin access", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible();
     const nav = adminNav(page);
     await expect(nav.getByRole("link", { name: "Overview" })).toHaveAttribute("aria-current", "page");
-    await expect(nav.getByText("Inquiries")).toHaveCount(0);
+    await expect(nav.getByText("Inquiries & bookings")).toHaveCount(0);
     await expect(nav.getByText("Staff & roles")).toHaveCount(0);
     await expect(page.getByText("No modules are available for your role yet.")).toBeVisible();
   });
@@ -103,7 +103,7 @@ test.describe("role-based admin access", () => {
     const nav = adminNav(page);
     await expect(nav.getByText("Services")).toBeVisible();
     await expect(nav.getByText("Translations")).toBeVisible();
-    for (const hidden of ["Inquiries", "Bookings", "Staff & roles", "Audit log", "Settings"]) {
+    for (const hidden of ["Inquiries & bookings", "Staff & roles", "Audit log", "Settings"]) {
       await expect(nav.getByText(hidden, { exact: true })).toHaveCount(0);
     }
   });
@@ -111,7 +111,8 @@ test.describe("role-based admin access", () => {
   test("an owner sees every module, keeps the session on reload, and can sign out", async ({ page }) => {
     await signIn(page, TEST_USERS.owner.email);
     const nav = adminNav(page);
-    for (const visible of ["Inquiries", "Bookings", "Staff & roles", "Audit log", "Settings"]) {
+    await expect(nav.getByRole("link", { name: "Inquiries & bookings" })).toBeVisible();
+    for (const visible of ["Staff & roles", "Audit log", "Settings"]) {
       await expect(nav.getByText(visible, { exact: true })).toBeVisible();
     }
 

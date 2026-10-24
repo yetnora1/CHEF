@@ -23,11 +23,31 @@ services ──1:n── service_translations        bookings (private)
                     body, seo_*, updated_by
 ```
 
-| Migration                                       | Contents                                                                                                                                                                                                                                                                                                      |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `20261024100000_identity_roles_permissions.sql` | `private` schema, `locale_code` domain (`en`, `am`), `app_role` / `app_permission` enums, `profiles`, `user_roles`, `role_permissions` (+ matrix data), `audit_logs` (+ append-only trigger), `has_permission`, `get_my_access`, `assign_role`, `revoke_role`, `bootstrap_first_owner`, new-user trigger, RLS |
-| `20261024100100_localized_services.sql`         | `publication_status` enum, `services`, `service_translations`, publish-permission / `published_at` / actor-stamp triggers, RLS                                                                                                                                                                                |
-| `20261024100200_private_bookings.sql`           | `booking_status`, `event_type` enums, `bookings`, assignment trigger, RLS                                                                                                                                                                                                                                     |
+| Migration                                       | Contents                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261024100000_identity_roles_permissions.sql` | `private` schema, `locale_code` domain (`en`, `am`), `app_role` / `app_permission` enums, `profiles`, `user_roles`, `role_permissions` (+ matrix data), `audit_logs` (+ append-only trigger), `has_permission`, `get_my_access`, `assign_role`, `revoke_role`, `bootstrap_first_owner`, new-user trigger, RLS                                                                                                          |
+| `20261024100100_localized_services.sql`         | `publication_status` enum, `services`, `service_translations`, publish-permission / `published_at` / actor-stamp triggers, RLS                                                                                                                                                                                                                                                                                         |
+| `20261024100200_private_bookings.sql`           | `booking_status`, `event_type` enums, `bookings`, assignment trigger, RLS                                                                                                                                                                                                                                                                                                                                              |
+| `20261025090000_booking_status_contacted.sql`   | Adds the `contacted` lifecycle step (own migration: a new enum value cannot be used in the transaction that adds it)                                                                                                                                                                                                                                                                                                   |
+| `20261025090100_inquiry_workflow.sql`           | Inquiry columns, `booking_status_history`, `booking_notes`, `private.rate_limits`, `private.notification_outbox`, transition trigger, `submit_inquiry`, `consume_rate_limit`, outbox functions, admin functions (`list_bookings`, `get_booking_detail`, `booking_inbox_counts`, `booking_report`, `list_assignable_staff`, `change_booking_status`, `assign_booking`, `add_booking_note`), `service_role` restrictions |
+
+## Stage 2 additions
+
+```
+bookings ──1:n── booking_status_history   from/to status, changed_by (no FK), note; written by trigger
+    │      ──1:n── booking_notes          internal, immutable; author_id (no FK)
+    │      ──1:n── private.notification_outbox   once per (booking, kind); pending/sending/sent/failed
+    └── new columns: preferred_contact_method, service_requirements, source (website|staff),
+        submission_key (unique, idempotency), submission_fingerprint, possible_duplicate_of
+private.rate_limits   (bucket, window_start) → hits; hashed identifiers; expires within a day
+```
+
+- History, notes and outbox rows are deleted with their inquiry (privacy erasure); API roles cannot
+  update or delete them otherwise. The audit log keeps only references and statuses, never personal
+  data, and survives erasure.
+- `service_role` (the secret key) has **no** table privileges on any booking table; it can only
+  execute `submit_inquiry`, `consume_rate_limit`, `claim_notifications` and `complete_notification`.
+- Status and assignment cannot be updated directly by any API role; see [INQUIRIES.md](INQUIRIES.md).
 
 Conventions used by every table:
 
@@ -56,8 +76,6 @@ applies the fallback policy in [LOCALIZATION.md](LOCALIZATION.md). Slugs are sha
 
 | Entity                                   | Shape                                                                                                                                             | Stage |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `booking_status_history`                 | `booking_id`, `from_status`, `to_status`, `changed_by`, `note`, `changed_at`; written by trigger on `bookings.status`                             | 2     |
-| `booking_notes` (internal)               | staff-only notes, same RLS scope as the parent booking                                                                                            | 2     |
 | `pages` / `page_translations`            | same pattern as services; structured sections as `jsonb` validated by Zod                                                                         | 3     |
 | `journal_posts` / `journal_translations` | same pattern + `published_at`, author, cover media                                                                                                | 3     |
 | `menu_items` / `menu_item_translations`  | same pattern + dietary tags, ordering, optional grouping                                                                                          | 3     |
@@ -68,7 +86,7 @@ applies the fallback policy in [LOCALIZATION.md](LOCALIZATION.md). Slugs are sha
 ## Migration workflow
 
 ```bash
-npm run db:new add_booking_status_history   # creates supabase/migrations/<timestamp>_add_booking_status_history.sql
+npm run db:new add_site_settings          # creates supabase/migrations/<timestamp>_add_site_settings.sql
 # edit the SQL: create objects → revoke defaults from anon/authenticated → minimal grants → enable RLS → policies
 npm run test:db                              # applies all migrations to in-process Postgres and runs RLS tests
 npm run db:reset                             # (Docker) rebuild the local database from migrations + seed

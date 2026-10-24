@@ -6,18 +6,17 @@ const keysFor = (role: AppRole) => modulesFor(ROLE_PERMISSIONS[role]).map((m) =>
 
 describe("admin module visibility", () => {
   it("shows the owner every module", () => {
-    expect(keysFor("owner")).toHaveLength(12);
+    expect(keysFor("owner")).toHaveLength(11);
   });
 
   it("never lists customer inquiries for content editors or analysts", () => {
     for (const role of ["content_editor", "analyst"] as const) {
-      expect(keysFor(role)).not.toContain("inquiries");
       expect(keysFor(role)).not.toContain("bookings");
     }
   });
 
-  it("limits event managers to inquiries and bookings", () => {
-    expect(keysFor("event_manager")).toEqual(["overview", "inquiries", "bookings"]);
+  it("limits event managers to the inquiry inbox", () => {
+    expect(keysFor("event_manager")).toEqual(["overview", "bookings"]);
   });
 
   it("keeps user management and the audit log away from non-managers", () => {

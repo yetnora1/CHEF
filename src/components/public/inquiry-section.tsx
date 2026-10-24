@@ -1,6 +1,8 @@
-import { Info } from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { Button } from "@/components/ui/button";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
+import { Link } from "@/i18n/navigation";
 import type { ResolvedText } from "@/lib/localization/translations";
 
 type InquirySectionProps = {
@@ -8,10 +10,7 @@ type InquirySectionProps = {
   body: ResolvedText;
 };
 
-/**
- * The event inquiry call to action. The inquiry form itself is the next stage;
- * until then this section says so plainly instead of showing a dead button.
- */
+/** The event inquiry call to action, linking to the inquiry form. */
 export async function InquirySection({ title, body }: InquirySectionProps) {
   const t = await getTranslations("Home");
 
@@ -33,10 +32,18 @@ export async function InquirySection({ title, body }: InquirySectionProps) {
             {body.text}
           </p>
         </div>
-        <p className="flex items-start gap-3 rounded-2xl border border-band-muted/30 bg-white/5 p-5 text-sm text-band-foreground lg:justify-self-end">
-          <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-band-accent" />
-          {t("inquiryStatus")}
-        </p>
+        <div className="space-y-4 lg:justify-self-end">
+          <Button asChild variant="band" size="lg">
+            <Link href="/book">
+              {t("inquiryCta")}
+              <ArrowRight aria-hidden />
+            </Link>
+          </Button>
+          <p className="flex items-start gap-2 text-sm text-band-muted">
+            <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-band-accent" />
+            {t("inquiryNote")}
+          </p>
+        </div>
       </div>
       <span aria-hidden className="tilet-band text-band-accent" />
     </section>

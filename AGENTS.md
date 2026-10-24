@@ -20,5 +20,8 @@ Read `docs/ARCHITECTURE.md` and `docs/SECURITY_MODEL.md` before changing routes,
 - Permission changes need a migration **and** `src/lib/permissions/matrix.ts` (tested for drift).
 - Interface strings go in both `src/messages/en.json` and `am.json` (parity is tested). Business
   content is per-locale data, never message keys. Never invent business facts or label English as Amharic.
+- The Supabase secret key is used only in `src/features/bookings/server/store.ts`, and `service_role`
+  may only execute the functions granted to it (see `docs/INQUIRIES.md`). Never add a general
+  service-role client or grant it table access.
 - Use semantic design tokens from `src/app/globals.css`, never raw colours.
 - Before handing off, run `npm run verify` and `npm run test:e2e`.

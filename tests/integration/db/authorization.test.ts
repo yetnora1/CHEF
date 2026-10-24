@@ -300,24 +300,38 @@ describe("event manager", () => {
     expect(result).toMatchObject({ ok: true, rows: [] });
   });
 
-  it("can update the status of an assigned inquiry", async () => {
-    const result = await asActor(
+  it("can change the status of an assigned inquiry through the audited function only", async () => {
+    const direct = await asActor(
       db,
       actor(),
       "update public.bookings set status = 'in_review' where id = $1",
       [assignedBookingId],
     );
-    expect(result).toMatchObject({ ok: true, affectedRows: 1 });
+    const viaFunction = await asActor(db, actor(), "select public.change_booking_status($1, 'in_review')", [
+      assignedBookingId,
+    ]);
+    expect(direct).toMatchObject({ ok: false, code: PERMISSION_DENIED });
+    expect(viaFunction.ok).toBe(true);
   });
 
-  it("cannot update an unassigned inquiry", async () => {
-    const result = await asActor(
-      db,
-      actor(),
-      "update public.bookings set status = 'confirmed' where id = $1",
-      [unassignedBookingId],
-    );
-    expect(result).toMatchObject({ ok: true, affectedRows: 0 });
+  it("cannot change an unassigned inquiry", async () => {
+    const result = await asActor(db, actor(), "select public.change_booking_status($1, 'in_review')", [
+      unassignedBookingId,
+    ]);
+    expect(result).toMatchObject({ ok: false, code: "P0002" });
+  });
+
+  it("cannot edit inquiry fields directly (all writes go through audited functions)", async () => {
+    for (const sql of [
+      "update public.bookings set venue = 'Updated venue' where id = $1",
+      "update public.bookings set contact_email = 'victim@example.com?bcc=attacker%40evil.example' where id = $1",
+      "update public.bookings set event_date = '2000-01-01' where id = $1",
+    ]) {
+      expect(await asActor(db, actor(), sql, [assignedBookingId]), sql).toMatchObject({
+        ok: false,
+        code: PERMISSION_DENIED,
+      });
+    }
   });
 
   it("cannot reassign an inquiry", async () => {

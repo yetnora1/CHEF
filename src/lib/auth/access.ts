@@ -24,13 +24,18 @@ export type AccessDecision =
 
 /**
  * Pure authorization decision for admin pages. Every protected route requires
- * `admin.access` in addition to its own permission; anything else is denied.
+ * `admin.access` plus its own permission (or any one of a list, e.g.
+ * bookings.read_all OR bookings.read_assigned); anything else is denied.
  */
-export function decideAdminAccess(session: StaffSession, required: AppPermission): AccessDecision {
+export function decideAdminAccess(
+  session: StaffSession,
+  required: AppPermission | readonly AppPermission[],
+): AccessDecision {
   if (session.status !== "signed-in") return { kind: "login", reason: session.status };
 
   const granted = new Set(session.permissions);
-  if (granted.has("admin.access") && granted.has(required)) return { kind: "allow", session };
+  const anyOf = typeof required === "string" ? [required] : required;
+  if (granted.has("admin.access") && anyOf.some((p) => granted.has(p))) return { kind: "allow", session };
 
   return { kind: "forbidden", session };
 }

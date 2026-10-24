@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { AccessDenied } from "@/components/admin/access-denied";
+import { buttonVariants } from "@/components/ui/button";
 import { ADMIN_MODULE_ICONS } from "@/features/admin/module-icons";
 import { modulesFor } from "@/features/admin/modules";
+import { bookingReport, inboxCounts, READ_BOOKINGS } from "@/features/bookings/admin-data";
+import { OPEN_STATUSES } from "@/features/bookings/status";
+import { hasPermission, type SignedInStaffSession } from "@/lib/auth/access";
 import { authorizeAdmin } from "@/lib/auth/staff-session";
 
 // Blocks on the session cookie by design: nothing renders before authorization.
@@ -43,6 +48,8 @@ export default async function AdminOverviewPage() {
         </ul>
       </section>
 
+      <InquirySummary session={session} />
+
       <section aria-labelledby="modules-heading" className="mt-12">
         <h2 id="modules-heading" className="display-md">
           {t("overview.modulesHeading")}
@@ -77,5 +84,58 @@ export default async function AdminOverviewPage() {
         )}
       </section>
     </div>
+  );
+}
+
+/*
+ * Reporting roles get aggregate counts across all inquiries (booking_report:
+ * no personal data). Event managers get counts for the inquiries they can see.
+ */
+async function InquirySummary({ session }: { session: SignedInStaffSession }) {
+  const canReport = hasPermission(session, "reports.read");
+  const canRead = hasPermission(session, READ_BOOKINGS);
+  if (!canReport && !canRead) return null;
+
+  const t = await getTranslations("AdminBookings.summary");
+  let stats: { label: string; value: number }[];
+
+  if (canReport) {
+    const report = await bookingReport();
+    stats = [
+      { label: t("total"), value: report.total },
+      { label: t("last30"), value: report.last_30_days },
+      { label: t("awaitingReview"), value: report.by_status.new ?? 0 },
+      { label: t("open"), value: OPEN_STATUSES.reduce((sum, s) => sum + (report.by_status[s] ?? 0), 0) },
+    ];
+  } else {
+    const counts = await inboxCounts();
+    stats = [
+      { label: t("total"), value: Object.values(counts).reduce((sum, n) => sum + (n ?? 0), 0) },
+      { label: t("awaitingReview"), value: counts.new ?? 0 },
+      { label: t("open"), value: OPEN_STATUSES.reduce((sum, s) => sum + (counts[s] ?? 0), 0) },
+    ];
+  }
+
+  return (
+    <section aria-labelledby="summary-heading" className="mt-12">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h2 id="summary-heading" className="display-md">
+          {t("title")}
+        </h2>
+        {canRead && (
+          <Link href="/admin/bookings" className={buttonVariants({ variant: "outline", size: "sm" })}>
+            {t("openInbox")}
+          </Link>
+        )}
+      </div>
+      <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label} className="rounded-2xl border border-border bg-surface p-5">
+            <dt className="text-sm text-muted-foreground">{stat.label}</dt>
+            <dd className="mt-2 font-display text-3xl tabular-nums">{stat.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

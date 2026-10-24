@@ -1,5 +1,4 @@
 import {
-  CalendarCheck,
   ConciergeBell,
   FolderOpen,
   Images,
@@ -18,8 +17,7 @@ import type { AdminModuleKey } from "./modules";
 // Shared by Server and Client Components, so this module must not be "use client".
 export const ADMIN_MODULE_ICONS: Record<AdminModuleKey, LucideIcon> = {
   overview: LayoutDashboard,
-  inquiries: Inbox,
-  bookings: CalendarCheck,
+  bookings: Inbox,
   services: ConciergeBell,
   menu: UtensilsCrossed,
   gallery: Images,

@@ -32,6 +32,13 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      // The largest legitimate request is an inquiry (~25 KB with Amharic text
+      // at the field limits). Anything bigger is rejected before parsing.
+      bodySizeLimit: "64kb",
+    },
+  },
   turbopack: {
     rules: {
       "*.css": {

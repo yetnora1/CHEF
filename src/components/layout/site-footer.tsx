@@ -1,4 +1,5 @@
 import { cacheLife } from "next/cache";
+import type { ComponentProps } from "react";
 import { getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/brand/wordmark";
 import { Link } from "@/i18n/navigation";
@@ -19,10 +20,11 @@ export async function SiteFooter() {
     currentYear(),
   ]);
 
-  const links = [
-    { hash: HOME_SECTIONS.about, label: tNav("about") },
-    { hash: HOME_SECTIONS.services, label: tNav("services") },
-    { hash: HOME_SECTIONS.inquire, label: tNav("planEvent") },
+  const links: { key: string; href: ComponentProps<typeof Link>["href"]; label: string }[] = [
+    { key: "about", href: { pathname: "/", hash: HOME_SECTIONS.about }, label: tNav("about") },
+    { key: "services", href: { pathname: "/", hash: HOME_SECTIONS.services }, label: tNav("services") },
+    { key: "book", href: "/book", label: tNav("planEvent") },
+    { key: "privacy", href: "/privacy", label: tNav("privacy") },
   ];
 
   return (
@@ -37,9 +39,9 @@ export async function SiteFooter() {
         <nav aria-label={t("navigationLabel")}>
           <ul className="space-y-3 text-sm">
             {links.map((link) => (
-              <li key={link.hash}>
+              <li key={link.key}>
                 <Link
-                  href={{ pathname: "/", hash: link.hash }}
+                  href={link.href}
                   className="text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {link.label}

@@ -100,10 +100,44 @@ describe("function privileges", () => {
     `);
     expect(rows).toEqual([
       { fn: "private.has_permission", role: "authenticated" },
+      { fn: "private.staff_display_name", role: "authenticated" },
+      { fn: "public.add_booking_note", role: "authenticated" },
+      { fn: "public.assign_booking", role: "authenticated" },
       { fn: "public.assign_role", role: "authenticated" },
+      { fn: "public.booking_inbox_counts", role: "authenticated" },
+      { fn: "public.booking_report", role: "authenticated" },
+      { fn: "public.change_booking_status", role: "authenticated" },
+      { fn: "public.get_booking_detail", role: "authenticated" },
       { fn: "public.get_my_access", role: "authenticated" },
+      { fn: "public.list_assignable_staff", role: "authenticated" },
+      { fn: "public.list_bookings", role: "authenticated" },
       { fn: "public.revoke_role", role: "authenticated" },
     ]);
+  });
+
+  it("reserve submission and delivery functions for the server secret key", async () => {
+    const { rows } = await db.query<{ fn: string; anon: boolean; authenticated: boolean; service: boolean }>(`
+      select p.proname as fn,
+             has_function_privilege('anon', p.oid, 'execute') as anon,
+             has_function_privilege('authenticated', p.oid, 'execute') as authenticated,
+             has_function_privilege('service_role', p.oid, 'execute') as service
+      from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.proname in ('submit_inquiry', 'consume_rate_limit', 'claim_notifications', 'complete_notification')
+      order by 1
+    `);
+    expect(rows).toHaveLength(4);
+    for (const row of rows)
+      expect(row, row.fn).toMatchObject({ anon: false, authenticated: false, service: true });
+  });
+
+  it("give the server secret key no direct access to booking data", async () => {
+    const { rows } = await db.query<{ t: string; any_privilege: boolean }>(`
+      select t, has_table_privilege('service_role', t, 'select,insert,update,delete,truncate') as any_privilege
+      from unnest(array['public.bookings', 'public.booking_status_history', 'public.booking_notes',
+                        'private.rate_limits', 'private.notification_outbox']) as t
+    `);
+    for (const row of rows) expect(row.any_privilege, row.t).toBe(false);
   });
 });
 

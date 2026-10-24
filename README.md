@@ -9,21 +9,26 @@ It is two connected applications in one Next.js codebase:
 - **Admin application** (`/admin/…`): staff-only, role-based management of content, inquiries,
   media, translations, users and settings.
 
-> **Status: Stage 1 foundation.** The architecture, design system, bilingual routing, themes,
-> database security model and admin authentication are in place. Most admin modules, the CMS and
-> the inquiry form are **not built yet** (see [Roadmap](#roadmap)). The public homepage shows clearly
-> labelled placeholder copy and photography; no business details have been invented.
+> **Status: Stage 2 (event inquiries).** On top of the Stage 1 foundation, visitors can send event
+> inquiries (`/en/book`, `/am/book`) and staff can review, assign, annotate and progress them in
+> `/admin/bookings`. The CMS and remaining admin modules are **not built yet** (see [Roadmap](#roadmap)).
+> Placeholder copy and photography are clearly labelled; no business details have been invented.
+>
+> **Not yet verified against a real Supabase instance** (Docker was unavailable during development):
+> database rules are tested on PGlite and the admin/inquiry browser flows against a Supabase test
+> double. See [Verification status](#verification-status).
 
 ## Documentation
 
-| Document                                                                   | Contents                                                    |
-| -------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                               | Structure, route map, rendering model, request flow         |
-| [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md)                           | Roles, permission matrix, authorization layers, known gaps  |
-| [docs/DATABASE.md](docs/DATABASE.md)                                       | Schema, migrations, local Supabase workflow, DB tests       |
-| [docs/LOCALIZATION.md](docs/LOCALIZATION.md)                               | Locale strategy, fallback policy, fonts, translation review |
-| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)                             | Tokens, themes, typography, motifs, components              |
-| [docs/adr/0001-stage-1-foundation.md](docs/adr/0001-stage-1-foundation.md) | Architecture decisions and their trade-offs                 |
+| Document                                         | Contents                                                    |
+| ------------------------------------------------ | ----------------------------------------------------------- |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)     | Structure, route map, rendering model, request flow         |
+| [docs/SECURITY_MODEL.md](docs/SECURITY_MODEL.md) | Roles, permission matrix, authorization layers, known gaps  |
+| [docs/DATABASE.md](docs/DATABASE.md)             | Schema, migrations, local Supabase workflow, DB tests       |
+| [docs/LOCALIZATION.md](docs/LOCALIZATION.md)     | Locale strategy, fallback policy, fonts, translation review |
+| [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)   | Tokens, themes, typography, motifs, components              |
+| [docs/INQUIRIES.md](docs/INQUIRIES.md)           | Inquiry form, abuse controls, workflow, email, operations   |
+| [docs/adr/](docs/adr/)                           | Architecture decisions (0001 foundation, 0002 inquiries)    |
 
 ## Tech stack
 
@@ -86,6 +91,23 @@ arrives in a later stage).
 4. In the dashboard, disable public sign-ups (Authentication → Sign In / Providers), create a user,
    and run `select private.bootstrap_first_owner('you@example.com');` in the SQL editor.
 
+### Event inquiries configuration
+
+The inquiry form accepts submissions only when storage **and** abuse protection are configured;
+otherwise `/book` says plainly that online inquiries are not open yet (fail closed).
+
+| To enable…                     | Set                                                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Storage (required)             | `SUPABASE_SECRET_KEY` (server-only secret key) plus the public Supabase variables                                                 |
+| CAPTCHA (required, production) | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` from a Cloudflare Turnstile widget                                      |
+| Local testing without CAPTCHA  | `INQUIRY_LOCAL_CAPTCHA_BYPASS=true` (ignored by every production build)                                                           |
+| Rate-limit IP source           | `CLIENT_IP_HEADER` (required in production): a header your proxy sets; `CLIENT_IP_TRUSTED_HOPS`                                   |
+| Email (optional)               | `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`, `INQUIRY_NOTIFY_TO`, https `NEXT_PUBLIC_SITE_URL` in production; optionally `CRON_SECRET` |
+
+For local tests with a real widget, Cloudflare publishes always-pass test keys
+(site `1x00000000000000000000AA`, secret `1x0000000000000000000000000000000AA`); production refuses them.
+Details: [docs/INQUIRIES.md](docs/INQUIRIES.md).
+
 ### Run the app
 
 ```bash
@@ -100,12 +122,19 @@ npm run dev                # http://localhost:3000 → redirects to /en or /am
 
 ## Environment variables
 
-| Variable                               | Scope       | Required  | Purpose                                                         |
-| -------------------------------------- | ----------- | --------- | --------------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`             | public      | for admin | Supabase API URL                                                |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | public      | for admin | Supabase publishable key (RLS still applies)                    |
-| `NEXT_PUBLIC_SITE_URL`                 | public      | no        | Canonical origin for metadata (default `http://localhost:3000`) |
-| `SUPABASE_SECRET_KEY`                  | server-only | not yet   | Stage 2+ (trusted inquiry inserts, staff invitations)           |
+| Variable                                                    | Scope       | Required               | Purpose                                                                       |
+| ----------------------------------------------------------- | ----------- | ---------------------- | ----------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`                                  | public      | for admin              | Supabase API URL                                                              |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`                      | public      | for admin              | Supabase publishable key (RLS still applies)                                  |
+| `NEXT_PUBLIC_SITE_URL`                                      | public      | for email              | Canonical origin; email links, Turnstile hostname check (https in production) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`                            | public      | inquiries              | Cloudflare Turnstile widget                                                   |
+| `SUPABASE_SECRET_KEY`                                       | server-only | inquiries              | Calls only the inquiry/rate-limit/outbox functions                            |
+| `TURNSTILE_SECRET_KEY`                                      | server-only | inquiries              | Turnstile verification (production refuses test keys)                         |
+| `INQUIRY_LOCAL_CAPTCHA_BYPASS`                              | server-only | no                     | `true` = local testing without CAPTCHA; ignored in production                 |
+| `CLIENT_IP_HEADER`                                          | server-only | inquiries (production) | Proxy-set header carrying the client IP for rate limiting                     |
+| `CLIENT_IP_TRUSTED_HOPS`                                    | server-only | no                     | Proxies you control in front of a list header (1–5, default 1)                |
+| `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`, `INQUIRY_NOTIFY_TO` | server-only | no                     | Optional email via Resend                                                     |
+| `CRON_SECRET`                                               | server-only | no                     | Enables the email-retry endpoint for a scheduler                              |
 
 The app refuses to use a secret or `service_role` key placed in a `NEXT_PUBLIC_` variable.
 Never commit `.env.local`; only `.env.example` (placeholders) is tracked.
@@ -139,10 +168,11 @@ src/
     [locale]/            public site (root layout per locale: /en, /am)
     admin/               admin app (separate root layout, no locale prefix)
       login/             sign-in
-      (protected)/       everything behind authorization (overview, future modules)
+      (protected)/       everything behind authorization (overview, bookings inbox, future modules)
+    api/internal/        server-to-server endpoints (email outbox retries)
     globals.css          design tokens, themes, typography, motifs
   components/            ui/ (primitives) · layout/ · public/ · admin/ · brand/ · theme/
-  features/              feature logic: admin modules, auth, content, localization
+  features/              feature logic: admin modules, auth, bookings (inquiries), content, localization
   i18n/                  next-intl routing, request config, navigation helpers
   lib/                   auth (DAL), permissions, supabase clients, localization, theme, fonts
   messages/              interface translations (en.json, am.json)
@@ -154,20 +184,34 @@ supabase/
 tests/
   unit/                  pure logic, catalogues, design tokens
   integration/db/        migrations + RLS on Postgres (PGlite) with a Supabase auth shim
-  e2e/                   Playwright, incl. a fake Supabase HTTP test double for sign-in flows
+  e2e/                   Playwright, incl. a Supabase test double (fake Auth, real SQL on PGlite)
 scripts/                 check-client-bundle.mjs
 docs/                    architecture, security, database, localization, design, ADRs
 ```
 
 ## Roadmap
 
-| Stage                           | Scope                                                                                                                                    |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| **1 — Foundation (this stage)** | Architecture, design system, EN/AM routing, themes, schema + RLS for identity, roles, services, bookings; admin authentication and shell |
-| 2 — Event inquiries             | Public inquiry form (validated server action, abuse controls), admin inquiry inbox, status history, notifications                        |
-| 3 — CMS                         | Pages, services, menu, gallery, journal with per-locale editing and publishing; media library on Supabase Storage                        |
-| 4 — Staff & settings            | Invitations, role management UI, site settings, audit-log viewer, MFA for privileged roles                                               |
-| 5 — Hardening & launch          | Nonce-based CSP, rate limiting/CAPTCHA, monitoring, SEO (sitemap, structured data), deployment                                           |
+| Stage                                | Scope                                                                                                                                                            |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 — Foundation                       | Architecture, design system, EN/AM routing, themes, schema + RLS for identity, roles, services, bookings; admin authentication and shell                         |
+| **2 — Event inquiries (this stage)** | Public inquiry form (validated server action, rate limits, Turnstile), admin inbox, lifecycle, assignment, notes, history, optional email outbox, privacy notice |
+| 3 — CMS                              | Pages, services, menu, gallery, journal with per-locale editing and publishing; media library on Supabase Storage                                                |
+| 4 — Staff & settings                 | Invitations, role management UI, site settings, audit-log viewer, MFA for privileged roles                                                                       |
+| 5 — Hardening & launch               | Real-Supabase verification, nonce-based CSP, monitoring, SEO (sitemap, structured data), deployment                                                              |
+
+## Verification status
+
+| Layer                                  | What runs                                                                                                                                     | Real Supabase?                                        |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Unit (Vitest)                          | validation, config fail-closed rules, CAPTCHA verifier, rate-limit buckets, submission pipeline, email templates/outbox, contrast, catalogues | n/a                                                   |
+| Database (Vitest + PGlite)             | every migration; RLS, grants and SQL functions as `anon`/`authenticated`/`service_role`                                                       | **No**: Postgres 18 in WASM with a Supabase auth shim |
+| Browser (Playwright)                   | public site; fail-closed admin and inquiry form; sign-in, roles, inquiry submission and staff workflow                                        | **No**: a test double (fake Auth; real SQL on PGlite) |
+| Real local Supabase (`supabase start`) | not run: Docker unavailable                                                                                                                   | —                                                     |
+| Deployed Supabase project              | none exists                                                                                                                                   | —                                                     |
+| Cloudflare Turnstile, Resend           | verified with mocked HTTP only                                                                                                                | —                                                     |
+
+Before launch, run the migrations on a real Supabase stack, repeat the DB and e2e checks there, and
+test Turnstile and email with real (test-mode) credentials.
 
 ## Content and claims policy
 

@@ -61,19 +61,25 @@ Ethiopic blocks or basic Latin/punctuation covered by the fonts; an e2e test ass
 Ethiopic faces actually load and are used on `/am`; full-page screenshots in light/dark, desktop
 and mobile were reviewed during Stage 1.
 
-**Dates:** `Intl` formats Amharic dates in the Gregorian calendar by default. Whether to show
-Ethiopian-calendar dates (`am-ET-u-ca-ethiopic`) for inquiries is a product decision for Stage 2.
+**Dates:** dates are stored and entered in the Gregorian calendar (the inquiry form uses the
+browser's native date picker), and shown with `Intl` in Addis Ababa time. Offering
+Ethiopian-calendar display (`am-ET-u-ca-ethiopic`) or entry is an open product decision; the data
+model needs no change for it.
 
 ## Translation review required before launch
 
 All Amharic in this repository was drafted without a native-speaker review. It is labelled as
 draft and must be reviewed before launch:
 
-| Location                                             | What                                                               |
-| ---------------------------------------------------- | ------------------------------------------------------------------ |
-| `src/messages/am.json`                               | All interface strings                                              |
-| `src/features/content/home-content.ts` (`am` fields) | Homepage placeholder copy                                          |
-| `supabase/seed.sql`                                  | Amharic service rows (seeded as `draft`, so they are never public) |
+| Location                                                | What                                                                              |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `src/messages/am.json`                                  | All interface strings, incl. Stage 2: inquiry form, errors, statuses, admin inbox |
+| `src/features/content/home-content.ts` (`am` fields)    | Homepage placeholder copy                                                         |
+| `src/features/content/privacy-content.ts` (`am`)        | Privacy notice: needs native-speaker **and legal** review; the page says so       |
+| `src/features/bookings/server/email.ts` (`ACK_COPY.am`) | Customer acknowledgement email                                                    |
+| `supabase/seed.sql`                                     | Amharic service rows (seeded as `draft`, so they are never public)                |
+
+Staff alert emails are English-only for now (the business has not chosen a staff language).
 
 Open questions for the reviewer:
 

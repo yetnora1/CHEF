@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./locale-switcher";
-import { MobileNav } from "./mobile-nav";
+import { MobileNav, type NavLink } from "./mobile-nav";
 
 export async function SiteHeader() {
   const t = await getTranslations("Navigation");
   const tBrand = await getTranslations("Brand");
 
-  const links = [
-    { hash: HOME_SECTIONS.about, label: t("about") },
-    { hash: HOME_SECTIONS.services, label: t("services") },
+  const links: NavLink[] = [
+    { key: "about", href: { pathname: "/", hash: HOME_SECTIONS.about }, label: t("about") },
+    { key: "services", href: { pathname: "/", hash: HOME_SECTIONS.services }, label: t("services") },
   ];
 
   return (
@@ -26,9 +26,9 @@ export async function SiteHeader() {
         <nav aria-label={t("primaryLabel")} className="hidden md:block">
           <ul className="flex items-center gap-8 text-sm font-medium">
             {links.map((link) => (
-              <li key={link.hash}>
+              <li key={link.key}>
                 <Link
-                  href={{ pathname: "/", hash: link.hash }}
+                  href={link.href}
                   className="text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {link.label}
@@ -42,10 +42,10 @@ export async function SiteHeader() {
           <LocaleSwitcher className="hidden sm:inline-flex" />
           <ThemeToggle />
           <Button asChild size="sm" className="ml-1 hidden md:inline-flex">
-            <Link href={{ pathname: "/", hash: HOME_SECTIONS.inquire }}>{t("planEvent")}</Link>
+            <Link href="/book">{t("planEvent")}</Link>
           </Button>
           <MobileNav
-            links={[...links, { hash: HOME_SECTIONS.inquire, label: t("planEvent") }]}
+            links={[...links, { key: "book", href: "/book", label: t("planEvent") }]}
             labels={{ open: t("openMenu"), close: t("closeMenu"), title: t("menuTitle") }}
           />
         </div>

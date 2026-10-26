@@ -53,16 +53,18 @@ previews), while its interface labels follow the admin's interface language.
 
 ## Fonts and Ethiopic typography
 
-| Use                | Latin                     | Ethiopic                 |
-| ------------------ | ------------------------- | ------------------------ |
-| Display / headings | Manrope, bold and tighter | Noto Sans Ethiopic, bold |
-| Interface / body   | Manrope                   | Noto Sans Ethiopic       |
+| Use                | Latin                                          | Ethiopic                 |
+| ------------------ | ---------------------------------------------- | ------------------------ |
+| Display / headings | System font, bold                              | Noto Sans Ethiopic, bold |
+| Interface / body   | System font (Segoe UI, San Francisco, Roboto…) | Noto Sans Ethiopic       |
 
-- Both families are SIL Open Font License 1.1, self-hosted by `next/font` (downloaded at build
-  time; visitors never contact Google). Builds need network access to fetch them. Stage 3.6
-  dropped the serif display faces (Fraunces, Noto Serif Ethiopic) for one plain sans family.
-- Stacks list the Latin face first; the browser falls through to the Ethiopic face per glyph, so
-  mixed text such as "Chief Harena ለሠርግ…" renders correctly.
+- Latin text uses the device's own UI font, so nothing is downloaded for it. Noto Sans Ethiopic
+  (SIL Open Font License 1.1) is self-hosted by `next/font` (downloaded at build time; visitors
+  never contact Google), because system Ethiopic coverage varies by device. Builds need network
+  access to fetch it. Stage 3.6 dropped the serif display faces (Fraunces, Noto Serif Ethiopic)
+  and then the Manrope web font, at the owner's request for a "normal" font.
+- Stacks list the Latin system fonts first; the browser falls through to the Ethiopic face per
+  glyph, so mixed text such as "Chief Harena ለሠርግ…" renders correctly.
 - Only the `ethiopic` subset is requested (Ethiopic U+1200–137F, Supplement U+1380–139F and the
   Extended blocks).
 - Ethiopic-specific typography via `:lang(am)`: body line-height 1.85; headings with looser

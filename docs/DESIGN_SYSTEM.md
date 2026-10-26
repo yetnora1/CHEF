@@ -38,17 +38,18 @@ semantic tokens make it rarely necessary.
 
 ## Typography
 
-One sans family throughout: Manrope for Latin, Noto Sans Ethiopic for Amharic. Headings are the
-same face set heavier and tighter, not a separate display face.
+Latin text uses the visitor's own system font (Segoe UI on Windows, San Francisco on Apple devices,
+Roboto on Android), so the site reads like any everyday app; Amharic uses Noto Sans Ethiopic.
+Headings are the same font in bold, with normal letter-spacing, not a separate display face.
 
-| Utility       | Use                          | Notes                                                                      |
-| ------------- | ---------------------------- | -------------------------------------------------------------------------- |
-| `display-xl`  | Hero headline                | Weight 750, fluid 36→60px, leading 1.08; Amharic 30→48px, leading 1.35     |
-| `display-lg`  | Section headings             | Weight 700, fluid 28→40px                                                  |
-| `display-md`  | Card and panel titles        | Weight 700, 18→22px                                                        |
-| `eyebrow`     | Section labels               | Sentence case, 14px semibold (15px for Ethiopic); no uppercase or tracking |
-| body          | Manrope / Noto Sans Ethiopic | line-height 1.65 (Latin), 1.85 (Amharic)                                   |
-| `admin-title` | Admin page titles            | Weight 700 at an operational size, 24→32px; Amharic 22→28px, leading 1.4   |
+| Utility       | Use                              | Notes                                                                      |
+| ------------- | -------------------------------- | -------------------------------------------------------------------------- |
+| `display-xl`  | Hero headline                    | Bold, fluid 36→56px, leading 1.15; Amharic 30→48px, leading 1.35           |
+| `display-lg`  | Section headings                 | Bold, fluid 28→36px                                                        |
+| `display-md`  | Card and panel titles            | Semibold, 18→22px                                                          |
+| `eyebrow`     | Section labels                   | Sentence case, 14px semibold (15px for Ethiopic); no uppercase or tracking |
+| body          | System font / Noto Sans Ethiopic | line-height 1.65 (Latin), 1.85 (Amharic)                                   |
+| `admin-title` | Admin page titles                | Bold at an operational size, 24→32px; Amharic 22→28px, leading 1.4         |
 
 The public site uses `display-xl`/`display-lg` for page titles; the admin uses `admin-title` for
 every page `h1` and `display-md` for section headings, so operational screens stay compact.

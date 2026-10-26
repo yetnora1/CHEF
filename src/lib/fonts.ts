@@ -1,23 +1,17 @@
-import { Manrope, Noto_Sans_Ethiopic } from "next/font/google";
+import { Noto_Sans_Ethiopic } from "next/font/google";
 
 /*
- * Both families are SIL Open Font License 1.1. next/font downloads them at
- * build time and serves them from this site, so visitors never contact Google.
+ * Latin text uses the visitor's own system font (Segoe UI on Windows, San
+ * Francisco on Apple devices, Roboto on Android), through the font stacks in
+ * globals.css. Nothing is downloaded for it.
  *
- * Latin:    Manrope, for headings and body text alike
- * Ethiopic: Noto Sans Ethiopic, covering the Ethiopic, Ethiopic Supplement and
- *           Ethiopic Extended blocks used by Amharic.
- *
- * Only the `ethiopic` subset of Noto Sans Ethiopic is requested; Latin text
- * keeps using Manrope through the font stacks in globals.css. It is preloaded
- * because the language switcher renders Ethiopic ("አማርኛ") on every page.
+ * Ethiopic: Noto Sans Ethiopic (SIL Open Font License 1.1), because system
+ * Ethiopic coverage varies by device. next/font downloads it at build time and
+ * serves it from this site, so visitors never contact Google. Only the
+ * `ethiopic` subset is requested (Ethiopic, Ethiopic Supplement and Ethiopic
+ * Extended blocks); it is preloaded because the language switcher renders
+ * Ethiopic ("አማርኛ") on every page.
  */
-
-export const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-  display: "swap",
-});
 
 export const notoSansEthiopic = Noto_Sans_Ethiopic({
   subsets: ["ethiopic"],
@@ -25,4 +19,4 @@ export const notoSansEthiopic = Noto_Sans_Ethiopic({
   display: "swap",
 });
 
-export const fontVariables = [manrope.variable, notoSansEthiopic.variable].join(" ");
+export const fontVariables = notoSansEthiopic.variable;

@@ -70,8 +70,8 @@ previews), while its interface labels follow the admin's interface language.
 - Ethiopic-specific typography via `:lang(am)`: body line-height 1.85; headings with looser
   line-height (1.35–1.5), no negative tracking, slightly smaller display sizes; eyebrows (sentence
   case in both scripts) and the language switchers are enlarged to 12.5–15px for Ethiopic. Footer
-  fine print, the preview bar and the "Sample photo" label remain 11–12px in both scripts; revisit
-  with the native-speaker review.
+  fine print and the "Sample photo" label remain 11–12px in both scripts; revisit with the
+  native-speaker review.
 
 **Verification performed:** the message test parses every message with the ICU grammar next-intl
 uses and requires the same arguments (including those inside plural branches) and rich-text tags in

@@ -19,10 +19,12 @@ themes change in one place.
 Each token is declared once as `light-dark(<light>, <dark>)`; `color-scheme` on `<html>` selects
 the half:
 
-| Theme state                  | How it is set                                                                                        | Result                                                           |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| First visit / "Match device" | no `data-theme`                                                                                      | follows the OS (`prefers-color-scheme`), also without JavaScript |
-| Light / Dark chosen          | `localStorage["chief-harena:theme"]`; inline script in `<head>` sets `data-theme` before first paint | no flash, persists across reloads and both locales               |
+| Theme state              | How it is set                                                                                        | Result                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| First visit              | no `data-theme`                                                                                      | light, whatever the device prefers (also without JavaScript)            |
+| Switched with the button | `localStorage["chief-harena:theme"]`; inline script in `<head>` sets `data-theme` before first paint | no flash, persists across reloads and both locales; `dark` selects dark |
+
+There is no "match device" mode: the owner chose a plain light/dark switch (Stage 3.6).
 
 Tokens: `background`, `foreground`, `surface`, `surface-foreground`, `surface-muted`,
 `muted-foreground`, `border`, `border-strong`, `primary`, `primary-hover`, `primary-foreground`,
@@ -33,7 +35,7 @@ Tokens: `background`, `foreground`, `surface`, `surface-foreground`, `surface-mu
 themes: 4.5:1 for text pairs, 3:1 for focus rings and input borders. Gold is never used as body
 text on ivory (2:1); `accent-ink` (#7E5A1C, 5.5:1) is used instead.
 
-Tailwind's `dark:` variant is redefined to match this model (explicit choice or OS when unset), but
+Tailwind's `dark:` variant is redefined to match this model (`data-theme="dark"` only), but
 semantic tokens make it rarely necessary.
 
 ## Typography
@@ -125,7 +127,7 @@ religious or civic symbol.
 | `ui/sheet`                                              | Radix Dialog side panel (focus trap, Escape, scroll lock) for mobile navigation                                                                                                                                                                                                                                                  |
 | `public/photo-slot`                                     | Until a real image is published: a sample photo with a visible "Sample photo" label and a linked credit, or (no sample) a labelled placeholder naming the photograph to supply                                                                                                                                                   |
 | `layout/locale-switcher`, `admin/admin-locale-switcher` | Native-name language toggles with `lang`/`hreflang`                                                                                                                                                                                                                                                                              |
-| `theme/theme-toggle`                                    | Light / Dark / Match device, state from `useSyncExternalStore`, syncs across tabs                                                                                                                                                                                                                                                |
+| `theme/theme-toggle`                                    | One icon button: each click switches light ↔ dark (a toggle button, `aria-pressed` = dark), remembered per browser; state from `useSyncExternalStore`, syncs across tabs                                                                                                                                                         |
 | `layout/nav-link`                                       | Public navigation link with `aria-current` (`page`, or `true` inside a section); styled with `aria-[current]:` variants                                                                                                                                                                                                          |
 | `admin/admin-nav`                                       | Sidebar; a module stays current on the pages below it (`isModuleActive`)                                                                                                                                                                                                                                                         |
 | `admin/filter-disclosure`                               | On phones, list filters fold behind a "Filter …" toggle that shows the active count; open while filters apply                                                                                                                                                                                                                    |

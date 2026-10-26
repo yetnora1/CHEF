@@ -1,18 +1,16 @@
 export const THEME_STORAGE_KEY = "chief-harena:theme";
 
-export const THEME_PREFERENCES = ["light", "dark", "system"] as const;
+/** Light is the default; dark applies only when chosen with the theme button. */
+export type Theme = "light" | "dark";
 
-export type ThemePreference = (typeof THEME_PREFERENCES)[number];
-export type ResolvedTheme = Exclude<ThemePreference, "system">;
-
-export function isExplicitTheme(value: unknown): value is ResolvedTheme {
+export function isTheme(value: unknown): value is Theme {
   return value === "light" || value === "dark";
 }
 
 /**
- * Runs synchronously in <head> before first paint. Only an explicit choice is
- * applied; with no stored choice, CSS `color-scheme: light dark` follows the
- * operating system, which also works with JavaScript disabled.
+ * Runs synchronously in <head> before first paint. A stored choice is applied
+ * as data-theme; with none, CSS renders the light theme (the device's
+ * light/dark setting is deliberately ignored), also with JavaScript disabled.
  */
 export const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem(${JSON.stringify(
   THEME_STORAGE_KEY,

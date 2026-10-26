@@ -7,7 +7,6 @@
   },
   "Common": {
     "skipToContent": "ወደ ዋናው ይዘት ይዝለሉ",
-    "previewNotice": "ቅድመ እይታ፦ ጽሑፎቹና ፎቶዎቹ ጊዜያዊ ናቸው፤ የChief Harena የመጨረሻ ይዘት ይጠበቃል።",
     "demoTitle": "የማሳያ ሁነታ።",
     "demoBody": "ናሙና ይዘትና የሙከራ መለያዎች በዚህ ኮምፒውተር ማህደረ ትውስታ ውስጥ ብቻ ናቸው። ምንም ነገር አይቀመጥም፣ አይላክም ወይም አይታተምም፤ ማሳያው ሲቆም ሁሉም ይጠፋል።",
     "placeholderBadge": "ጊዜያዊ",
@@ -45,11 +44,7 @@
     "switchTo": "ወደ {language} ይቀይሩ"
   },
   "Theme": {
-    "label": "ገጽታ",
-    "trigger": "ገጽታ፦ {theme}",
-    "light": "ብሩህ",
-    "dark": "ጨለማ",
-    "system": "እንደ መሣሪያው"
+    "dark": "ጨለማ ገጽታ"
   },
   "Home": {
     "heroPrimaryCta": "ዝግጅት ያቅዱ",

@@ -7,7 +7,6 @@
   },
   "Common": {
     "skipToContent": "Skip to main content",
-    "previewNotice": "Preview: placeholder copy and photography, pending Chief Harena's final content.",
     "demoTitle": "Demo mode.",
     "demoBody": "Sample content and test accounts, held in memory on this computer. Nothing is saved, sent or published, and everything resets when the demo stops.",
     "placeholderBadge": "Placeholder",
@@ -45,11 +44,7 @@
     "switchTo": "Switch to {language}"
   },
   "Theme": {
-    "label": "Theme",
-    "trigger": "Theme: {theme}",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "Match device"
+    "dark": "Dark theme"
   },
   "Home": {
     "heroPrimaryCta": "Plan an event",

@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { DemoBanner } from "@/components/layout/demo-banner";
-import { PreviewNotice } from "@/components/layout/preview-notice";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SkipLink } from "@/components/layout/skip-link";
@@ -18,11 +17,10 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// The site opens in light whatever the device prefers (dark is a choice made
+// with the theme button), so the browser bar matches the light background.
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f0e6" },
-    { media: "(prefers-color-scheme: dark)", color: "#171d1a" },
-  ],
+  themeColor: "#f5f0e6",
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -61,7 +59,6 @@ export default async function PublicRootLayout({ children }: LayoutProps<"/[loca
         <NextIntlClientProvider messages={messages}>
           <SkipLink label={t("skipToContent")} />
           <DemoBanner />
-          <PreviewNotice />
           <SiteHeader />
           <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
             {children}

@@ -23,7 +23,7 @@ describe("theme init script", () => {
     expect(runInitScript("light")).toBe("light");
   });
 
-  it("leaves the attribute unset so CSS follows the OS on first visit", () => {
+  it("leaves the attribute unset without a stored choice, so CSS renders light", () => {
     expect(runInitScript(null)).toBeUndefined();
     expect(runInitScript("system")).toBeUndefined();
   });

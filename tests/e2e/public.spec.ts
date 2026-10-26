@@ -39,7 +39,8 @@ test.describe("locale routing", () => {
     await expect(page).toHaveTitle(/Chief Harena/);
     await expect(page.locator('link[rel="alternate"][hreflang="am"]')).toHaveAttribute("href", /\/am$/);
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
-    await expect(page.getByText("Preview: placeholder copy and photography")).toBeVisible();
+    // The site-wide preview banner was removed at the owner's request (Stage 3.6).
+    await expect(page.getByText("Preview: placeholder copy")).toHaveCount(0);
     // The inquiry band describes the form that exists (Stage 2), not one still to come.
     await expect(page.getByText("through the inquiry form")).toBeVisible();
     // Demo mode is off in every normal build.
@@ -90,33 +91,42 @@ test.describe("locale routing", () => {
 });
 
 test.describe("theme", () => {
+  // The device prefers dark; the site ignores that and opens in light.
   test.use({ colorScheme: "dark" });
 
-  test("follows the operating system on first visit", async ({ page }) => {
+  test("opens in light whatever the device prefers", async ({ page }) => {
     await page.goto("/en");
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
-    expect(await bodyBackground(page)).toBe(CHARCOAL);
+    expect(await bodyBackground(page)).toBe(IVORY);
   });
 
-  test("persists an explicit choice across reloads and navigation", async ({ page }) => {
+  test("one button switches between light and dark and remembers the choice", async ({ page }) => {
     await page.goto("/en");
-    await page.getByRole("button", { name: /^Theme/ }).click();
-    await page.getByRole("menuitemradio", { name: "Light" }).click();
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-    expect(await bodyBackground(page)).toBe(IVORY);
+    const toggle = page.getByRole("button", { name: "Dark theme" });
+    // aria-pressed appears once the button is hydrated, so clicks after this count.
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+
+    await toggle.click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    // A direct switch: no menu of choices opens.
+    await expect(page.getByRole("menu")).toHaveCount(0);
+    expect(await bodyBackground(page)).toBe(CHARCOAL);
 
     await page.reload();
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-    expect(await bodyBackground(page)).toBe(IVORY);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    expect(await bodyBackground(page)).toBe(CHARCOAL);
 
     await page.goto("/am");
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    const amToggle = page.getByRole("button", { name: "ጨለማ ገጽታ" });
+    await expect(amToggle).toHaveAttribute("aria-pressed", "true");
 
-    await page.getByRole("button", { name: /^ገጽታ/ }).click();
-    await page.getByRole("menuitemradio", { name: "እንደ መሣሪያው" }).click();
-    await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
-    expect(await page.evaluate(() => localStorage.getItem("chief-harena:theme"))).toBeNull();
-    expect(await bodyBackground(page)).toBe(CHARCOAL);
+    await amToggle.click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(amToggle).toHaveAttribute("aria-pressed", "false");
+    expect(await page.evaluate(() => localStorage.getItem("chief-harena:theme"))).toBe("light");
+    expect(await bodyBackground(page)).toBe(IVORY);
   });
 
   test("applies a stored theme before first paint", async ({ page, request }) => {
@@ -126,7 +136,7 @@ test.describe("theme", () => {
     expect(html.indexOf("chief-harena:theme")).toBeLessThan(html.indexOf("<body"));
 
     await page.addInitScript(() => {
-      localStorage.setItem("chief-harena:theme", "light");
+      localStorage.setItem("chief-harena:theme", "dark");
       document.addEventListener("DOMContentLoaded", () => {
         (window as unknown as { themeAtParse: string | null }).themeAtParse =
           document.documentElement.getAttribute("data-theme");
@@ -135,7 +145,7 @@ test.describe("theme", () => {
     await page.goto("/en");
     expect(
       await page.evaluate(() => (window as unknown as { themeAtParse: string | null }).themeAtParse),
-    ).toBe("light");
+    ).toBe("dark");
   });
 });
 

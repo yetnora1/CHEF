@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
-import { Emblem } from "./emblem";
+import { Logo } from "./logo";
 
 export function Wordmark({ tagline, className }: { tagline: string; className?: string }) {
   return (
     <span className={cn("inline-flex items-center gap-3", className)}>
-      <Emblem />
+      <Logo />
       <span className="flex flex-col leading-none">
         <span className="font-display text-[1.2rem] font-bold" lang="en">
           Chef Harena

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
-import { Emblem } from "@/components/brand/emblem";
+import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { AdminLocaleSwitcher } from "./admin-locale-switcher";
 
@@ -12,7 +12,7 @@ export async function AuthShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-dvh flex-col">
       <header className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <span className="inline-flex items-center gap-2.5 text-sm font-semibold">
-          <Emblem className="size-8" />
+          <Logo className="size-8" />
           <span>
             <span lang="en">Chef Harena</span>
             <span className="text-muted-foreground"> · {t("appName")}</span>

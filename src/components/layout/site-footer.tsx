@@ -11,7 +11,7 @@ async function currentYear() {
   return new Date().getFullYear();
 }
 
-/** A compact footer: brand and links on one row, the fine print on another. */
+/** A compact footer: brand and links on one row, the copyright on another. */
 export async function SiteFooter() {
   const [t, tNav, tBrand, year] = await Promise.all([
     getTranslations("Footer"),
@@ -46,10 +46,7 @@ export async function SiteFooter() {
         </nav>
       </div>
       <div className="border-t border-border">
-        <div className="page-container flex flex-col gap-1 py-4 text-xs text-muted-foreground md:flex-row md:justify-between md:gap-6">
-          <p>{t("copyright", { year })}</p>
-          <p className="md:text-right">{t("photoCredit")}</p>
-        </div>
+        <p className="page-container py-4 text-xs text-muted-foreground">{t("copyright", { year })}</p>
       </div>
     </footer>
   );

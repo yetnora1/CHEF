@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
-import { Emblem } from "@/components/brand/emblem";
+import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { modulesFor } from "@/features/admin/modules";
 import type { SignedInStaffSession } from "@/lib/auth/access";
@@ -38,7 +38,7 @@ export async function AdminShell({
 
   const brand = (
     <span className="inline-flex items-center gap-2.5 text-sm font-semibold">
-      <Emblem className="size-8" />
+      <Logo className="size-8" />
       <span>
         <span lang="en">Chef Harena</span>
         <span className="block text-xs font-medium text-muted-foreground">{t("appName")}</span>

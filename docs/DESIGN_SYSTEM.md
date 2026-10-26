@@ -68,7 +68,7 @@ every page `h1` and `display-md` for section headings, so operational screens st
 
 - `page-container`: up to 80rem with 1 / 1.5 / 2rem gutters. Text measures: `max-w-3xl` for
   articles, the About page, the privacy notice and the menu; `max-w-xl`/`max-w-2xl` for ledes.
-- Vertical rhythm: homepage sections `py-14 md:py-20`, the inquiry band a slim `py-8 md:py-10` row, the footer two compact rows; content pages `py-14 md:py-20`; admin pages
+- Vertical rhythm: homepage sections `py-14 md:py-20`, the inquiry band a slim `py-8 md:py-10` row, the footer two compact rows (links; copyright); content pages `py-14 md:py-20`; admin pages
   `py-8 lg:py-12` inside the shell.
 - The public header shows its links inline only from `lg`: with every section published (about,
   services, menu, gallery, journal) five links do not fit beside the actions on a tablet. An e2e
@@ -108,8 +108,20 @@ regional pattern or meaning.
 - `dot-texture`: fine dotted texture marking photography placeholders (only where no sample photo
   exists).
 
-The emblem (`src/components/brand/emblem.tsx`) is an abstract ring and lozenge, deliberately not a
-religious or civic symbol.
+## Logo
+
+`src/components/brand/logo.tsx`: an "H" monogram (Harena) whose crossbar is the gold lozenge from
+the woven-border motif, in ivory and gold on a forest-green tile with 10/40 rounded corners. It is
+abstract by design, not a religious or civic symbol. Brand colours are fixed (palette tokens), so
+it is identical in both themes; in dark mode a hairline outline separates the tile from the dark
+background. Readable from 16px up.
+
+| Where                                   | How                                                                  |
+| --------------------------------------- | -------------------------------------------------------------------- |
+| Public header and footer                | `Wordmark` (logo, "Chef Harena", tagline)                            |
+| Admin sidebar/header and sign-in screen | `Logo` at 32px beside "Chef Harena · Admin"                          |
+| Browser tab                             | `src/app/icon.svg`, the same drawing in fixed hex colours            |
+| Phone home screen                       | `src/app/apple-icon.png`, 180px, full-bleed (iOS rounds the corners) |
 
 ## Two design languages
 
@@ -153,7 +165,7 @@ licensed **sample photo** from Wikimedia Commons (`src/features/content/sample-p
 `src/assets/samples`), so the preview reads as a real site rather than a wireframe. Rules:
 
 - Every sample carries a visible "Sample photo" label and its credit (photographer and licence),
-  linked to the Commons page that states the licence; the footer says the same. None is ever
+  linked to the Commons page that states the licence. None is ever
   presented as Chef Harena's food or events.
 - No sample shows an identifiable face, so no stranger stands in for the chef or a client. The
   "chef" slot uses a coffee-ceremony still life, not a portrait.

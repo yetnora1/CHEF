@@ -6,10 +6,10 @@ export function Wordmark({ tagline, className }: { tagline: string; className?: 
     <span className={cn("inline-flex items-center gap-3", className)}>
       <Emblem />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-[1.35rem] font-medium tracking-[-0.01em]" lang="en">
+        <span className="font-display text-[1.2rem] font-bold tracking-[-0.02em]" lang="en">
           Chief Harena
         </span>
-        <span className="mt-1 text-[0.68rem] font-semibold tracking-[0.18em] text-muted-foreground uppercase [&:lang(am)]:text-[0.78rem] [&:lang(am)]:tracking-normal">
+        <span className="mt-1 text-xs font-medium text-muted-foreground [&:lang(am)]:text-[0.78rem]">
           {tagline}
         </span>
       </span>

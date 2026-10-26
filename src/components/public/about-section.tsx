@@ -4,8 +4,11 @@ import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-i
 import { Markup } from "@/features/cms/markup";
 import { Link } from "@/i18n/navigation";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
+import { samplePhotos } from "@/features/content/sample-photos";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { PhotoSlot } from "./photo-slot";
+
+const ABOUT_IMAGE_SIZES = "(min-width: 48rem) 40vw, 24rem";
 
 type AboutSectionProps = {
   title: ResolvedText;
@@ -35,11 +38,16 @@ export async function AboutSection({
     <section id={HOME_SECTIONS.about} aria-labelledby="about-heading" className="py-20 md:py-28">
       <div className="page-container grid items-center gap-12 md:grid-cols-[0.8fr_1fr] lg:gap-20">
         {image ? (
-          <div className="aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[1.75rem] bg-surface-muted md:max-w-none">
-            <CmsImage image={image} sizes="(min-width: 48rem) 40vw, 24rem" />
+          <div className="aspect-[4/5] w-full max-w-sm overflow-hidden rounded-2xl bg-surface-muted md:max-w-none">
+            <CmsImage image={image} sizes={ABOUT_IMAGE_SIZES} />
           </div>
         ) : (
-          <PhotoSlot subject={photoSubject} className="aspect-[4/5] w-full max-w-sm md:max-w-none" />
+          <PhotoSlot
+            subject={photoSubject}
+            sample={samplePhotos.about}
+            sizes={ABOUT_IMAGE_SIZES}
+            className="aspect-[4/5] w-full max-w-sm md:max-w-none"
+          />
         )}
 
         <div className="max-w-xl">
@@ -64,10 +72,13 @@ export async function AboutSection({
           {moreHref && (
             <Link
               href={moreHref}
-              className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink hover:underline"
+              className="group/more mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink underline-offset-4 hover:text-foreground hover:underline"
             >
               {t("aboutMore")}
-              <ArrowRight aria-hidden className="size-4" />
+              <ArrowRight
+                aria-hidden
+                className="size-4 transition-transform duration-200 motion-safe:group-hover/more:translate-x-0.5"
+              />
             </Link>
           )}
         </div>

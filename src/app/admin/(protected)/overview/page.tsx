@@ -300,7 +300,7 @@ async function InquirySummary({ session }: { session: SignedInStaffSession }) {
         {stats.map((stat) => (
           <div key={stat.label} className="rounded-2xl border border-border bg-surface p-5">
             <dt className="text-sm text-muted-foreground">{stat.label}</dt>
-            <dd className="mt-2 font-display text-3xl tabular-nums">{stat.value}</dd>
+            <dd className="mt-2 font-display text-3xl font-bold tracking-tight tabular-nums">{stat.value}</dd>
           </div>
         ))}
       </dl>

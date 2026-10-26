@@ -2,9 +2,15 @@ import { getTranslations } from "next-intl/server";
 import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-image";
 import { Link } from "@/i18n/navigation";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
+import { samplePhotoFor } from "@/features/content/sample-photos";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { cn } from "@/lib/utils";
 import { PhotoSlot } from "./photo-slot";
+
+const SERVICE_IMAGE_SIZES = "(min-width: 64rem) 18rem, (min-width: 40rem) 50vw, 100vw";
+// A linked card's photo zooms slightly while the card is hovered.
+const CARD_IMAGE_HOVER =
+  "transition-transform duration-260 ease-out motion-safe:group-hover/card:scale-[1.03]";
 
 export type ServiceCard = {
   slug: string;
@@ -54,24 +60,30 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
 
         {/* Placeholder cards are not links; published services link to their page. */}
         <ul className={cn("mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2", desktopColumns(services.length))}>
-          {services.map((service, index) => (
-            <li key={service.slug} className="relative flex flex-col">
+          {services.map((service) => (
+            <li key={service.slug} className="group/card relative flex flex-col">
               {service.image ? (
-                <div className="aspect-[4/3] w-full overflow-hidden rounded-[1.75rem] bg-surface-muted">
+                <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-muted">
                   <CmsImage
                     image={service.image}
-                    sizes="(min-width: 64rem) 18rem, (min-width: 40rem) 50vw, 100vw"
+                    sizes={SERVICE_IMAGE_SIZES}
+                    className={service.href ? CARD_IMAGE_HOVER : undefined}
                   />
                 </div>
               ) : (
-                <PhotoSlot subject={service.photoSubject} className="aspect-[4/3] w-full" />
+                <PhotoSlot
+                  subject={service.photoSubject}
+                  sample={samplePhotoFor(service.slug)}
+                  sizes={SERVICE_IMAGE_SIZES}
+                  className="aspect-[4/3] w-full"
+                />
               )}
-              <p aria-hidden className="mt-6 font-display text-sm text-accent-ink tabular-nums">
-                {String(index + 1).padStart(2, "0")}
-              </p>
-              <h3 className="mt-2 display-md" lang={service.title.lang}>
+              <h3 className="mt-5 display-md" lang={service.title.lang}>
                 {service.href ? (
-                  <Link href={service.href} className="after:absolute after:inset-0 hover:underline">
+                  <Link
+                    href={service.href}
+                    className="underline-offset-4 group-hover/card:underline after:absolute after:inset-0"
+                  >
                     {service.title.text}
                   </Link>
                 ) : (

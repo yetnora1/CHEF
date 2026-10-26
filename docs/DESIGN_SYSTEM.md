@@ -38,14 +38,17 @@ semantic tokens make it rarely necessary.
 
 ## Typography
 
-| Utility       | Use                          | Notes                                                                                       |
-| ------------- | ---------------------------- | ------------------------------------------------------------------------------------------- |
-| `display-xl`  | Hero headline                | Fraunces, fluid 42→88px, tight leading; Amharic: Noto Serif Ethiopic, 34→64px, leading 1.32 |
-| `display-lg`  | Section headings             | Fluid 32→56px                                                                               |
-| `display-md`  | Card and panel titles        | 22→28px                                                                                     |
-| `eyebrow`     | Section labels               | Uppercase, tracked for Latin; plain and larger for Ethiopic                                 |
-| body          | Manrope / Noto Sans Ethiopic | line-height 1.65 (Latin), 1.85 (Amharic)                                                    |
-| `admin-title` | Admin page titles            | Fraunces at an operational size, 28→38px; Amharic 24→32px, leading 1.4                      |
+One sans family throughout: Manrope for Latin, Noto Sans Ethiopic for Amharic. Headings are the
+same face set heavier and tighter, not a separate display face.
+
+| Utility       | Use                          | Notes                                                                      |
+| ------------- | ---------------------------- | -------------------------------------------------------------------------- |
+| `display-xl`  | Hero headline                | Weight 750, fluid 36→60px, leading 1.08; Amharic 30→48px, leading 1.35     |
+| `display-lg`  | Section headings             | Weight 700, fluid 28→40px                                                  |
+| `display-md`  | Card and panel titles        | Weight 700, 18→22px                                                        |
+| `eyebrow`     | Section labels               | Sentence case, 14px semibold (15px for Ethiopic); no uppercase or tracking |
+| body          | Manrope / Noto Sans Ethiopic | line-height 1.65 (Latin), 1.85 (Amharic)                                   |
+| `admin-title` | Admin page titles            | Weight 700 at an operational size, 24→32px; Amharic 22→28px, leading 1.4   |
 
 The public site uses `display-xl`/`display-lg` for page titles; the admin uses `admin-title` for
 every page `h1` and `display-md` for section headings, so operational screens stay compact.
@@ -74,7 +77,7 @@ every page `h1` and `display-md` for section headings, so operational screens st
 
 | Slot                                       | Ratio         | Notes                                                |
 | ------------------------------------------ | ------------- | ---------------------------------------------------- |
-| Homepage hero                              | 4:5, arch top | `preload`; gold offset outline                       |
+| Homepage hero                              | 4:5           | `preload`; same 16px corners as every photo          |
 | Homepage and About portrait / story images | 4:5           | About sections alternate image sides                 |
 | Service, journal and list cards; gallery   | 4:3           | Gallery captions and credits sit in the `figcaption` |
 | Service and journal article image          | 16:9          | Wider than the text column (`max-w-4xl`)             |
@@ -100,31 +103,32 @@ regional pattern or meaning.
 - `tilet-band`: diamond chain with edge rules, used under the hero and around the inquiry band.
 - `tilet-rule`: small lozenge divider for headings and the footer.
 - `lattice-backdrop`: very faint diagonal lattice behind the inquiry band.
-- `dot-texture`: fine dotted texture marking photography placeholders.
+- `dot-texture`: fine dotted texture marking photography placeholders (only where no sample photo
+  exists).
 
 The emblem (`src/components/brand/emblem.tsx`) is an abstract ring and lozenge, deliberately not a
 religious or civic symbol.
 
 ## Two design languages
 
-| Public site                                                                                    | Admin                                                                                                                                     |
-| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Editorial serif headlines, asymmetric grids, arch photo frame, brand band, generous whitespace | Sans-serif, compact density, sidebar plus sticky header, cards and badges, minimal ornament (wordmark and a single tilet band on sign-in) |
+| Public site                                                                            | Admin                                                                                                                                     |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Bold sans headlines, asymmetric grids, photo-led hero, brand band, generous whitespace | Sans-serif, compact density, sidebar plus sticky header, cards and badges, minimal ornament (wordmark and a single tilet band on sign-in) |
 
 ## Components
 
-| Component                                               | Notes                                                                                                                   |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `ui/button`                                             | Variants `primary`, `outline`, `ghost`, `band`, `band-outline`; sizes `sm/md/lg/icon`; `asChild` for links              |
-| `ui/dropdown-menu`                                      | Radix; used by the theme toggle and account menu                                                                        |
-| `ui/sheet`                                              | Radix Dialog side panel (focus trap, Escape, scroll lock) for mobile navigation                                         |
-| `public/photo-slot`                                     | Labelled placeholder that names the photograph to supply; swap in `next/image` once real, licensed photography exists   |
-| `layout/locale-switcher`, `admin/admin-locale-switcher` | Native-name language toggles with `lang`/`hreflang`                                                                     |
-| `theme/theme-toggle`                                    | Light / Dark / Match device, state from `useSyncExternalStore`, syncs across tabs                                       |
-| `layout/nav-link`                                       | Public navigation link with `aria-current` (`page`, or `true` inside a section); styled with `aria-[current]:` variants |
-| `admin/admin-nav`                                       | Sidebar; a module stays current on the pages below it (`isModuleActive`)                                                |
-| `admin/filter-disclosure`                               | On phones, list filters fold behind a "Filter …" toggle that shows the active count; open while filters apply           |
-| `layout/demo-banner`                                    | "Demo mode" notice on every page when `NEXT_PUBLIC_DEMO_MODE=true` (`npm run dev:demo` only)                            |
+| Component                                               | Notes                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ui/button`                                             | Variants `primary`, `outline`, `ghost`, `band`, `band-outline`; sizes `sm/md/lg/icon`; `asChild` for links. 8px corners. Hover: deeper fill or border; solid and outline variants also rise 1px with a shadow (`motion-safe` only) and settle when pressed; icons can react through `group-hover/button:` (arrows nudge forward) |
+| `ui/dropdown-menu`                                      | Radix; used by the theme toggle and account menu                                                                                                                                                                                                                                                                                 |
+| `ui/sheet`                                              | Radix Dialog side panel (focus trap, Escape, scroll lock) for mobile navigation                                                                                                                                                                                                                                                  |
+| `public/photo-slot`                                     | Until a real image is published: a sample photo with a visible "Sample photo" label and a linked credit, or (no sample) a labelled placeholder naming the photograph to supply                                                                                                                                                   |
+| `layout/locale-switcher`, `admin/admin-locale-switcher` | Native-name language toggles with `lang`/`hreflang`                                                                                                                                                                                                                                                                              |
+| `theme/theme-toggle`                                    | Light / Dark / Match device, state from `useSyncExternalStore`, syncs across tabs                                                                                                                                                                                                                                                |
+| `layout/nav-link`                                       | Public navigation link with `aria-current` (`page`, or `true` inside a section); styled with `aria-[current]:` variants                                                                                                                                                                                                          |
+| `admin/admin-nav`                                       | Sidebar; a module stays current on the pages below it (`isModuleActive`)                                                                                                                                                                                                                                                         |
+| `admin/filter-disclosure`                               | On phones, list filters fold behind a "Filter …" toggle that shows the active count; open while filters apply                                                                                                                                                                                                                    |
+| `layout/demo-banner`                                    | "Demo mode" notice on every page when `NEXT_PUBLIC_DEMO_MODE=true` (`npm run dev:demo` only)                                                                                                                                                                                                                                     |
 
 New primitives can be added with the shadcn CLI (`components.json` is configured); restyle them to
 the semantic tokens above.
@@ -142,6 +146,27 @@ the semantic tokens above.
 
 ## Photography
 
-No stock photography is used, so nothing can be mistaken for Chief Harena's own work. Each slot
-names the intended shot (for example "a portrait of Chief Harena" or "a wedding feast") so the
-chef can supply or commission it. The media library (Stage 3) will add licence and credit fields.
+A published image from the media library always wins. Until one exists, a slot shows an openly
+licensed **sample photo** from Wikimedia Commons (`src/features/content/sample-photos.ts`, files in
+`src/assets/samples`), so the preview reads as a real site rather than a wireframe. Rules:
+
+- Every sample carries a visible "Sample photo" label and its credit (photographer and licence),
+  linked to the Commons page that states the licence; the footer says the same. None is ever
+  presented as Chief Harena's food or events.
+- No sample shows an identifiable face, so no stranger stands in for the chef or a client. The
+  "chef" slot uses a coffee-ceremony still life, not a portrait.
+- Only CC BY / CC BY-SA (or more permissive) images; copies are resized to 1600px and keep the
+  original licence.
+
+| Slot                           | Sample                                  | Credit                       |
+| ------------------------------ | --------------------------------------- | ---------------------------- |
+| Homepage hero                  | Injera, bread, cheese, stews and meat   | FrogsLegs71, CC BY-SA 3.0    |
+| About / the chef               | Jebena over a brazier of incense        | ProtoplasmaKid, CC BY-SA 4.0 |
+| Service: weddings              | Platter of injera with stews and eggs   | Miguel Discart, CC BY-SA 2.0 |
+| Service: corporate events      | Coffee ceremony sets laid out on grass  | Khajitdadddy, CC BY-SA 4.0   |
+| Service: summits & conferences | Shared beyaynetu platter                | Jean Rebiffé, CC BY-SA 4.0   |
+| Service: culinary experiences  | Jebena on a stove beside roasted coffee | Radosław Botev, CC BY 3.0 PL |
+
+A slot with no sample keeps the labelled placeholder, which names the intended shot (for example
+"a portrait of Chief Harena") so the chef can supply or commission it. Replacing the samples with
+Chief Harena's own photography is the single biggest step toward a site that feels personal.

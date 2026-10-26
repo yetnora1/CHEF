@@ -55,7 +55,7 @@ export async function FallbackNote({ lang }: { lang?: AppLocale }) {
 export async function EmptyState({ title, body }: { title: string; body: string }) {
   const t = await getTranslations("PublicContent");
   return (
-    <div className="mt-12 rounded-[1.75rem] border border-dashed border-border-strong bg-surface p-8 text-center sm:p-12">
+    <div className="mt-12 rounded-2xl border border-dashed border-border-strong bg-surface p-8 text-center sm:p-12">
       <p className="display-md">{title}</p>
       <p className="mx-auto mt-3 max-w-xl text-muted-foreground">{body}</p>
       <Button asChild className="mt-6">
@@ -109,7 +109,7 @@ export async function ArticleView({
           image={image}
           sizes="(min-width: 64rem) 56rem, 100vw"
           className="mx-auto mt-10 max-w-4xl"
-          frameClassName="aspect-[16/9] rounded-[1.75rem]"
+          frameClassName="aspect-[16/9] rounded-2xl"
           creditLabel={t("credit")}
           preload
         />
@@ -136,9 +136,9 @@ export async function CardGrid({ items, cta }: { items: CardItem[]; cta: string 
         <li key={item.key} className="flex flex-col">
           <Link
             href={item.href}
-            className="group flex flex-col rounded-[1.75rem] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+            className="group flex flex-col rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >
-            <div className="aspect-[4/3] overflow-hidden rounded-[1.75rem] bg-surface-muted">
+            <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-surface-muted">
               {item.image ? (
                 <CmsImage
                   image={item.image}
@@ -286,7 +286,7 @@ export async function AboutView({ sections }: { sections: AboutSectionView[] }) 
             <CmsFigure
               image={section.image}
               sizes="(min-width: 48rem) 40vw, 100vw"
-              frameClassName="aspect-[4/5] rounded-[1.75rem]"
+              frameClassName="aspect-[4/5] rounded-2xl"
               creditLabel={t("credit")}
               className={index % 2 === 1 ? "md:order-2" : undefined}
               preload={index === 0}

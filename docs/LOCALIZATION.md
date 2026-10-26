@@ -53,29 +53,30 @@ previews), while its interface labels follow the admin's interface language.
 
 ## Fonts and Ethiopic typography
 
-| Use                | Latin    | Ethiopic            |
-| ------------------ | -------- | ------------------- |
-| Display / headings | Fraunces | Noto Serif Ethiopic |
-| Interface / body   | Manrope  | Noto Sans Ethiopic  |
+| Use                | Latin                     | Ethiopic                 |
+| ------------------ | ------------------------- | ------------------------ |
+| Display / headings | Manrope, bold and tighter | Noto Sans Ethiopic, bold |
+| Interface / body   | Manrope                   | Noto Sans Ethiopic       |
 
-- All four families are SIL Open Font License 1.1, self-hosted by `next/font` (downloaded at build
-  time; visitors never contact Google). Builds need network access to fetch them.
+- Both families are SIL Open Font License 1.1, self-hosted by `next/font` (downloaded at build
+  time; visitors never contact Google). Builds need network access to fetch them. Stage 3.6
+  dropped the serif display faces (Fraunces, Noto Serif Ethiopic) for one plain sans family.
 - Stacks list the Latin face first; the browser falls through to the Ethiopic face per glyph, so
   mixed text such as "Chief Harena ለሠርግ…" renders correctly.
 - Only the `ethiopic` subset is requested (Ethiopic U+1200–137F, Supplement U+1380–139F and the
   Extended blocks).
 - Ethiopic-specific typography via `:lang(am)`: body line-height 1.85; headings with looser
-  line-height (1.3–1.45), no negative tracking, slightly smaller display sizes; no uppercase or
-  wide-tracked eyebrows (Ethiopic has no case); eyebrows, the language switchers and the
-  wordmark tagline are enlarged to 12.5–14px for Ethiopic. Footer fine print and the preview bar
-  remain 12px in both scripts; revisit with the native-speaker review.
+  line-height (1.35–1.5), no negative tracking, slightly smaller display sizes; eyebrows (sentence
+  case in both scripts) and the language switchers are enlarged to 12.5–15px for Ethiopic. Footer
+  fine print, the preview bar and the "Sample photo" label remain 11–12px in both scripts; revisit
+  with the native-speaker review.
 
 **Verification performed:** the message test parses every message with the ICU grammar next-intl
 uses and requires the same arguments (including those inside plural branches) and rich-text tags in
 both languages; a unit test checks that every character in `am.json` falls within the
-Ethiopic blocks or basic Latin/punctuation covered by the fonts; an e2e test asserts that both Noto
-Ethiopic faces actually load and are used on `/am`; full-page screenshots in light/dark, desktop
-and mobile were reviewed during Stage 1.
+Ethiopic blocks or basic Latin/punctuation covered by the fonts; an e2e test asserts that Noto Sans
+Ethiopic actually loads and is used on `/am` (and that the retired serif face does not); full-page
+screenshots in light/dark, desktop and mobile were reviewed in Stage 1 and again in Stage 3.6.
 
 **Dates:** dates are stored and entered in the Gregorian calendar (the inquiry form uses the
 browser's native date picker), and shown with `Intl` in Addis Ababa time. Offering
@@ -87,13 +88,13 @@ model needs no change for it.
 All Amharic in this repository was drafted without a native-speaker review. It is labelled as
 draft and must be reviewed before launch:
 
-| Location                                                | What                                                                                                                                                                                                                                                                                                            |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/messages/am.json`                                  | All interface strings, incl. Stage 2 (inquiry form, errors, statuses, admin inbox), Stage 3 (CMS admin, publication statuses, dietary tags, public content pages and empty states) and Stage 3.5 (inquiry steps, admin "needs attention" counts with plurals, filter toggle, demo-mode banner, error reference) |
-| `src/features/content/home-content.ts` (`am` fields)    | Homepage placeholder copy (the inquiry band was rewritten in Stage 3.5)                                                                                                                                                                                                                                         |
-| `src/features/content/privacy-content.ts` (`am`)        | Privacy notice: needs native-speaker **and legal** review; the page says so                                                                                                                                                                                                                                     |
-| `src/features/bookings/server/email.ts` (`ACK_COPY.am`) | Customer acknowledgement email                                                                                                                                                                                                                                                                                  |
-| `supabase/seed.sql`                                     | Amharic service rows (seeded as `draft`, so they are never public)                                                                                                                                                                                                                                              |
+| Location                                                | What                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/messages/am.json`                                  | All interface strings, incl. Stage 2 (inquiry form, errors, statuses, admin inbox), Stage 3 (CMS admin, publication statuses, dietary tags, public content pages and empty states), Stage 3.5 (inquiry steps, admin "needs attention" counts with plurals, filter toggle, demo-mode banner, error reference) and Stage 3.6 (`Common.samplePhoto`, `Footer.photoCredit`) |
+| `src/features/content/home-content.ts` (`am` fields)    | Homepage placeholder copy (the inquiry band was rewritten in Stage 3.5)                                                                                                                                                                                                                                                                                                 |
+| `src/features/content/privacy-content.ts` (`am`)        | Privacy notice: needs native-speaker **and legal** review; the page says so                                                                                                                                                                                                                                                                                             |
+| `src/features/bookings/server/email.ts` (`ACK_COPY.am`) | Customer acknowledgement email                                                                                                                                                                                                                                                                                                                                          |
+| `supabase/seed.sql`                                     | Amharic service rows (seeded as `draft`, so they are never public)                                                                                                                                                                                                                                                                                                      |
 
 Staff alert emails are English-only for now (the business has not chosen a staff language).
 

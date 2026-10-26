@@ -17,7 +17,7 @@ export function AdminLocaleSwitcher({ className }: { className?: string }) {
       aria-label={t("label")}
       aria-busy={pending || undefined}
       className={cn(
-        "inline-flex items-center rounded-full border border-border-strong/60 p-0.5 text-xs font-semibold",
+        "inline-flex items-center rounded-lg border border-border-strong/60 p-0.5 text-xs font-semibold",
         className,
       )}
     >
@@ -32,8 +32,10 @@ export function AdminLocaleSwitcher({ className }: { className?: string }) {
             disabled={pending}
             onClick={() => startTransition(() => setAdminLocale(value))}
             className={cn(
-              "rounded-full px-3 py-1.5 leading-none transition-colors disabled:cursor-wait [&:lang(am)]:text-[0.82rem]",
-              active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+              "rounded-md px-3 py-1.5 leading-none transition-colors disabled:cursor-wait [&:lang(am)]:text-[0.82rem]",
+              active
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:bg-surface-muted hover:text-foreground",
             )}
           >
             {LOCALE_NATIVE_NAMES[value]}

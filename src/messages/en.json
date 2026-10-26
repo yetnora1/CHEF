@@ -13,6 +13,7 @@
     "placeholderBadge": "Placeholder",
     "photoPlaceholder": "Photography placeholder",
     "photoPlaceholderIntended": "Intended photo: {subject}",
+    "samplePhoto": "Sample photo",
     "loading": "Loading…",
     "errorTitle": "Something went wrong",
     "errorBody": "This page could not be displayed. Please try again.",
@@ -65,7 +66,7 @@
   "Footer": {
     "navigationLabel": "Footer",
     "contactPending": "Contact details will be published once confirmed by Chief Harena.",
-    "photoCredit": "Photography shown is placeholder artwork, to be replaced with Chief Harena's own photographs.",
+    "photoCredit": "Sample photos are openly licensed images from Wikimedia Commons, credited on each photo, until Chief Harena's own photographs are published.",
     "copyright": "© {year} Chief Harena. All rights reserved."
   },
   "Admin": {

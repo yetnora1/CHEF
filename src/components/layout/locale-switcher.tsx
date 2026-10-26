@@ -26,7 +26,7 @@ export function LocaleSwitcher({
       role="group"
       aria-label={t("label")}
       className={cn(
-        "inline-flex items-center rounded-full border p-0.5 text-xs font-semibold",
+        "inline-flex items-center rounded-lg border p-0.5 text-xs font-semibold",
         tone === "band" ? "border-band-muted/40" : "border-border-strong/60",
         className,
       )}
@@ -42,14 +42,14 @@ export function LocaleSwitcher({
             lang={value}
             aria-current={active ? "true" : undefined}
             className={cn(
-              "rounded-full px-3 py-1.5 leading-none transition-colors [&:lang(am)]:text-[0.82rem]",
+              "rounded-md px-3 py-1.5 leading-none transition-colors [&:lang(am)]:text-[0.82rem]",
               active
                 ? tone === "band"
                   ? "bg-band-foreground text-band"
                   : "bg-foreground text-background"
                 : tone === "band"
-                  ? "text-band-foreground/85 hover:text-band-foreground"
-                  : "text-muted-foreground hover:text-foreground",
+                  ? "text-band-foreground/85 hover:bg-white/8 hover:text-band-foreground"
+                  : "text-muted-foreground hover:bg-surface-muted hover:text-foreground",
             )}
           >
             {LOCALE_NATIVE_NAMES[value]}

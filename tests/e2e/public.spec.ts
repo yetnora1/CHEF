@@ -59,8 +59,9 @@ test.describe("locale routing", () => {
       [...document.fonts].filter((face) => face.status === "loaded").map((face) => face.family),
     );
     // A face only loads when glyphs in its unicode-range are actually rendered.
+    // Headings and body text share one Ethiopic face; the serif display face is gone.
     expect(loadedFamilies.some((family) => family.includes("Noto Sans Ethiopic"))).toBe(true);
-    expect(loadedFamilies.some((family) => family.includes("Noto Serif Ethiopic"))).toBe(true);
+    expect(loadedFamilies.some((family) => family.includes("Noto Serif Ethiopic"))).toBe(false);
     expect(errors).toEqual([]);
   });
 

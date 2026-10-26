@@ -131,9 +131,10 @@
   --color-warning: var(--warning);
   --color-danger: var(--danger);
 
-  /* Latin faces first; browsers fall through to the Ethiopic face per glyph. */
+  /* Latin faces first; browsers fall through to the Ethiopic face per glyph.
+   * Headings use the same sans family as body text, set heavier and tighter. */
   --font-sans: var(--font-manrope), var(--font-noto-sans-ethiopic), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), var(--font-noto-serif-ethiopic), ui-serif, Georgia, serif;
+  --font-display: var(--font-manrope), var(--font-noto-sans-ethiopic), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -217,81 +218,76 @@
   }
 }
 
+/* Short section label above a heading, in plain sentence case. */
 @utility eyebrow {
   font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 650;
   line-height: 1.4;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
 
   &:lang(am) {
-    font-size: 0.875rem;
-    letter-spacing: 0.02em;
+    font-size: 0.9375rem;
+    font-weight: 600;
   }
 }
 
 @utility display-xl {
   font-family: var(--font-display);
-  font-size: clamp(2.6rem, 1.5rem + 4.6vw, 5.5rem);
-  font-weight: 400;
-  font-variation-settings: "SOFT" 50;
-  line-height: 1.02;
-  letter-spacing: -0.025em;
+  font-size: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
+  font-weight: 750;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
 
   &:lang(am) {
-    font-size: clamp(2.1rem, 1.35rem + 3.2vw, 4rem);
-    font-weight: 500;
-    line-height: 1.32;
+    font-size: clamp(1.9rem, 1.4rem + 2vw, 3rem);
+    font-weight: 700;
+    line-height: 1.35;
     letter-spacing: 0;
   }
 }
 
 @utility display-lg {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 1.35rem + 2.4vw, 3.5rem);
-  font-weight: 400;
-  font-variation-settings: "SOFT" 50;
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
 
   &:lang(am) {
-    font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.75rem);
-    font-weight: 500;
-    line-height: 1.38;
+    font-size: clamp(1.55rem, 1.25rem + 1.1vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.4;
     letter-spacing: 0;
   }
 }
 
 @utility display-md {
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 1.2rem + 0.6vw, 1.75rem);
-  font-weight: 450;
-  font-variation-settings: "SOFT" 50;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
 
   &:lang(am) {
-    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
-    font-weight: 500;
-    line-height: 1.45;
+    font-size: clamp(1.1rem, 1rem + 0.35vw, 1.3rem);
+    font-weight: 700;
+    line-height: 1.5;
     letter-spacing: 0;
   }
 }
 
-/* Admin page titles: the display face at an operational size (the admin is
+/* Admin page titles: the heading face at an operational size (the admin is
  * compact; the large display sizes belong to the public site). */
 @utility admin-title {
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 1.5rem + 0.9vw, 2.375rem);
-  font-weight: 450;
-  font-variation-settings: "SOFT" 50;
-  line-height: 1.15;
-  letter-spacing: -0.015em;
+  font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 
   &:lang(am) {
-    font-size: clamp(1.5rem, 1.32rem + 0.7vw, 2rem);
-    font-weight: 500;
+    font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.75rem);
+    font-weight: 700;
     line-height: 1.4;
     letter-spacing: 0;
   }
@@ -354,8 +350,10 @@
   & h2 {
     margin-top: 1.8em;
     font-family: var(--font-display);
-    font-size: clamp(1.35rem, 1.2rem + 0.5vw, 1.6rem);
-    line-height: 1.25;
+    font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.45rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
     color: var(--color-foreground);
   }
 

@@ -13,6 +13,7 @@
     "placeholderBadge": "ጊዜያዊ",
     "photoPlaceholder": "ጊዜያዊ የፎቶ ቦታ",
     "photoPlaceholderIntended": "የሚገባው ፎቶ፦ {subject}",
+    "samplePhoto": "የናሙና ፎቶ",
     "loading": "በመጫን ላይ…",
     "errorTitle": "ችግር ተፈጥሯል",
     "errorBody": "ይህ ገጽ ሊታይ አልቻለም። እባክዎ እንደገና ይሞክሩ።",
@@ -65,7 +66,7 @@
   "Footer": {
     "navigationLabel": "የግርጌ ማውጫ",
     "contactPending": "የመገኛ አድራሻዎች በChief Harena ሲረጋገጡ ይታተማሉ።",
-    "photoCredit": "የሚታዩት ፎቶዎች ጊዜያዊ ምስሎች ናቸው፤ በChief Harena የራሳቸው ፎቶዎች ይተካሉ።",
+    "photoCredit": "የናሙና ፎቶዎቹ ከWikimedia Commons በክፍት ፈቃድ የተገኙ ናቸው፤ ምንጫቸው በእያንዳንዱ ፎቶ ላይ ተጠቅሷል። የChief Harena የራሳቸው ፎቶዎች ሲታተሙ ይተካሉ።",
     "copyright": "© {year} Chief Harena። መብቱ በሕግ የተጠበቀ ነው።"
   },
   "Admin": {

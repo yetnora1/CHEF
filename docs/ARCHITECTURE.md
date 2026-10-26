@@ -57,24 +57,24 @@ placeholder pages; unknown paths return a localized 404.
 
 ### Public (`/[locale]`, locale ∈ `en`, `am`)
 
-| Route                                    | Purpose                       | Status                                                                  |
-| ---------------------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
-| `/[locale]`                              | Homepage                      | ✅ published CMS sections and services; labelled placeholders otherwise |
-| `/[locale]/about`                        | Chef biography and philosophy | ✅ Stage 3 (404 until published)                                        |
-| `/[locale]/services`, `/services/[slug]` | Service overview and details  | ✅ Stage 3                                                              |
-| `/[locale]/menu`                         | Curated menu                  | ✅ Stage 3                                                              |
-| `/[locale]/gallery`                      | Culinary and event portfolio  | ✅ Stage 3                                                              |
-| `/[locale]/journal`, `/journal/[slug]`   | Articles                      | ✅ Stage 3                                                              |
-| `/[locale]/book`                         | Event inquiry form            | ✅ Stage 2 (fails closed until configured; see INQUIRIES.md)            |
-| `/[locale]/contact`                      | Contact page                  | Later stage (needs confirmed contact details)                           |
-| `/[locale]/privacy`                      | Privacy notice                | ✅ Stage 2 (draft for owner and legal review)                           |
-| `/[locale]/terms`                        | Terms                         | Later stage (needs business terms)                                      |
-| `/`                                      | Redirect to preferred locale  | ✅                                                                      |
-| `/media/assets/<id>/<file>`              | Images of published content   | ✅ Stage 3 ([MEDIA.md](MEDIA.md))                                       |
+| Route                                    | Purpose                       | Status                                                                                                                             |
+| ---------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `/[locale]`                              | Homepage                      | ✅ published CMS sections and services; labelled placeholders otherwise                                                            |
+| `/[locale]/about`                        | Chef biography and philosophy | ✅ Stage 3 (404 until published)                                                                                                   |
+| `/[locale]/services`, `/services/[slug]` | Service overview and details  | ✅ Stage 3                                                                                                                         |
+| `/[locale]/menu`                         | Curated menu                  | ✅ Stage 3                                                                                                                         |
+| `/[locale]/gallery`                      | Culinary and event portfolio  | ✅ Stage 3                                                                                                                         |
+| `/[locale]/journal`, `/journal/[slug]`   | Articles                      | ✅ Stage 3                                                                                                                         |
+| `/[locale]/book`                         | Event inquiry form            | ✅ Stage 2 (fails closed until configured; see INQUIRIES.md)                                                                       |
+| `/[locale]/contact`                      | Contact page                  | ✅ Stage 3.6: the inquiry form first; phone, email and location appear once confirmed in `src/features/content/contact-content.ts` |
+| `/[locale]/privacy`                      | Privacy notice                | ✅ Stage 2 (draft for owner and legal review)                                                                                      |
+| `/[locale]/terms`                        | Terms                         | Later stage (needs business terms)                                                                                                 |
+| `/`                                      | Redirect to preferred locale  | ✅                                                                                                                                 |
+| `/media/assets/<id>/<file>`              | Images of published content   | ✅ Stage 3 ([MEDIA.md](MEDIA.md))                                                                                                  |
 
 Navigation only links to destinations that have something to show (`src/features/cms/navigation.ts`):
 About and Services link to their pages once published content exists, otherwise to the homepage
-sections; Menu, Gallery and Journal appear only once something is published. Empty list pages show
+sections; Menu, Gallery and Journal appear only once something is published; Contact is always linked. Empty list pages show
 an empty state and are `noindex`.
 
 ### Admin (`/admin`, no locale prefix)

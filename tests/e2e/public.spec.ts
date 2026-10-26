@@ -98,6 +98,20 @@ test.describe("locale routing", () => {
     ).toBeVisible();
   });
 
+  test("the contact page is linked everywhere and leads to the inquiry form", async ({ page }) => {
+    await page.goto("/en");
+    await page.getByRole("contentinfo").getByRole("link", { name: "Contact" }).click();
+    await expect(page).toHaveURL(/\/en\/contact$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Contact" })).toBeVisible();
+    // No contact details are confirmed yet, so none are shown (never invented).
+    await expect(page.getByRole("heading", { name: "Direct contact" })).toHaveCount(0);
+    await page.getByRole("main").getByRole("link", { name: "Start your inquiry" }).click();
+    await expect(page).toHaveURL(/\/en\/book$/);
+
+    await page.goto("/am/contact");
+    await expect(page.getByRole("heading", { level: 1, name: "ያግኙን" })).toBeVisible();
+  });
+
   test("unknown pages return a localized 404", async ({ page }) => {
     const en = await page.goto("/en/this-page-does-not-exist");
     expect(en?.status()).toBe(404);

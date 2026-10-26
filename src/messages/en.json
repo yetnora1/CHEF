@@ -37,7 +37,8 @@
     "privacy": "Privacy",
     "menu": "Menu",
     "gallery": "Gallery",
-    "journal": "Journal"
+    "journal": "Journal",
+    "contact": "Contact"
   },
   "Language": {
     "label": "Language",
@@ -247,6 +248,18 @@
     "draftNotice": "Draft for review. This notice describes how the website currently handles inquiry information. Items marked for review must be completed by Chef Harena, and the notice should be checked by a qualified adviser before launch. On its own it does not establish legal compliance.",
     "reviewTag": "Owner review required",
     "lastUpdated": "Last updated {date}"
+  },
+  "Contact": {
+    "metaTitle": "Contact",
+    "metaDescription": "Contact Chef Harena about weddings, corporate events and private occasions.",
+    "title": "Contact",
+    "lede": "Planning a wedding, a corporate event or a private dinner? Send an inquiry and Chef Harena will review your request.",
+    "inquiryTitle": "Event inquiries",
+    "inquiryBody": "Share your date, guest count and occasion through the inquiry form.",
+    "detailsTitle": "Direct contact",
+    "phone": "Phone",
+    "email": "Email",
+    "location": "Location"
   },
   "AdminBookings": {
     "title": "Inquiries & bookings",

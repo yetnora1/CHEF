@@ -21,7 +21,11 @@ export default function AdminError({ error, retry }: { error: unknown; retry: ()
       </span>
       <h1 className="display-md">{t("errorTitle")}</h1>
       <p className="text-sm text-muted-foreground">{t("errorBody")}</p>
-      {digest && <p className="font-mono text-xs text-muted-foreground">ref: {digest}</p>}
+      {digest && (
+        <p className="font-mono text-xs text-muted-foreground">
+          {t("errorReference", { reference: digest })}
+        </p>
+      )}
       <Button onClick={() => retry()}>{t("tryAgain")}</Button>
     </div>
   );

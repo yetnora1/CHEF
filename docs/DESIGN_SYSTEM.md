@@ -38,13 +38,58 @@ semantic tokens make it rarely necessary.
 
 ## Typography
 
-| Utility      | Use                          | Notes                                                                                       |
-| ------------ | ---------------------------- | ------------------------------------------------------------------------------------------- |
-| `display-xl` | Hero headline                | Fraunces, fluid 42→88px, tight leading; Amharic: Noto Serif Ethiopic, 34→64px, leading 1.32 |
-| `display-lg` | Section headings             | Fluid 32→56px                                                                               |
-| `display-md` | Card and panel titles        | 22→28px                                                                                     |
-| `eyebrow`    | Section labels               | Uppercase, tracked for Latin; plain and larger for Ethiopic                                 |
-| body         | Manrope / Noto Sans Ethiopic | line-height 1.65 (Latin), 1.85 (Amharic)                                                    |
+| Utility       | Use                          | Notes                                                                                       |
+| ------------- | ---------------------------- | ------------------------------------------------------------------------------------------- |
+| `display-xl`  | Hero headline                | Fraunces, fluid 42→88px, tight leading; Amharic: Noto Serif Ethiopic, 34→64px, leading 1.32 |
+| `display-lg`  | Section headings             | Fluid 32→56px                                                                               |
+| `display-md`  | Card and panel titles        | 22→28px                                                                                     |
+| `eyebrow`     | Section labels               | Uppercase, tracked for Latin; plain and larger for Ethiopic                                 |
+| body          | Manrope / Noto Sans Ethiopic | line-height 1.65 (Latin), 1.85 (Amharic)                                                    |
+| `admin-title` | Admin page titles            | Fraunces at an operational size, 28→38px; Amharic 24→32px, leading 1.4                      |
+
+The public site uses `display-xl`/`display-lg` for page titles; the admin uses `admin-title` for
+every page `h1` and `display-md` for section headings, so operational screens stay compact.
+
+## Layout and breakpoints
+
+| Breakpoint | Width   | What changes                                                                               |
+| ---------- | ------- | ------------------------------------------------------------------------------------------ |
+| base       | 320px + | One column; header: wordmark, theme, menu button                                           |
+| `xs`       | 26rem   | Custom, for small two-up arrangements                                                      |
+| `sm`       | 40rem   | Header language switcher and "Plan an event" button appear; admin filters always shown     |
+| `md`       | 48rem   | Two-column editorial sections (about, services intro)                                      |
+| `lg`       | 64rem   | **Inline public navigation** (below it, the menu sheet); admin sidebar; multi-column grids |
+
+- `page-container`: up to 80rem with 1 / 1.5 / 2rem gutters. Text measures: `max-w-3xl` for
+  articles, the About page, the privacy notice and the menu; `max-w-xl`/`max-w-2xl` for ledes.
+- Vertical rhythm: homepage bands `py-20 md:py-28`; content pages `py-14 md:py-20`; admin pages
+  `py-8 lg:py-12` inside the shell.
+- The public header shows its links inline only from `lg`: with every section published (about,
+  services, menu, gallery, journal) five links do not fit beside the actions on a tablet. An e2e
+  test checks 768/1000px (menu button, no overflow) and 1280px (inline links).
+- Grids fill whole rows for the usual counts (the homepage services grid uses 4, 3 or 2 columns
+  depending on how many services are published).
+
+## Images: ratios, cropping and descriptions
+
+| Slot                                       | Ratio         | Notes                                                |
+| ------------------------------------------ | ------------- | ---------------------------------------------------- |
+| Homepage hero                              | 4:5, arch top | `preload`; gold offset outline                       |
+| Homepage and About portrait / story images | 4:5           | About sections alternate image sides                 |
+| Service, journal and list cards; gallery   | 4:3           | Gallery captions and credits sit in the `figcaption` |
+| Service and journal article image          | 16:9          | Wider than the text column (`max-w-4xl`)             |
+| Menu dish thumbnail                        | 1:1 (80–96px) | Optional                                             |
+
+- Every image fills its frame with `object-cover`, centred. There is no focal-point control yet,
+  so supply photographs with the subject near the centre and at least 1600px on the long edge
+  (uploads are resized to ≤ 2560px, see [MEDIA.md](MEDIA.md)).
+- `sizes` is set per slot so the optimiser serves the right width; only above-the-fold images
+  preload.
+- Descriptions (alt text) say what the photograph shows and why it is there ("a wedding table set
+  with injera and stews"), not "image of". They are written per language in the media library;
+  Amharic descriptions reach visitors only after a fluent speaker's review, otherwise the English
+  one is used and marked `lang="en"`. Decorative motifs are `aria-hidden`; placeholders expose one
+  label ("Photography placeholder: …").
 
 ## Motifs
 
@@ -68,14 +113,18 @@ religious or civic symbol.
 
 ## Components
 
-| Component                                               | Notes                                                                                                                 |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `ui/button`                                             | Variants `primary`, `outline`, `ghost`, `band`, `band-outline`; sizes `sm/md/lg/icon`; `asChild` for links            |
-| `ui/dropdown-menu`                                      | Radix; used by the theme toggle and account menu                                                                      |
-| `ui/sheet`                                              | Radix Dialog side panel (focus trap, Escape, scroll lock) for mobile navigation                                       |
-| `public/photo-slot`                                     | Labelled placeholder that names the photograph to supply; swap in `next/image` once real, licensed photography exists |
-| `layout/locale-switcher`, `admin/admin-locale-switcher` | Native-name language toggles with `lang`/`hreflang`                                                                   |
-| `theme/theme-toggle`                                    | Light / Dark / Match device, state from `useSyncExternalStore`, syncs across tabs                                     |
+| Component                                               | Notes                                                                                                                   |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `ui/button`                                             | Variants `primary`, `outline`, `ghost`, `band`, `band-outline`; sizes `sm/md/lg/icon`; `asChild` for links              |
+| `ui/dropdown-menu`                                      | Radix; used by the theme toggle and account menu                                                                        |
+| `ui/sheet`                                              | Radix Dialog side panel (focus trap, Escape, scroll lock) for mobile navigation                                         |
+| `public/photo-slot`                                     | Labelled placeholder that names the photograph to supply; swap in `next/image` once real, licensed photography exists   |
+| `layout/locale-switcher`, `admin/admin-locale-switcher` | Native-name language toggles with `lang`/`hreflang`                                                                     |
+| `theme/theme-toggle`                                    | Light / Dark / Match device, state from `useSyncExternalStore`, syncs across tabs                                       |
+| `layout/nav-link`                                       | Public navigation link with `aria-current` (`page`, or `true` inside a section); styled with `aria-[current]:` variants |
+| `admin/admin-nav`                                       | Sidebar; a module stays current on the pages below it (`isModuleActive`)                                                |
+| `admin/filter-disclosure`                               | On phones, list filters fold behind a "Filter …" toggle that shows the active count; open while filters apply           |
+| `layout/demo-banner`                                    | "Demo mode" notice on every page when `NEXT_PUBLIC_DEMO_MODE=true` (`npm run dev:demo` only)                            |
 
 New primitives can be added with the shadcn CLI (`components.json` is configured); restyle them to
 the semantic tokens above.
@@ -86,8 +135,10 @@ the semantic tokens above.
   animations and smooth scrolling.
 - Visible `:focus-visible` ring on every interactive element; skip link to `#main-content`.
 - Photography placeholders expose a single accessible name ("Photography placeholder: …").
-- Hit targets ≥ 40px for icon buttons; layouts verified at 360/390px (no horizontal scroll),
-  tablet and 1440px.
+- Hit targets ≥ 40px for icon buttons; layouts verified at 320/390/768/1024/1440px in both themes
+  and both languages, with placeholder content and with the full demo content (no horizontal
+  scroll; see [UI_REVIEW.md](UI_REVIEW.md)).
+- Links that open a new tab say so (an icon plus "opens in a new tab" for screen readers).
 
 ## Photography
 

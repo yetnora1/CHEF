@@ -9,6 +9,14 @@ test.describe("inquiry page without server configuration", () => {
     await expect(page.locator("form input[name=fullName]")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Send inquiry" })).toHaveCount(0);
     await expect(page.getByText("An inquiry is not a booking.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How inquiries work" })).toBeVisible();
+    // Not a dead end: the closed notice offers the services and the homepage.
+    const notice = page.getByRole("status").filter({ hasText: "Online inquiries are not open yet" });
+    await expect(notice.getByRole("link", { name: "Explore services" })).toHaveAttribute(
+      "href",
+      "/en#services",
+    );
+    await expect(notice.getByRole("link", { name: "Back to the homepage" })).toHaveAttribute("href", "/en");
   });
 
   test("is localized in Amharic", async ({ page }) => {

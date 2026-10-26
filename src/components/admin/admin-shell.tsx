@@ -74,6 +74,7 @@ export async function AdminShell({
                 yourRoles: t("yourRoles"),
                 noRoles: t("noRoles"),
                 viewSite: t("viewSite"),
+                opensInNewTab: t("opensInNewTab"),
                 signOut: tAuth("signOut"),
               }}
             />

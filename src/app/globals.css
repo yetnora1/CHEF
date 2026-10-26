@@ -279,6 +279,24 @@
   }
 }
 
+/* Admin page titles: the display face at an operational size (the admin is
+ * compact; the large display sizes belong to the public site). */
+@utility admin-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.5rem + 0.9vw, 2.375rem);
+  font-weight: 450;
+  font-variation-settings: "SOFT" 50;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+
+  &:lang(am) {
+    font-size: clamp(1.5rem, 1.32rem + 0.7vw, 2rem);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Ethiopian textile-inspired motifs
  * Geometric bands in the spirit of woven tilet borders, drawn as CSS masks so

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
+import { DemoBanner } from "@/components/layout/demo-banner";
 import { PreviewNotice } from "@/components/layout/preview-notice";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -59,6 +60,7 @@ export default async function PublicRootLayout({ children }: LayoutProps<"/[loca
       <body className="flex min-h-dvh flex-col">
         <NextIntlClientProvider messages={messages}>
           <SkipLink label={t("skipToContent")} />
+          <DemoBanner />
           <PreviewNotice />
           <SiteHeader />
           <main id="main-content" tabIndex={-1} className="flex-1 outline-none">

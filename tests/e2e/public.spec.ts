@@ -40,6 +40,10 @@ test.describe("locale routing", () => {
     await expect(page.locator('link[rel="alternate"][hreflang="am"]')).toHaveAttribute("href", /\/am$/);
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     await expect(page.getByText("Preview: placeholder copy and photography")).toBeVisible();
+    // The inquiry band describes the form that exists (Stage 2), not one still to come.
+    await expect(page.getByText("through the inquiry form")).toBeVisible();
+    // Demo mode is off in every normal build.
+    await expect(page.getByText("Demo mode.")).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 
@@ -155,6 +159,31 @@ test.describe("accessibility basics", () => {
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     await expect(trigger).toBeFocused();
+  });
+
+  test("the header marks the current page", async ({ page }) => {
+    const planEvent = page.getByRole("banner").getByRole("link", { name: "Plan an event" });
+    await page.goto("/en/book");
+    await expect(planEvent).toHaveAttribute("aria-current", "page");
+    await page.goto("/en/privacy");
+    await expect(planEvent).not.toHaveAttribute("aria-current");
+  });
+
+  test("tablets get the menu button; the inline navigation starts at desktop width", async ({ page }) => {
+    // With every section published the five inline links would not fit beside the actions.
+    for (const width of [768, 1000]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/en");
+      await expect(page.getByRole("navigation", { name: "Primary" }), `${width}`).toBeHidden();
+      await expect(page.getByRole("button", { name: "Open menu" }), `${width}`).toBeVisible();
+      await expect(page.getByRole("banner").getByRole("link", { name: "Plan an event" })).toBeVisible();
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow, `${width}`).toBeLessThanOrEqual(0);
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/en");
+    await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Open menu" })).toBeHidden();
   });
 
   test("has no horizontal overflow at phone width", async ({ page }) => {

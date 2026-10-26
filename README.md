@@ -36,6 +36,7 @@ It is two connected applications in one Next.js codebase:
 | [docs/CMS.md](docs/CMS.md)                       | Content model, workflow, Amharic review, safe rendering, caching, preview             |
 | [docs/MEDIA.md](docs/MEDIA.md)                   | Media uploads, Storage bucket and policies, image delivery, hosted checks             |
 | [docs/VERIFICATION.md](docs/VERIFICATION.md)     | Verification evidence (Stages 2.5 and 3), findings, owner checklist                   |
+| [docs/UI_REVIEW.md](docs/UI_REVIEW.md)           | Route-by-route UI audit, changes, remaining gaps and content the owner must supply    |
 | [docs/adr/](docs/adr/)                           | Architecture decisions (0001 foundation, 0002 inquiries, 0003 verification, 0004 CMS) |
 
 ## Tech stack
@@ -129,6 +130,25 @@ npm run dev                # http://localhost:3000 → redirects to /en or /am
 
 `NEXT_PUBLIC_*` values are inlined at build time: restart `npm run dev`, or rebuild, after changing them.
 
+### Demo mode (no Supabase, no Docker)
+
+```bash
+npm run dev:demo           # http://localhost:3000 (add -- --port 3200 for another port)
+```
+
+Runs the app against the in-memory Supabase test double used by the e2e tests, filled with clearly
+labelled **sample** content (pages, services, menu, gallery, journal, generated abstract images) and
+sample inquiries in every workflow state. The console lists the test accounts (owner, admin, event
+manager, content editor, analyst, no role) and their test-only password. Every page shows a
+**Demo mode** banner.
+
+Nothing persists or leaves the computer: data lives in memory and resets when the command stops;
+email and CAPTCHA are switched off even if `.env.local` holds real keys; no Supabase project is
+contacted. Sign-in, roles, RLS, the CMS workflow and uploads behave as in the e2e tests (real SQL
+on PGlite, simulated Auth), which is **not** proof that they work against a real Supabase project.
+Needs Node.js 22.18+ or 24; stop `npm run dev` and the e2e suite first (they share ports and the
+`.next/dev` folder).
+
 ## Environment variables
 
 | Variable                                                    | Scope       | Required               | Purpose                                                                       |
@@ -153,6 +173,7 @@ Never commit `.env.local`; only `.env.example` (placeholders) is tracked.
 | Command                                      | What it does                                                                                    |
 | -------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `npm run dev`                                | Development server                                                                              |
+| `npm run dev:demo`                           | Development server with in-memory sample data and test accounts (no Supabase needed)            |
 | `npm run build` / `start`                    | Production build / serve it                                                                     |
 | `npm run lint`                               | ESLint (Next.js core-web-vitals + TypeScript rules)                                             |
 | `npm run format[:check]`                     | Prettier (with Tailwind class sorting)                                                          |
@@ -198,19 +219,20 @@ tests/
   unit/                  pure logic, catalogues, design tokens
   integration/db/        migrations + RLS on Postgres (PGlite) with a Supabase auth and Storage shim
   e2e/                   Playwright, incl. a Supabase test double (fake Auth, real SQL and Storage rows on PGlite)
-scripts/                 check-client-bundle.mjs
+scripts/                 check-client-bundle.mjs, compare-deployed-schema.mjs, dev-demo.mjs (+ demo/ sample content)
 docs/                    architecture, security, database, localization, design, ADRs
 ```
 
 ## Roadmap
 
-| Stage                    | Scope                                                                                                                                                            |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 — Foundation           | Architecture, design system, EN/AM routing, themes, schema + RLS for identity, roles, services, bookings; admin authentication and shell                         |
-| 2 — Event inquiries      | Public inquiry form (validated server action, rate limits, Turnstile), admin inbox, lifecycle, assignment, notes, history, optional email outbox, privacy notice |
-| **3 — CMS (this stage)** | Pages, services, menu, gallery, journal with per-locale editing, review and publishing; preview; media library on Supabase Storage                               |
-| 4 — Staff & settings     | Invitations, role management UI, site settings, audit-log viewer, MFA for privileged roles                                                                       |
-| 5 — Hardening & launch   | Real-Supabase verification, nonce-based CSP, monitoring, SEO (sitemap, structured data), deployment                                                              |
+| Stage                   | Scope                                                                                                                                                            |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 — Foundation          | Architecture, design system, EN/AM routing, themes, schema + RLS for identity, roles, services, bookings; admin authentication and shell                         |
+| 2 — Event inquiries     | Public inquiry form (validated server action, rate limits, Turnstile), admin inbox, lifecycle, assignment, notes, history, optional email outbox, privacy notice |
+| 3 — CMS                 | Pages, services, menu, gallery, journal with per-locale editing, review and publishing; preview; media library on Supabase Storage                               |
+| **3.5 — UI completion** | Route-by-route UI audit and polish, operational admin overview, responsive and accessibility fixes, local demo mode ([docs/UI_REVIEW.md](docs/UI_REVIEW.md))     |
+| 4 — Staff & settings    | Invitations, role management UI, site settings, audit-log viewer, MFA for privileged roles                                                                       |
+| 5 — Hardening & launch  | Real-Supabase verification, nonce-based CSP, monitoring, SEO (sitemap, structured data), deployment                                                              |
 
 ## Verification status
 

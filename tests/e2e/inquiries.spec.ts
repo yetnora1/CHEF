@@ -310,4 +310,25 @@ test.describe("admin inquiry workflow", () => {
     }
     await expect(page.getByText(/\d+–\d+ of \d+/)).toBeVisible();
   });
+
+  test("on a phone the inbox filters fold away and open on request", async ({ page }) => {
+    await signIn(page, TEST_USERS.admin.email);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/admin/bookings");
+    const toggle = page.getByRole("button", { name: "Filter inquiries" });
+    const search = page.getByRole("searchbox", { name: "Search" });
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(search).toBeHidden();
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(search).toBeVisible();
+
+    // Active filters keep the panel open, and the toggle says how many apply.
+    await page.goto("/admin/bookings?status=new&type=summit");
+    await expect(page.getByRole("button", { name: /Filter inquiries\s*2 active/ })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    await expect(search).toBeVisible();
+  });
 });

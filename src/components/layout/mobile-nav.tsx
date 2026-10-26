@@ -4,13 +4,14 @@ import { Menu } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Link } from "@/i18n/navigation";
+import type { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./locale-switcher";
+import { NavLink } from "./nav-link";
 
-export type NavLink = { key: string; href: ComponentProps<typeof Link>["href"]; label: string };
+export type NavItem = { key: string; href: ComponentProps<typeof Link>["href"]; label: string };
 
 type MobileNavProps = {
-  links: NavLink[];
+  links: NavItem[];
   labels: { open: string; close: string; title: string };
 };
 
@@ -18,7 +19,7 @@ export function MobileNav({ links, labels }: MobileNavProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden" aria-label={labels.open}>
+        <Button variant="ghost" size="icon" className="lg:hidden" aria-label={labels.open}>
           <Menu aria-hidden className="size-5" />
         </Button>
       </SheetTrigger>
@@ -29,12 +30,16 @@ export function MobileNav({ links, labels }: MobileNavProps) {
             {links.map((link) => (
               <li key={link.key} className="border-b border-border">
                 <SheetClose asChild>
-                  <Link
+                  <NavLink
                     href={link.href}
-                    className="block py-4 display-md transition-colors hover:text-accent-ink"
+                    className="group flex items-center justify-between gap-3 py-4 display-md transition-colors hover:text-accent-ink aria-[current]:text-accent-ink"
                   >
                     {link.label}
-                  </Link>
+                    <span
+                      aria-hidden
+                      className="hidden size-2 rotate-45 bg-accent group-aria-[current]:block"
+                    />
+                  </NavLink>
                 </SheetClose>
               </li>
             ))}

@@ -52,3 +52,8 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
 export function modulesFor(permissions: readonly AppPermission[]): AdminModule[] {
   return ADMIN_MODULES.filter((module) => module.permissions.some((p) => permissions.includes(p)));
 }
+
+/** A module is current on its own page and on every page below it (entries, "new", categories). */
+export function isModuleActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}

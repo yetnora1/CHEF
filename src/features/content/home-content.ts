@@ -115,8 +115,8 @@ export const homeContent = {
       am: "በዓል ወይም ዝግጅት እያቀዱ ነው?",
     },
     body: {
-      en: "Soon you'll be able to share your date, guest count and occasion here and receive a reply from Chief Harena.",
-      am: "በቅርቡ የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት እዚህ ማሳወቅና ከ Chief Harena ምላሽ ማግኘት ይችላሉ።",
+      en: "Share your date, guest count and occasion through the inquiry form, and Chief Harena will review your request.",
+      am: "በጥያቄ ቅጹ የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት ያጋሩ፤ Chief Harena ጥያቄዎን ይገመግማሉ።",
     },
   },
 } as const;

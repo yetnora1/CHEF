@@ -23,6 +23,7 @@ type UserMenuProps = {
     yourRoles: string;
     noRoles: string;
     viewSite: string;
+    opensInNewTab: string;
     signOut: string;
   };
 };
@@ -53,6 +54,7 @@ export function UserMenu({ email, roleLabels, labels }: UserMenuProps) {
             <a href="/" target="_blank" rel="noopener">
               <ExternalLink aria-hidden />
               {labels.viewSite}
+              <span className="sr-only"> ({labels.opensInNewTab})</span>
             </a>
           </DropdownMenuItem>
           <DropdownMenuItem

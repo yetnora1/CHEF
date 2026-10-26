@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { siteNavigation } from "@/features/cms/navigation";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./locale-switcher";
-import { MobileNav, type NavLink } from "./mobile-nav";
+import { MobileNav, type NavItem } from "./mobile-nav";
+import { NavLink } from "./nav-link";
 
 export async function SiteHeader() {
   const t = await getTranslations("Navigation");
   const tBrand = await getTranslations("Brand");
 
-  const links: NavLink[] = (await siteNavigation(await getLocale())).map((link) => ({
+  const links: NavItem[] = (await siteNavigation(await getLocale())).map((link) => ({
     ...link,
     label: t(link.key),
   }));
@@ -23,16 +24,17 @@ export async function SiteHeader() {
           <Wordmark tagline={tBrand("tagline")} />
         </Link>
 
-        <nav aria-label={t("primaryLabel")} className="hidden md:block">
+        {/* Inline from lg: with every section published, five links do not fit beside the actions on tablets. */}
+        <nav aria-label={t("primaryLabel")} className="hidden lg:block">
           <ul className="flex items-center gap-8 text-sm font-medium">
             {links.map((link) => (
               <li key={link.key}>
-                <Link
+                <NavLink
                   href={link.href}
-                  className="text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-muted-foreground decoration-accent decoration-2 underline-offset-[0.65em] transition-colors hover:text-foreground aria-[current]:text-foreground aria-[current]:underline"
                 >
                   {link.label}
-                </Link>
+                </NavLink>
               </li>
             ))}
           </ul>
@@ -41,8 +43,8 @@ export async function SiteHeader() {
         <div className="flex items-center gap-1.5 sm:gap-2">
           <LocaleSwitcher className="hidden sm:inline-flex" />
           <ThemeToggle />
-          <Button asChild size="sm" className="ml-1 hidden md:inline-flex">
-            <Link href="/book">{t("planEvent")}</Link>
+          <Button asChild size="sm" className="ml-1 hidden sm:inline-flex">
+            <NavLink href="/book">{t("planEvent")}</NavLink>
           </Button>
           <MobileNav
             links={[...links, { key: "book", href: "/book", label: t("planEvent") }]}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
+import { DemoBanner } from "@/components/layout/demo-banner";
 import { SkipLink } from "@/components/layout/skip-link";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { getClientMessages } from "@/i18n/client-messages";
@@ -38,6 +39,7 @@ export default async function AdminRootLayout({ children }: LayoutProps<"/admin"
       <body>
         <NextIntlClientProvider messages={messages}>
           <SkipLink label={t("skipToContent")} />
+          <DemoBanner />
           {children}
         </NextIntlClientProvider>
       </body>

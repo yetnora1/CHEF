@@ -3,6 +3,7 @@ import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-i
 import { Link } from "@/i18n/navigation";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
 import type { ResolvedText } from "@/lib/localization/translations";
+import { cn } from "@/lib/utils";
 import { PhotoSlot } from "./photo-slot";
 
 export type ServiceCard = {
@@ -21,6 +22,13 @@ type ServicesSectionProps = {
   lede: ResolvedText;
   services: ServiceCard[];
 };
+
+/** Columns that fill whole rows for the usual counts (no empty slot beside three services). */
+function desktopColumns(count: number): string {
+  if (count % 4 === 0) return "lg:grid-cols-4";
+  if (count <= 2) return "lg:grid-cols-2";
+  return "lg:grid-cols-3";
+}
 
 export async function ServicesSection({ title, lede, services }: ServicesSectionProps) {
   const t = await getTranslations("Home");
@@ -45,7 +53,7 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
         </div>
 
         {/* Placeholder cards are not links; published services link to their page. */}
-        <ul className="mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className={cn("mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2", desktopColumns(services.length))}>
           {services.map((service, index) => (
             <li key={service.slug} className="relative flex flex-col">
               {service.image ? (

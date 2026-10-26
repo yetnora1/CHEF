@@ -46,6 +46,8 @@ const PAIRS: [string, string, number][] = [
   ["success", "background", 4.5],
   ["warning", "background", 4.5],
   ["warning", "surface-muted", 4.5],
+  // Demo-mode banner: page background colour as text on the warning colour.
+  ["background", "warning", 4.5],
   ["ring", "background", 3],
   ["ring", "surface", 3],
   ["border-strong", "background", 3],

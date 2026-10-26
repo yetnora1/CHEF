@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, Copy, Search } from "lucide-react";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import { FilterDisclosure } from "@/components/admin/filter-disclosure";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input, NativeSelect } from "@/components/ui/form-controls";
 import { formatCalendarDate, formatTimestamp } from "@/lib/format";
@@ -86,107 +87,123 @@ export async function InboxFilters({
   filters: ListFilters;
   staff: { id: string; name: string }[] | null;
 }) {
-  const [t, tStatus, tEvent] = await Promise.all([
+  const [t, tStatus, tEvent, tAdmin] = await Promise.all([
     getTranslations("AdminBookings.filters"),
     getTranslations("BookingStatus"),
     getTranslations("EventType"),
+    getTranslations("Admin"),
   ]);
+  const activeCount = [
+    filters.q,
+    filters.status,
+    filters.type,
+    filters.from,
+    filters.to,
+    filters.assignee,
+  ].filter(Boolean).length;
 
   return (
-    <form
-      method="get"
-      action={BASE}
-      aria-label={t("label")}
-      className="grid gap-4 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-4"
+    <FilterDisclosure
+      label={t("label")}
+      activeLabel={tAdmin("activeFilters", { count: activeCount })}
+      activeCount={activeCount}
     >
-      <label className="space-y-1.5 sm:col-span-2">
-        <span className="text-xs font-semibold">{t("search")}</span>
-        <span className="relative block">
-          <Search
-            aria-hidden
-            className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-          <Input
-            name="q"
-            type="search"
-            defaultValue={filters.q ?? ""}
-            placeholder={t("searchPlaceholder")}
-            maxLength={100}
-            className="h-11 pl-10"
-          />
-        </span>
-      </label>
-      <label className="space-y-1.5">
-        <span className="text-xs font-semibold">{t("status")}</span>
-        <NativeSelect name="status" defaultValue={filters.status ?? ""} className="h-11">
-          <option value="">{t("anyStatus")}</option>
-          {BOOKING_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {tStatus(s)}
-            </option>
-          ))}
-        </NativeSelect>
-      </label>
-      <label className="space-y-1.5">
-        <span className="text-xs font-semibold">{t("eventType")}</span>
-        <NativeSelect name="type" defaultValue={filters.type ?? ""} className="h-11">
-          <option value="">{t("anyEventType")}</option>
-          {EVENT_TYPES.map((type) => (
-            <option key={type} value={type}>
-              {tEvent(type)}
-            </option>
-          ))}
-        </NativeSelect>
-      </label>
-      <label className="space-y-1.5">
-        <span className="text-xs font-semibold">{t("from")}</span>
-        <Input name="from" type="date" defaultValue={filters.from ?? ""} className="h-11" />
-      </label>
-      <label className="space-y-1.5">
-        <span className="text-xs font-semibold">{t("to")}</span>
-        <Input name="to" type="date" defaultValue={filters.to ?? ""} className="h-11" />
-      </label>
-      {staff && (
+      <form
+        method="get"
+        action={BASE}
+        role="search"
+        aria-label={t("label")}
+        className="grid gap-4 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <label className="space-y-1.5 sm:col-span-2">
+          <span className="text-xs font-semibold">{t("search")}</span>
+          <span className="relative block">
+            <Search
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              name="q"
+              type="search"
+              defaultValue={filters.q ?? ""}
+              placeholder={t("searchPlaceholder")}
+              maxLength={100}
+              className="h-11 pl-10"
+            />
+          </span>
+        </label>
         <label className="space-y-1.5">
-          <span className="text-xs font-semibold">{t("assignee")}</span>
-          <NativeSelect name="assignee" defaultValue={filters.assignee ?? ""} className="h-11">
-            <option value="">{t("anyone")}</option>
-            <option value="unassigned">{t("unassigned")}</option>
-            {staff.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
+          <span className="text-xs font-semibold">{t("status")}</span>
+          <NativeSelect name="status" defaultValue={filters.status ?? ""} className="h-11">
+            <option value="">{t("anyStatus")}</option>
+            {BOOKING_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {tStatus(s)}
               </option>
             ))}
           </NativeSelect>
         </label>
-      )}
-      <label className="space-y-1.5">
-        <span className="text-xs font-semibold">{t("sort")}</span>
-        <NativeSelect name="sort" defaultValue={filters.sort} className="h-11">
-          {SORTS.map((sort) => (
-            <option key={sort} value={sort}>
-              {t(
-                sort === "received_desc"
-                  ? "sortReceivedDesc"
-                  : sort === "received_asc"
-                    ? "sortReceivedAsc"
-                    : sort === "event_date_asc"
-                      ? "sortEventAsc"
-                      : "sortEventDesc",
-              )}
-            </option>
-          ))}
-        </NativeSelect>
-      </label>
-      <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-1 lg:col-start-4">
-        <Button type="submit" size="sm" className="h-11 flex-1">
-          {t("apply")}
-        </Button>
-        <Link href={BASE} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "h-11")}>
-          {t("reset")}
-        </Link>
-      </div>
-    </form>
+        <label className="space-y-1.5">
+          <span className="text-xs font-semibold">{t("eventType")}</span>
+          <NativeSelect name="type" defaultValue={filters.type ?? ""} className="h-11">
+            <option value="">{t("anyEventType")}</option>
+            {EVENT_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {tEvent(type)}
+              </option>
+            ))}
+          </NativeSelect>
+        </label>
+        <label className="space-y-1.5">
+          <span className="text-xs font-semibold">{t("from")}</span>
+          <Input name="from" type="date" defaultValue={filters.from ?? ""} className="h-11" />
+        </label>
+        <label className="space-y-1.5">
+          <span className="text-xs font-semibold">{t("to")}</span>
+          <Input name="to" type="date" defaultValue={filters.to ?? ""} className="h-11" />
+        </label>
+        {staff && (
+          <label className="space-y-1.5">
+            <span className="text-xs font-semibold">{t("assignee")}</span>
+            <NativeSelect name="assignee" defaultValue={filters.assignee ?? ""} className="h-11">
+              <option value="">{t("anyone")}</option>
+              <option value="unassigned">{t("unassigned")}</option>
+              {staff.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </NativeSelect>
+          </label>
+        )}
+        <label className="space-y-1.5">
+          <span className="text-xs font-semibold">{t("sort")}</span>
+          <NativeSelect name="sort" defaultValue={filters.sort} className="h-11">
+            {SORTS.map((sort) => (
+              <option key={sort} value={sort}>
+                {t(
+                  sort === "received_desc"
+                    ? "sortReceivedDesc"
+                    : sort === "received_asc"
+                      ? "sortReceivedAsc"
+                      : sort === "event_date_asc"
+                        ? "sortEventAsc"
+                        : "sortEventDesc",
+                )}
+              </option>
+            ))}
+          </NativeSelect>
+        </label>
+        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-1 lg:col-start-4">
+          <Button type="submit" size="sm" className="h-11 flex-1">
+            {t("apply")}
+          </Button>
+          <Link href={BASE} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "h-11")}>
+            {t("reset")}
+          </Link>
+        </div>
+      </form>
+    </FilterDisclosure>
   );
 }
 

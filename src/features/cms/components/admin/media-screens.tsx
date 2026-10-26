@@ -56,7 +56,7 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
     <CmsMessages>
       <div className="mx-auto max-w-6xl space-y-6">
         <header>
-          <h1 className="display-lg">{t("media.title")}</h1>
+          <h1 className="admin-title">{t("media.title")}</h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">{t("media.intro")}</p>
         </header>
 
@@ -226,7 +226,7 @@ export async function MediaDetailScreen({ id }: { id: string }) {
           {t("media.title")}
         </Link>
         <header className="space-y-2">
-          <h1 className="display-lg break-words">{asset.title}</h1>
+          <h1 className="admin-title break-words">{asset.title}</h1>
           <p className="inline-flex items-center gap-1.5 text-sm font-semibold">
             {is_public ? <Globe aria-hidden className="size-4" /> : <Lock aria-hidden className="size-4" />}
             {is_public ? t("media.publicExplained") : t("media.privateExplained")}

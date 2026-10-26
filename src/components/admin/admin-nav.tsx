@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ADMIN_MODULE_ICONS } from "@/features/admin/module-icons";
-import type { AdminModuleKey } from "@/features/admin/modules";
+import { isModuleActive, type AdminModuleKey } from "@/features/admin/modules";
 import { cn } from "@/lib/utils";
 
 export type AdminNavItem = {
@@ -51,13 +51,16 @@ export function AdminNav({ label, sections, plannedLabel, onNavigate }: AdminNav
                   );
                 }
 
-                const active = pathname === item.href;
+                // "page" on the module's own list; "true" (current section) on pages below it.
+                const current =
+                  pathname === item.href ? "page" : isModuleActive(pathname, item.href) ? "true" : undefined;
+                const active = current !== undefined;
                 return (
                   <li key={item.key}>
                     <Link
                       href={item.href}
                       onClick={onNavigate}
-                      aria-current={active ? "page" : undefined}
+                      aria-current={current}
                       className={cn(
                         base,
                         "font-medium transition-colors",

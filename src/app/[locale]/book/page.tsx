@@ -1,12 +1,15 @@
-import { Info } from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { Button } from "@/components/ui/button";
 import { InquiryForm, type InquiryCaptcha } from "@/features/bookings/components/inquiry-form";
 import { getInquiryConfig } from "@/features/bookings/server/config";
+import { siteNavigation } from "@/features/cms/navigation";
 import { getClientMessages } from "@/i18n/client-messages";
+import { Link } from "@/i18n/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -17,6 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: `/${locale}/book`, languages: { en: "/en/book", am: "/am/book" } },
   };
 }
+
+const PROCESS_STEPS = ["processStep1", "processStep2", "processStep3"] as const;
 
 export default async function BookPage() {
   const t = await getTranslations("Booking");
@@ -31,10 +36,26 @@ export default async function BookPage() {
           </h1>
           <p className="mt-5 text-lg text-muted-foreground">{t("intro")}</p>
           <span aria-hidden className="mt-8 tilet-rule w-28 text-accent" />
-          <p className="mt-8 flex items-start gap-3 rounded-2xl border border-border bg-surface p-5 text-sm leading-relaxed">
-            <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-accent-ink" />
-            {t("notBookingNote")}
-          </p>
+          <div className="mt-8 rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <h2 className="text-sm font-semibold">{t("processTitle")}</h2>
+            <ol className="mt-4 space-y-3 text-sm leading-relaxed">
+              {PROCESS_STEPS.map((step, index) => (
+                <li key={step} className="flex gap-3">
+                  <span
+                    aria-hidden
+                    className="inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-border-strong/60 font-display text-xs text-accent-ink tabular-nums"
+                  >
+                    {index + 1}
+                  </span>
+                  <span className="pt-0.5">{t(step)}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-5 flex items-start gap-3 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground">
+              <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-accent-ink" />
+              {t("notBookingNote")}
+            </p>
+          </div>
         </div>
 
         <Suspense fallback={<FormPlaceholder />}>
@@ -52,11 +73,28 @@ async function InquiryFormSection() {
   const config = getInquiryConfig();
 
   if (!config.available) {
-    const t = await getTranslations("Booking");
+    const [t, tHome, tCommon, navigation] = await Promise.all([
+      getTranslations("Booking"),
+      getTranslations("Home"),
+      getTranslations("Common"),
+      siteNavigation(locale),
+    ]);
+    const services = navigation.find((link) => link.key === "services")?.href ?? "/";
     return (
-      <div role="status" className="rounded-3xl border border-border bg-surface p-7 sm:p-10">
+      <div role="status" className="self-start rounded-3xl border border-border bg-surface p-7 sm:p-10">
         <h2 className="display-md">{t("unavailableTitle")}</h2>
         <p className="mt-4 text-muted-foreground">{t("unavailableBody")}</p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button asChild variant="outline">
+            <Link href={services}>
+              {tHome("heroSecondaryCta")}
+              <ArrowRight aria-hidden />
+            </Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link href="/">{tCommon("backHome")}</Link>
+          </Button>
+        </div>
       </div>
     );
   }

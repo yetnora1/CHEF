@@ -179,7 +179,8 @@ export type MenuCategoryView = {
 export async function MenuView({ categories }: { categories: MenuCategoryView[] }) {
   const [t, tDiet] = await Promise.all([getTranslations("PublicContent"), getTranslations("DietaryTag")]);
   return (
-    <div className="mt-12 space-y-14">
+    // A menu reads as one column at a comfortable line length.
+    <div className="mt-12 max-w-3xl space-y-14">
       {categories.map((category) => (
         <section key={category.key} aria-labelledby={`menu-${category.key}`}>
           <h2 id={`menu-${category.key}`} className="display-md" lang={category.name.lang}>
@@ -237,22 +238,27 @@ export async function GalleryView({ items }: { items: GalleryItemView[] }) {
     <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
         <li key={item.key}>
-          <CmsFigure
-            image={item.image}
-            sizes="(min-width: 64rem) 24rem, (min-width: 40rem) 50vw, 100vw"
-            frameClassName="aspect-[4/3] rounded-[1.5rem]"
-            creditLabel={t("credit")}
-          />
-          {(item.caption || item.event) && (
-            <div className="mt-3 space-y-1">
-              {item.event && <p className="text-xs font-semibold text-accent-ink">{item.event}</p>}
-              {item.caption && (
-                <p className="text-sm text-muted-foreground" lang={item.caption.lang}>
-                  {item.caption.text}
-                </p>
-              )}
+          {/* One figure: the occasion and caption describe the image; the credit comes last. */}
+          <figure>
+            <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-surface-muted">
+              <CmsImage image={item.image} sizes="(min-width: 64rem) 24rem, (min-width: 40rem) 50vw, 100vw" />
             </div>
-          )}
+            {(item.caption || item.event || item.image.credit) && (
+              <figcaption className="mt-3 space-y-1">
+                {item.event && <p className="text-xs font-semibold text-accent-ink">{item.event}</p>}
+                {item.caption && (
+                  <p className="text-sm text-muted-foreground" lang={item.caption.lang}>
+                    {item.caption.text}
+                  </p>
+                )}
+                {item.image.credit && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("credit")}: {item.image.credit}
+                  </p>
+                )}
+              </figcaption>
+            )}
+          </figure>
         </li>
       ))}
     </ul>

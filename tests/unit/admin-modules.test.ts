@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { modulesFor } from "@/features/admin/modules";
+import { isModuleActive, modulesFor } from "@/features/admin/modules";
 import { ROLE_PERMISSIONS, type AppRole } from "@/lib/permissions/matrix";
 
 const keysFor = (role: AppRole) => modulesFor(ROLE_PERMISSIONS[role]).map((m) => m.key);
@@ -36,5 +36,20 @@ describe("admin module visibility", () => {
       expect(keysFor(role)).not.toContain("users");
       expect(keysFor(role)).not.toContain("auditLog");
     }
+  });
+});
+
+describe("current module in the admin navigation", () => {
+  it("marks a module on its own page and on the pages below it", () => {
+    expect(isModuleActive("/admin/services", "/admin/services")).toBe(true);
+    expect(isModuleActive("/admin/services/new", "/admin/services")).toBe(true);
+    expect(isModuleActive("/admin/bookings/CH-0123456789", "/admin/bookings")).toBe(true);
+    expect(isModuleActive("/admin/menu/categories/new", "/admin/menu")).toBe(true);
+  });
+
+  it("does not match modules that only share a prefix", () => {
+    expect(isModuleActive("/admin/services", "/admin/overview")).toBe(false);
+    expect(isModuleActive("/admin/media-old", "/admin/media")).toBe(false);
+    expect(isModuleActive("/admin", "/admin/overview")).toBe(false);
   });
 });

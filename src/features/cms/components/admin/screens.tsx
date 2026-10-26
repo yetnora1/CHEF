@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { FilterDisclosure } from "@/components/admin/filter-disclosure";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input, NativeSelect } from "@/components/ui/form-controls";
 import { hasPermission, type SignedInStaffSession } from "@/lib/auth/access";
@@ -216,103 +217,120 @@ async function ListFilters({
   categories?: { id: string; label: string }[];
   types?: { value: string; label: string; selected: boolean }[];
 }) {
-  const [t, tStatus] = await Promise.all([getTranslations("AdminCms"), getTranslations("PublicationStatus")]);
+  const [t, tStatus, tAdmin] = await Promise.all([
+    getTranslations("AdminCms"),
+    getTranslations("PublicationStatus"),
+    getTranslations("Admin"),
+  ]);
+  const activeCount = [
+    filters.q,
+    filters.status,
+    filters.translation,
+    filters.parent,
+    types?.some((type) => type.selected) ? "type" : undefined,
+  ].filter(Boolean).length;
   return (
-    <form
-      method="get"
-      action={basePath}
-      role="search"
-      aria-label={t("list.filters")}
-      className="grid gap-4 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-5"
+    <FilterDisclosure
+      label={t("list.filters")}
+      activeLabel={tAdmin("activeFilters", { count: activeCount })}
+      activeCount={activeCount}
     >
-      <label className="space-y-1.5 sm:col-span-2">
-        <span className="text-xs font-semibold">{t("list.search")}</span>
-        <span className="relative block">
-          <Search
-            aria-hidden
-            className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-          <Input
-            name="q"
-            type="search"
-            defaultValue={filters.q ?? ""}
-            maxLength={100}
-            className="h-11 pl-10"
-            placeholder={t("list.searchPlaceholder")}
-          />
-        </span>
-      </label>
-      {types && (
+      <form
+        method="get"
+        action={basePath}
+        role="search"
+        aria-label={t("list.filters")}
+        className="grid gap-4 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-5"
+      >
+        <label className="space-y-1.5 sm:col-span-2">
+          <span className="text-xs font-semibold">{t("list.search")}</span>
+          <span className="relative block">
+            <Search
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              name="q"
+              type="search"
+              defaultValue={filters.q ?? ""}
+              maxLength={100}
+              className="h-11 pl-10"
+              placeholder={t("list.searchPlaceholder")}
+            />
+          </span>
+        </label>
+        {types && (
+          <label className="space-y-1.5">
+            <span className="text-xs font-semibold">{t("list.type")}</span>
+            <NativeSelect
+              name="type"
+              defaultValue={types.find((type) => type.selected)?.value ?? ""}
+              className="h-11"
+            >
+              <option value="">{t("list.anyType")}</option>
+              {types.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </NativeSelect>
+          </label>
+        )}
         <label className="space-y-1.5">
-          <span className="text-xs font-semibold">{t("list.type")}</span>
-          <NativeSelect
-            name="type"
-            defaultValue={types.find((type) => type.selected)?.value ?? ""}
-            className="h-11"
-          >
-            <option value="">{t("list.anyType")}</option>
-            {types.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
+          <span className="text-xs font-semibold">{t("list.status")}</span>
+          <NativeSelect name="status" defaultValue={filters.status ?? ""} className="h-11">
+            <option value="">{t("list.anyStatus")}</option>
+            {PUBLICATION_STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {tStatus(status)}
               </option>
             ))}
           </NativeSelect>
         </label>
-      )}
-      <label className="space-y-1.5">
-        <span className="text-xs font-semibold">{t("list.status")}</span>
-        <NativeSelect name="status" defaultValue={filters.status ?? ""} className="h-11">
-          <option value="">{t("list.anyStatus")}</option>
-          {PUBLICATION_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {tStatus(status)}
-            </option>
-          ))}
-        </NativeSelect>
-      </label>
-      <label className="space-y-1.5">
-        <span className="text-xs font-semibold">{t("list.translation")}</span>
-        <NativeSelect name="translation" defaultValue={filters.translation ?? ""} className="h-11">
-          <option value="">{t("list.anyTranslation")}</option>
-          {TRANSLATION_FILTERS.map((filter) => (
-            <option key={filter} value={filter}>
-              {t(`list.translationFilters.${filter}`)}
-            </option>
-          ))}
-        </NativeSelect>
-      </label>
-      {categories && (
         <label className="space-y-1.5">
-          <span className="text-xs font-semibold">{t("fields.category_id.label")}</span>
-          <NativeSelect name="parent" defaultValue={filters.parent ?? ""} className="h-11">
-            <option value="">{t("list.anyCategory")}</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.label}
+          <span className="text-xs font-semibold">{t("list.translation")}</span>
+          <NativeSelect name="translation" defaultValue={filters.translation ?? ""} className="h-11">
+            <option value="">{t("list.anyTranslation")}</option>
+            {TRANSLATION_FILTERS.map((filter) => (
+              <option key={filter} value={filter}>
+                {t(`list.translationFilters.${filter}`)}
               </option>
             ))}
           </NativeSelect>
         </label>
-      )}
-      <label className="space-y-1.5">
-        <span className="text-xs font-semibold">{t("list.sort")}</span>
-        <NativeSelect name="sort" defaultValue={filters.sort} className="h-11">
-          {LIST_SORTS.map((sort) => (
-            <option key={sort} value={sort}>
-              {t(`list.sorts.${sort}`)}
-            </option>
-          ))}
-        </NativeSelect>
-      </label>
-      <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-5">
-        <Button type="submit" size="sm">
-          {t("list.apply")}
-        </Button>
-        <Link href={basePath} className={buttonVariants({ variant: "ghost", size: "sm" })}>
-          {t("list.reset")}
-        </Link>
-      </div>
-    </form>
+        {categories && (
+          <label className="space-y-1.5">
+            <span className="text-xs font-semibold">{t("fields.category_id.label")}</span>
+            <NativeSelect name="parent" defaultValue={filters.parent ?? ""} className="h-11">
+              <option value="">{t("list.anyCategory")}</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.label}
+                </option>
+              ))}
+            </NativeSelect>
+          </label>
+        )}
+        <label className="space-y-1.5">
+          <span className="text-xs font-semibold">{t("list.sort")}</span>
+          <NativeSelect name="sort" defaultValue={filters.sort} className="h-11">
+            {LIST_SORTS.map((sort) => (
+              <option key={sort} value={sort}>
+                {t(`list.sorts.${sort}`)}
+              </option>
+            ))}
+          </NativeSelect>
+        </label>
+        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-5">
+          <Button type="submit" size="sm">
+            {t("list.apply")}
+          </Button>
+          <Link href={basePath} className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            {t("list.reset")}
+          </Link>
+        </div>
+      </form>
+    </FilterDisclosure>
   );
 }
 
@@ -367,7 +385,7 @@ export async function ContentListScreen({
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="display-lg">{t(`types.${type}.plural`)}</h1>
+            <h1 className="admin-title">{t(`types.${type}.plural`)}</h1>
             <p className="mt-3 max-w-3xl text-muted-foreground">{t(`types.${type}.intro`)}</p>
           </div>
           {canCreate && (
@@ -424,7 +442,7 @@ export async function ContentCreateScreen({ type }: { type: ContentType }) {
           {t(`types.${type}.plural`)}
         </Link>
         <header>
-          <h1 className="display-lg">{t(`types.${type}.new`)}</h1>
+          <h1 className="admin-title">{t(`types.${type}.new`)}</h1>
           <p className="mt-3 text-muted-foreground">{t("createIntro")}</p>
         </header>
         {type === "menu_item" && categories.length === 0 ? (
@@ -508,7 +526,7 @@ export async function ContentEditScreen({
 
         <header className="space-y-3">
           <p className="text-sm font-semibold text-accent-ink">{t(`types.${type}.singular`)}</p>
-          <h1 className="display-lg break-words" lang={english ? "en" : amharic ? "am" : undefined}>
+          <h1 className="admin-title break-words" lang={english ? "en" : amharic ? "am" : undefined}>
             {typeof label === "string"
               ? label
               : isPageKey(entry.id)
@@ -717,7 +735,7 @@ export async function TranslationsScreen({
     <CmsMessages>
       <div className="mx-auto max-w-6xl space-y-6">
         <header>
-          <h1 className="display-lg">{t("translations.title")}</h1>
+          <h1 className="admin-title">{t("translations.title")}</h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">{t("translations.intro")}</p>
         </header>
         <ListFilters basePath="/admin/translations" filters={effective} types={types} />

@@ -95,7 +95,7 @@ export default async function AdminBookingDetailPage({ params }: PageProps<"/adm
           <AlertTriangle aria-hidden className="mt-0.5 size-4 shrink-0 text-warning" />
           <Link
             href={`/admin/bookings/${detail.possible_duplicate_reference}`}
-            className="underline-offset-2 hover:underline"
+            className="underline decoration-warning/60 underline-offset-2 hover:decoration-current"
           >
             {t("detail.duplicateWarning", { reference: detail.possible_duplicate_reference })}
           </Link>

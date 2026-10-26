@@ -94,6 +94,8 @@ test.describe("role-based admin access", () => {
     await expect(nav.getByText("Inquiries & bookings")).toHaveCount(0);
     await expect(nav.getByText("Staff & roles")).toHaveCount(0);
     await expect(page.getByText("No modules are available for your role yet.")).toBeVisible();
+    // Nothing for an analyst to act on: no customer or content work queue.
+    await expect(page.getByRole("heading", { name: "Needs attention" })).toHaveCount(0);
   });
 
   test("a content editor sees content modules but no customer or security modules", async ({ page }) => {
@@ -109,6 +111,13 @@ test.describe("role-based admin access", () => {
     for (const hidden of ["Inquiries & bookings", "Staff & roles", "Audit log", "Settings"]) {
       await expect(nav.getByText(hidden, { exact: true })).toHaveCount(0);
     }
+    await expect(page.getByRole("heading", { level: 2, name: "Needs attention" })).toBeVisible();
+
+    // Pages below a module keep it marked as the current section.
+    await page.goto("/admin/services/new");
+    await expect(page.getByRole("heading", { level: 1, name: "New service" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Services" })).toHaveAttribute("aria-current", "true");
+    await expect(nav.getByRole("link", { name: "Overview" })).not.toHaveAttribute("aria-current");
   });
 
   test("an owner sees every module, keeps the session on reload, and can sign out", async ({ page }) => {
@@ -121,6 +130,7 @@ test.describe("role-based admin access", () => {
 
     await page.reload();
     await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Needs attention" })).toBeVisible();
 
     await page.getByRole("button", { name: "Account menu" }).click();
     const menu = page.getByRole("menu");

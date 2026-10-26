@@ -1,7 +1,8 @@
 /**
  * TEST DOUBLE — a stand-in for the Supabase HTTP APIs the app calls, used by
  * the Playwright "admin" project because Docker (and so the real local
- * Supabase stack) is unavailable in this environment.
+ * Supabase stack) is unavailable in this environment, and by the local demo
+ * (`npm run dev:demo`, scripts/dev-demo.mjs) with sample content added.
  *
  *  - Auth (GoTrue): password sign-in, refresh, user lookup and sign-out for a
  *    fixed set of test accounts.
@@ -41,7 +42,7 @@ export const TEST_USERS = {
   noRole: { email: "visitor@example.test", role: null, name: "Visitor Test" },
 } as const;
 
-type TestUser = { id: string; email: string };
+export type TestUser = { id: string; email: string };
 
 const root = process.cwd();
 const sql = (...parts: string[]) => readFileSync(path.join(root, ...parts), "utf8");
@@ -354,7 +355,7 @@ async function callTable(
   }
 }
 
-type StoredFile = { bytes: Buffer; contentType: string };
+export type StoredFile = { bytes: Buffer; contentType: string };
 
 /** Storage API errors: HTTP 400 with the meaningful status in `statusCode`. */
 const storageError = (statusCode: string, error: string, message: string) => ({
@@ -439,9 +440,22 @@ async function storageRemove(
   return { status: 200, body: rows };
 }
 
-export async function startFakeSupabase(): Promise<Server> {
+/**
+ * Extra data written straight into the database (as the superuser, so with no
+ * end-user identity) and into the in-memory Storage before the server starts.
+ * Used by `npm run dev:demo` (scripts/demo/demo-content.ts); the e2e tests
+ * start without it.
+ */
+export type FakeSupabaseSeed = (context: {
+  db: PGlite;
+  files: Map<string, StoredFile>;
+  users: Map<string, TestUser>;
+}) => Promise<void>;
+
+export async function startFakeSupabase(options: { seed?: FakeSupabaseSeed } = {}): Promise<Server> {
   const { db, users } = await createDatabase();
   const files = new Map<string, StoredFile>();
+  await options.seed?.({ db, files, users });
 
   async function handle(req: IncomingMessage, res: ServerResponse) {
     const url = new URL(req.url ?? "/", FAKE_SUPABASE_URL);

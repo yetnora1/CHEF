@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, Info, LoaderCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2, ExternalLink, Info, LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   startTransition,
@@ -386,6 +386,8 @@ export function InquiryForm({ locale, captcha }: { locale: AppLocale; captcha: I
                     target="_blank"
                   >
                     {chunks}
+                    <ExternalLink aria-hidden className="ml-1 inline size-3.5 align-[-0.1em]" />
+                    <span className="sr-only"> ({t("opensInNewTab")})</span>
                   </Link>
                 ),
               })}

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Chief Harena design tokens
+ * Chef Harena design tokens
  * ---------------------------------------------------------------------------
  * Brand palette (raw) → semantic tokens (role-based) → Tailwind utilities.
  * Components use semantic utilities (bg-background, text-muted-foreground…),
@@ -25,6 +25,15 @@
   --color-berbere-terracotta: #9d4135;
   --color-injera-ivory: #f5f0e6;
   --color-coffee-charcoal: #171d1a;
+
+  /* Flag artwork for the language toggle: fixed national colours, not theme
+   * roles, so they are the same in light and dark. */
+  --color-flag-us-red: #b22234;
+  --color-flag-us-blue: #3c3b6e;
+  --color-flag-et-green: #078930;
+  --color-flag-et-yellow: #fcdd09;
+  --color-flag-et-red: #da121a;
+  --color-flag-et-blue: #0f47af;
 
   --breakpoint-xs: 26rem;
 
@@ -306,13 +315,6 @@
   mask-repeat: repeat-x;
   mask-position: center;
   mask-size: auto 100%;
-}
-
-@utility lattice-backdrop {
-  background-image:
-    linear-gradient(45deg, currentColor 1px, transparent 1px),
-    linear-gradient(-45deg, currentColor 1px, transparent 1px);
-  background-size: 2.5rem 2.5rem;
 }
 
 /* Fine dotted texture used by photography placeholders. */

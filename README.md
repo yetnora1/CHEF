@@ -1,6 +1,6 @@
-# Chief Harena
+# Chef Harena
 
-Website and business-management platform for **Chief Harena**, an Ethiopian chef serving weddings,
+Website and business-management platform for **Chef Harena**, an Ethiopian chef serving weddings,
 corporate events, summits, private occasions and culinary experiences.
 
 It is two connected applications in one Next.js codebase:

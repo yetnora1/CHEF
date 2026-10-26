@@ -8,12 +8,12 @@ const base = {
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: "0x4AAAAAAAreal-site-key",
   TURNSTILE_SECRET_KEY: "0x4AAAAAAAreal-secret-key-value",
   CLIENT_IP_HEADER: "CF-Connecting-IP",
-  NEXT_PUBLIC_SITE_URL: "https://chiefharena.example",
+  NEXT_PUBLIC_SITE_URL: "https://chefharena.example",
 };
 
 const emailEnv = {
   RESEND_API_KEY: "re_test_key",
-  INQUIRY_EMAIL_FROM: "Chief Harena <inquiries@mail.example>",
+  INQUIRY_EMAIL_FROM: "Chef Harena <inquiries@mail.example>",
   INQUIRY_NOTIFY_TO: "owner@example.test, events@example.test",
 };
 
@@ -25,7 +25,7 @@ describe("resolveInquiryConfig", () => {
     const config = resolveInquiryConfig(base, { production: true });
     expect(config).toMatchObject({
       available: true,
-      captcha: { mode: "turnstile", expectedHostname: "chiefharena.example" },
+      captcha: { mode: "turnstile", expectedHostname: "chefharena.example" },
       email: null,
       clientIpHeader: "cf-connecting-ip",
       clientIpTrustedHops: 1,
@@ -112,7 +112,7 @@ describe("resolveInquiryConfig", () => {
 
   it("fails closed in production without the site URL whose hostname CAPTCHA tokens must match", () => {
     // Otherwise the hostname check would silently be skipped.
-    for (const NEXT_PUBLIC_SITE_URL of ["", "not a url", "ftp://chiefharena.example"]) {
+    for (const NEXT_PUBLIC_SITE_URL of ["", "not a url", "ftp://chefharena.example"]) {
       expect(resolveInquiryConfig({ ...base, NEXT_PUBLIC_SITE_URL }, { production: true })).toEqual({
         available: false,
         reason: "site-url-not-configured",
@@ -127,7 +127,7 @@ describe("resolveInquiryConfig", () => {
   it("requires an https site URL for email in production (staff links point to it)", () => {
     expect(
       resolveInquiryConfig(
-        { ...base, ...emailEnv, NEXT_PUBLIC_SITE_URL: "http://chiefharena.example" },
+        { ...base, ...emailEnv, NEXT_PUBLIC_SITE_URL: "http://chefharena.example" },
         { production: true },
       ),
     ).toMatchObject({ available: true, email: null, emailProblem: "site-url-required" });

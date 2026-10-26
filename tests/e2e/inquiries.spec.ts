@@ -35,7 +35,7 @@ async function fillInquiry(page: Page, input: InquiryInput) {
   if (input.eventDate) await page.getByLabel("Event date").fill(input.eventDate);
   await page.getByLabel("Approximate number of guests").fill(input.guests ?? "120");
   await page
-    .getByLabel("What would you like Chief Harena to provide?")
+    .getByLabel("What would you like Chef Harena to provide?")
     .fill(input.requirements ?? "Dinner for guests");
   await page.getByRole("checkbox").check();
 }

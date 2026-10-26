@@ -36,7 +36,7 @@ test.describe("locale routing", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Ethiopian cuisine for your most important gatherings.",
     );
-    await expect(page).toHaveTitle(/Chief Harena/);
+    await expect(page).toHaveTitle(/Chef Harena/);
     await expect(page.locator('link[rel="alternate"][hreflang="am"]')).toHaveAttribute("href", /\/am$/);
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     // The site-wide preview banner was removed at the owner's request (Stage 3.6).
@@ -77,6 +77,25 @@ test.describe("locale routing", () => {
 
     await page.goto("/");
     await expect(page).toHaveURL(/\/am$/);
+  });
+
+  test("the flag toggle switches language without jumping to the top", async ({ page }) => {
+    await page.goto("/en");
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    const before = await page.evaluate(() => window.scrollY);
+    expect(before).toBeGreaterThan(500);
+
+    // The header is sticky, so the toggle is still reachable at the bottom of the page.
+    await page.getByRole("group", { name: "Language" }).first().getByRole("link", { name: "አማርኛ" }).click();
+    await expect(page).toHaveURL(/\/am$/);
+    await expect(page.locator("html")).toHaveAttribute("lang", "am");
+    // The Amharic page is a little taller or shorter, so allow some drift, but no jump to the top.
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(before / 2);
+
+    // One toggle: on the Amharic page it offers English.
+    await expect(
+      page.getByRole("group", { name: "ቋንቋ" }).first().getByRole("link", { name: "English" }),
+    ).toBeVisible();
   });
 
   test("unknown pages return a localized 404", async ({ page }) => {
@@ -125,18 +144,18 @@ test.describe("theme", () => {
     await amToggle.click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await expect(amToggle).toHaveAttribute("aria-pressed", "false");
-    expect(await page.evaluate(() => localStorage.getItem("chief-harena:theme"))).toBe("light");
+    expect(await page.evaluate(() => localStorage.getItem("chef-harena:theme"))).toBe("light");
     expect(await bodyBackground(page)).toBe(IVORY);
   });
 
   test("applies a stored theme before first paint", async ({ page, request }) => {
     // The theme script is inline in <head>, ahead of any body content.
     const html = await (await request.get("/en")).text();
-    expect(html.indexOf("chief-harena:theme")).toBeGreaterThan(-1);
-    expect(html.indexOf("chief-harena:theme")).toBeLessThan(html.indexOf("<body"));
+    expect(html.indexOf("chef-harena:theme")).toBeGreaterThan(-1);
+    expect(html.indexOf("chef-harena:theme")).toBeLessThan(html.indexOf("<body"));
 
     await page.addInitScript(() => {
-      localStorage.setItem("chief-harena:theme", "dark");
+      localStorage.setItem("chef-harena:theme", "dark");
       document.addEventListener("DOMContentLoaded", () => {
         (window as unknown as { themeAtParse: string | null }).themeAtParse =
           document.documentElement.getAttribute("data-theme");

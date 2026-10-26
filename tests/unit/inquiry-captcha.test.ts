@@ -63,10 +63,10 @@ describe("verifyTurnstile", () => {
         secretKey: "secret",
         remoteIp: null,
         idempotencyKey: "key-1",
-        expectedHostname: "chiefharena.example",
+        expectedHostname: "chefharena.example",
         fetchImpl: respond({ success: true, action: "inquiry", hostname }),
       });
-    expect(await check("chiefharena.example")).toEqual({ ok: true });
+    expect(await check("chefharena.example")).toEqual({ ok: true });
     expect(await check("evil.example")).toEqual({ ok: false, reason: "rejected" });
     expect(await check(undefined)).toEqual({ ok: false, reason: "rejected" });
   });

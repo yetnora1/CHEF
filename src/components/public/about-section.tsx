@@ -35,7 +35,7 @@ export async function AboutSection({
   const t = await getTranslations("Home");
 
   return (
-    <section id={HOME_SECTIONS.about} aria-labelledby="about-heading" className="py-20 md:py-28">
+    <section id={HOME_SECTIONS.about} aria-labelledby="about-heading" className="py-14 md:py-20">
       <div className="page-container grid items-center gap-12 md:grid-cols-[0.8fr_1fr] lg:gap-20">
         {image ? (
           <div className="aspect-[4/5] w-full max-w-sm overflow-hidden rounded-2xl bg-surface-muted md:max-w-none">

@@ -64,12 +64,12 @@ previews), while its interface labels follow the admin's interface language.
   access to fetch it. Stage 3.6 dropped the serif display faces (Fraunces, Noto Serif Ethiopic)
   and then the Manrope web font, at the owner's request for a "normal" font.
 - Stacks list the Latin system fonts first; the browser falls through to the Ethiopic face per
-  glyph, so mixed text such as "Chief Harena ለሠርግ…" renders correctly.
+  glyph, so mixed text such as "Chef Harena ለሠርግ…" renders correctly.
 - Only the `ethiopic` subset is requested (Ethiopic U+1200–137F, Supplement U+1380–139F and the
   Extended blocks).
 - Ethiopic-specific typography via `:lang(am)`: body line-height 1.85; headings with looser
   line-height (1.35–1.5), no negative tracking, slightly smaller display sizes; eyebrows (sentence
-  case in both scripts) and the language switchers are enlarged to 12.5–15px for Ethiopic. Footer
+  case in both scripts) are enlarged to 15px for Ethiopic; the language toggle shows flags, not text. Footer
   fine print and the "Sample photo" label remain 11–12px in both scripts; revisit with the
   native-speaker review.
 
@@ -102,9 +102,9 @@ Staff alert emails are English-only for now (the business has not chosen a staff
 
 Open questions for the reviewer:
 
-- The brand name is kept in Latin script ("Chief Harena") inside Amharic text. Confirm whether an
+- The brand name is kept in Latin script ("Chef Harena") inside Amharic text. Confirm whether an
   official Ethiopic spelling should be used.
 - Register: the drafts use the polite/formal imperative (ይግቡ, ያቅዱ). Confirm the preferred tone.
-- Prefix forms attached to Latin text (e.g. "የChief Harena", "ከ Chief Harena ጋር").
-- The prompt refers to both "Chef Harena" and "Chief Harena"; Stage 1 uses **Chief Harena**
-  everywhere. Confirm the brand spelling.
+- Prefix forms attached to Latin text (e.g. "የChef Harena", "ከ Chef Harena ጋር").
+- Brand spelling: confirmed by the owner as **Chef Harena** (Stage 3.6); "Chief" is no longer
+  used anywhere visible.

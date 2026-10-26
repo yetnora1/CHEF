@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { isTheme, THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
-const CHANGE_EVENT = "chief-harena:theme-change";
+const CHANGE_EVENT = "chef-harena:theme-change";
 
 /** The applied theme: whatever ThemeScript set before paint, else light. */
 function readTheme(): Theme {

@@ -19,10 +19,10 @@ themes change in one place.
 Each token is declared once as `light-dark(<light>, <dark>)`; `color-scheme` on `<html>` selects
 the half:
 
-| Theme state              | How it is set                                                                                        | Result                                                                  |
-| ------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| First visit              | no `data-theme`                                                                                      | light, whatever the device prefers (also without JavaScript)            |
-| Switched with the button | `localStorage["chief-harena:theme"]`; inline script in `<head>` sets `data-theme` before first paint | no flash, persists across reloads and both locales; `dark` selects dark |
+| Theme state              | How it is set                                                                                       | Result                                                                  |
+| ------------------------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| First visit              | no `data-theme`                                                                                     | light, whatever the device prefers (also without JavaScript)            |
+| Switched with the button | `localStorage["chef-harena:theme"]`; inline script in `<head>` sets `data-theme` before first paint | no flash, persists across reloads and both locales; `dark` selects dark |
 
 There is no "match device" mode: the owner chose a plain light/dark switch (Stage 3.6).
 
@@ -68,7 +68,7 @@ every page `h1` and `display-md` for section headings, so operational screens st
 
 - `page-container`: up to 80rem with 1 / 1.5 / 2rem gutters. Text measures: `max-w-3xl` for
   articles, the About page, the privacy notice and the menu; `max-w-xl`/`max-w-2xl` for ledes.
-- Vertical rhythm: homepage bands `py-20 md:py-28`; content pages `py-14 md:py-20`; admin pages
+- Vertical rhythm: homepage sections `py-14 md:py-20`, the inquiry band a slim `py-8 md:py-10` row, the footer two compact rows; content pages `py-14 md:py-20`; admin pages
   `py-8 lg:py-12` inside the shell.
 - The public header shows its links inline only from `lg`: with every section published (about,
   services, menu, gallery, journal) five links do not fit beside the actions on a tablet. An e2e
@@ -103,9 +103,8 @@ Geometric bands in the spirit of woven _tilet_ borders, drawn as CSS masks so th
 colour. They are decorative only (`aria-hidden`), abstract, and make no claim about a specific
 regional pattern or meaning.
 
-- `tilet-band`: diamond chain with edge rules, used under the hero and around the inquiry band.
-- `tilet-rule`: small lozenge divider for headings and the footer.
-- `lattice-backdrop`: very faint diagonal lattice behind the inquiry band.
+- `tilet-band`: diamond chain with edge rules, used under the hero.
+- `tilet-rule`: small lozenge divider under headings.
 - `dot-texture`: fine dotted texture marking photography placeholders (only where no sample photo
   exists).
 
@@ -126,7 +125,7 @@ religious or civic symbol.
 | `ui/dropdown-menu`                                      | Radix; used by the theme toggle and account menu                                                                                                                                                                                                                                                                                 |
 | `ui/sheet`                                              | Radix Dialog side panel (focus trap, Escape, scroll lock) for mobile navigation                                                                                                                                                                                                                                                  |
 | `public/photo-slot`                                     | Until a real image is published: a sample photo with a visible "Sample photo" label and a linked credit, or (no sample) a labelled placeholder naming the photograph to supply                                                                                                                                                   |
-| `layout/locale-switcher`, `admin/admin-locale-switcher` | Native-name language toggles with `lang`/`hreflang`                                                                                                                                                                                                                                                                              |
+| `layout/locale-switcher`, `admin/admin-locale-switcher` | One flag toggle (US flag = English, Ethiopian flag = Amharic; the current one raised like a switch knob). Each click switches language; the public one keeps the scroll position (`scroll={false}`). Accessible name: the target language's native name, with `lang`/`hreflang`. Flag colours are fixed `flag-*` tokens          |
 | `theme/theme-toggle`                                    | One icon button: each click switches light ↔ dark (a toggle button, `aria-pressed` = dark), remembered per browser; state from `useSyncExternalStore`, syncs across tabs                                                                                                                                                         |
 | `layout/nav-link`                                       | Public navigation link with `aria-current` (`page`, or `true` inside a section); styled with `aria-[current]:` variants                                                                                                                                                                                                          |
 | `admin/admin-nav`                                       | Sidebar; a module stays current on the pages below it (`isModuleActive`)                                                                                                                                                                                                                                                         |
@@ -155,7 +154,7 @@ licensed **sample photo** from Wikimedia Commons (`src/features/content/sample-p
 
 - Every sample carries a visible "Sample photo" label and its credit (photographer and licence),
   linked to the Commons page that states the licence; the footer says the same. None is ever
-  presented as Chief Harena's food or events.
+  presented as Chef Harena's food or events.
 - No sample shows an identifiable face, so no stranger stands in for the chef or a client. The
   "chef" slot uses a coffee-ceremony still life, not a portrait.
 - Only CC BY / CC BY-SA (or more permissive) images; copies are resized to 1600px and keep the
@@ -171,5 +170,5 @@ licensed **sample photo** from Wikimedia Commons (`src/features/content/sample-p
 | Service: culinary experiences  | Jebena on a stove beside roasted coffee | Radosław Botev, CC BY 3.0 PL |
 
 A slot with no sample keeps the labelled placeholder, which names the intended shot (for example
-"a portrait of Chief Harena") so the chef can supply or commission it. Replacing the samples with
-Chief Harena's own photography is the single biggest step toward a site that feels personal.
+"a portrait of Chef Harena") so the chef can supply or commission it. Replacing the samples with
+Chef Harena's own photography is the single biggest step toward a site that feels personal.

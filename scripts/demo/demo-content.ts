@@ -8,10 +8,10 @@
  * inquiries in every stage of the workflow.
  *
  * Rules followed here:
- *   - Every text says it is sample or demo content. Nothing describes Chief
+ *   - Every text says it is sample or demo content. Nothing describes Chef
  *     Harena's real biography, clients, events, prices or contact details.
  *   - Images are generated abstract patterns labelled "Demo image"; no
- *     photograph is presented as Chief Harena's work.
+ *     photograph is presented as Chef Harena's work.
  *   - English is published. Amharic versions are left as unreviewed drafts:
  *     confirming a fluent speaker's review would be a false attestation, and it
  *     shows the review gate and the English fallback instead.
@@ -228,7 +228,7 @@ export const seedDemoContent: FakeSupabaseSeed = async ({ db, files, users }) =>
     hero: {
       eyebrow: "Sample content · Demo mode",
       headline: "A sample headline for the homepage.",
-      lede: "Sample text: this is where Chief Harena's own introduction will appear once it has been written and published in the admin.",
+      lede: "Sample text: this is where Chef Harena's own introduction will appear once it has been written and published in the admin.",
     },
     about: {
       heading: "Meet the chef (sample)",
@@ -257,7 +257,7 @@ export const seedDemoContent: FakeSupabaseSeed = async ({ db, files, users }) =>
   const aboutSections = {
     intro: {
       heading: "About the chef (sample)",
-      body: "Sample introduction for the demo. Nothing on this page describes Chief Harena's real biography, training or clients.",
+      body: "Sample introduction for the demo. Nothing on this page describes Chef Harena's real biography, training or clients.",
     },
     story: {
       heading: "A sample story section",
@@ -300,7 +300,7 @@ export const seedDemoContent: FakeSupabaseSeed = async ({ db, files, users }) =>
       "update public.service_translations set body = $2 where service_id = $1 and locale = 'en'",
       [
         service.id,
-        `## What this sample page shows\n\nSample service description for the demo. The final text describes how Chief Harena works for this kind of event.\n\n- Sample point about the menu\n- Sample point about service style\n- Sample point about planning\n\nTo talk about your own event, [send an inquiry](/en/book).`,
+        `## What this sample page shows\n\nSample service description for the demo. The final text describes how Chef Harena works for this kind of event.\n\n- Sample point about the menu\n- Sample point about service style\n- Sample point about planning\n\nTo talk about your own event, [send an inquiry](/en/book).`,
       ],
     );
   }

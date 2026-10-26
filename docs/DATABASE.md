@@ -172,8 +172,8 @@ and `npm run db:lint`.
 concurrency, which PGlite cannot do, and an opt-in Data API suite over HTTP through PostgREST).
 `TEST_POSTGRES_URL` must be a superuser URL of a **disposable local** PostgreSQL 15+ server (17
 matches Supabase); remote hosts are refused unless `TEST_POSTGRES_ALLOW_REMOTE=true`. Each suite gets
-its own `chief_test_*` database, dropped afterwards, and the migrations run as the non-superuser
-`chief_test_owner` (Supabase's `postgres` role is not a superuser either). The HTTP suite runs only
+its own `chef_test_*` database, dropped afterwards, and the migrations run as the non-superuser
+`chef_test_owner` (Supabase's `postgres` role is not a superuser either). The HTTP suite runs only
 when `TEST_POSTGREST_URL`, `TEST_POSTGREST_JWT_SECRET` and `TEST_POSTGREST_DB_URL` are set; see
 [VERIFICATION.md](VERIFICATION.md#8-what-the-owner-must-do).
 

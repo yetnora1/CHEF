@@ -50,7 +50,7 @@ export type ConsumeRateLimit = (
 
 /** Keyed hash: stable per deployment, irreversible without the server secret. */
 export function hashIdentifier(value: string, secret: string): string {
-  const key = createHash("sha256").update(`chief-harena:rate-limit:${secret}`).digest();
+  const key = createHash("sha256").update(`chef-harena:rate-limit:${secret}`).digest();
   return createHmac("sha256", key).update(value).digest("base64url").slice(0, 32);
 }
 

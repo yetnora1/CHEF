@@ -6,13 +6,13 @@
  * TEST_POSTGRES_URL must be a superuser connection to a DISPOSABLE local
  * server (PostgreSQL 15+, ideally 17 like Supabase). Each PGlite.create() makes
  * a fresh database, and close() drops it. As on hosted Supabase, migrations run
- * as a non-superuser role that owns the database (`chief_test_owner`, entered
+ * as a non-superuser role that owns the database (`chef_test_owner`, entered
  * with SET ROLE), so they cannot rely on superuser rights.
  */
 import { randomBytes } from "node:crypto";
 import pg from "pg";
 
-const OWNER = "chief_test_owner";
+const OWNER = "chef_test_owner";
 
 // Same JavaScript types PGlite returns: int8 as number, date as UTC midnight.
 pg.types.setTypeParser(pg.types.builtins.INT8, (value) => Number(value));
@@ -58,7 +58,7 @@ function bootstrap(): Promise<void> {
     );
     if (rows[0]!.version < 150000) throw new Error("PostgreSQL 15 or newer is required");
     // Test workers bootstrap in parallel; serialise on an advisory lock.
-    await admin.query("select pg_advisory_lock(hashtext('chief_test_bootstrap'))");
+    await admin.query("select pg_advisory_lock(hashtext('chef_test_bootstrap'))");
     try {
       for (const statement of [
         "create role anon nologin noinherit",
@@ -72,7 +72,7 @@ function bootstrap(): Promise<void> {
       }
       await admin.query(`grant anon, authenticated, service_role to ${OWNER}`);
     } finally {
-      await admin.query("select pg_advisory_unlock(hashtext('chief_test_bootstrap'))");
+      await admin.query("select pg_advisory_unlock(hashtext('chef_test_bootstrap'))");
     }
   });
   return bootstrapped;
@@ -102,7 +102,7 @@ export class PGlite {
 
   static async create(): Promise<PGlite> {
     await bootstrap();
-    const name = `chief_test_${randomBytes(6).toString("hex")}`;
+    const name = `chef_test_${randomBytes(6).toString("hex")}`;
     await withAdmin((admin) => admin.query(`create database ${name} owner ${OWNER}`));
     return new PGlite(await connectAsOwner({ name }), name);
   }

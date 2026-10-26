@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "siteName": "Chief Harena",
-    "homeTitle": "Chief Harena · ለሠርግ፣ ለዝግጅቶችና ለግል ግብዣዎች የኢትዮጵያ ምግብ",
+    "siteName": "Chef Harena",
+    "homeTitle": "Chef Harena · ለሠርግ፣ ለዝግጅቶችና ለግል ግብዣዎች የኢትዮጵያ ምግብ",
     "homeDescription": "ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች የኢትዮጵያ ምግብ የሚያዘጋጁ ሼፍ።",
     "notFoundTitle": "ገጹ አልተገኘም"
   },
@@ -24,7 +24,7 @@
   },
   "Brand": {
     "tagline": "የኢትዮጵያ ምግብ",
-    "homeLink": "Chief Harena፣ መነሻ ገጽ"
+    "homeLink": "Chef Harena፣ መነሻ ገጽ"
   },
   "Navigation": {
     "primaryLabel": "ዋና ማውጫ",
@@ -53,16 +53,14 @@
     "serviceToBeConfirmed": "አገልግሎቱ ገና አልተረጋገጠም",
     "aboutEyebrow": "ስለ ሼፉ",
     "aboutPending": "የሼፉ የራሳቸው የሕይወት ታሪክ ይጠበቃል",
-    "inquiryEyebrow": "የዝግጅት ጥያቄዎች",
     "inquiryCta": "ጥያቄዎን ይጀምሩ",
     "inquiryNote": "ጥያቄ መላክ ቀን አያስይዝም።",
     "aboutMore": "ስለ ሼፉ ተጨማሪ"
   },
   "Footer": {
     "navigationLabel": "የግርጌ ማውጫ",
-    "contactPending": "የመገኛ አድራሻዎች በChief Harena ሲረጋገጡ ይታተማሉ።",
-    "photoCredit": "የናሙና ፎቶዎቹ ከWikimedia Commons በክፍት ፈቃድ የተገኙ ናቸው፤ ምንጫቸው በእያንዳንዱ ፎቶ ላይ ተጠቅሷል። የChief Harena የራሳቸው ፎቶዎች ሲታተሙ ይተካሉ።",
-    "copyright": "© {year} Chief Harena። መብቱ በሕግ የተጠበቀ ነው።"
+    "photoCredit": "የናሙና ፎቶዎቹ ከWikimedia Commons በክፍት ፈቃድ የተገኙ ናቸው፤ ምንጫቸው በእያንዳንዱ ፎቶ ላይ ተጠቅሷል። የChef Harena የራሳቸው ፎቶዎች ሲታተሙ ይተካሉ።",
+    "copyright": "© {year} Chef Harena። መብቱ በሕግ የተጠበቀ ነው።"
   },
   "Admin": {
     "appName": "አስተዳደር",
@@ -129,7 +127,7 @@
   },
   "Auth": {
     "loginTitle": "ይግቡ",
-    "loginSubtitle": "ለChief Harena አስተዳደር የሠራተኞች መግቢያ።",
+    "loginSubtitle": "ለChef Harena አስተዳደር የሠራተኞች መግቢያ።",
     "email": "ኢሜይል",
     "password": "የይለፍ ቃል",
     "submit": "ይግቡ",
@@ -178,14 +176,14 @@
   },
   "Booking": {
     "metaTitle": "ዝግጅት ያቅዱ",
-    "metaDescription": "ለዝግጅትዎ የኢትዮጵያ ምግብ አገልግሎት ወይም የምግብ ባህል ልምድ ለማግኘት ለChief Harena ጥያቄ ይላኩ።",
+    "metaDescription": "ለዝግጅትዎ የኢትዮጵያ ምግብ አገልግሎት ወይም የምግብ ባህል ልምድ ለማግኘት ለChef Harena ጥያቄ ይላኩ።",
     "eyebrow": "የዝግጅት ጥያቄ",
     "title": "ስለ ዝግጅትዎ ይንገሩን",
-    "intro": "ጥቂት ዝርዝሮችን ያጋሩ፤ Chief Harena ጥያቄዎን ይገመግማሉ።",
-    "notBookingNote": "ጥያቄ ቦታ ማስያዝ አይደለም። ቀናትና አገልግሎቶች የሚረጋገጡት Chief Harena ጥያቄዎን ከገመገሙና ዝርዝሩን ከእርስዎ ጋር ከተስማሙ በኋላ ብቻ ነው።",
+    "intro": "ጥቂት ዝርዝሮችን ያጋሩ፤ Chef Harena ጥያቄዎን ይገመግማሉ።",
+    "notBookingNote": "ጥያቄ ቦታ ማስያዝ አይደለም። ቀናትና አገልግሎቶች የሚረጋገጡት Chef Harena ጥያቄዎን ከገመገሙና ዝርዝሩን ከእርስዎ ጋር ከተስማሙ በኋላ ብቻ ነው።",
     "processTitle": "ጥያቄዎች እንዴት እንደሚስተናገዱ",
     "processStep1": "ጥያቄዎ እንደተላከ መለያ ቁጥር ይሰጥዎታል።",
-    "processStep2": "Chief Harena ቀንዎን፣ የእንግዶችን ብዛትና ፍላጎቶችዎን ይገመግማሉ።",
+    "processStep2": "Chef Harena ቀንዎን፣ የእንግዶችን ብዛትና ፍላጎቶችዎን ይገመግማሉ።",
     "processStep3": "ዝርዝሩን ለመስማማት በመረጡት መንገድ እንገናኝዎታለን።",
     "requiredHint": "* ምልክት ያላቸው መስኮች የግድ መሞላት አለባቸው።",
     "sectionYou": "ስለ እርስዎ",
@@ -203,11 +201,11 @@
     "guestCount": "የእንግዶች ግምታዊ ብዛት",
     "venue": "ቦታ ወይም አዳራሽ",
     "venueHint": "የሚያውቁትን ያህል ከተማ፣ የአዳራሽ ስም ወይም አድራሻ።",
-    "requirements": "Chief Harena ምን እንዲያቀርቡልዎ ይፈልጋሉ?",
+    "requirements": "Chef Harena ምን እንዲያቀርቡልዎ ይፈልጋሉ?",
     "requirementsHint": "ለምሳሌ የምግቡ አይነት፣ የአቀራረብ ስልት ወይም የአመጋገብ ገደቦች።",
     "message": "ሌላ ማወቅ ያለብን ነገር አለ?",
     "optional": "አማራጭ",
-    "consent": "Chief Harena እነዚህን ዝርዝሮች ለጥያቄዬ ምላሽ ለመስጠት በ<link>የግላዊነት መግለጫው</link> መሠረት እንዲጠቀሙ እስማማለሁ።",
+    "consent": "Chef Harena እነዚህን ዝርዝሮች ለጥያቄዬ ምላሽ ለመስጠት በ<link>የግላዊነት መግለጫው</link> መሠረት እንዲጠቀሙ እስማማለሁ።",
     "opensInNewTab": "በአዲስ ትር ይከፈታል",
     "submit": "ጥያቄውን ይላኩ",
     "submitting": "በመላክ ላይ…",
@@ -238,16 +236,16 @@
     "error": "ጥያቄዎ ሊላክ አልቻለም፤ ምንም አልተቀመጠም። እባክዎ ትንሽ ቆይተው እንደገና ይሞክሩ።",
     "networkError": "ግንኙነቱ ስለተቋረጠ ጥያቄዎ መድረሱን ማወቅ አልቻልንም። እባክዎ እንደገና ይላኩት፤ ያንኑ ጥያቄ እንደገና መላክ ተደጋጋሚ ጥያቄ አይፈጥርም።",
     "successTitle": "እናመሰግናለን። ጥያቄዎ ደርሶናል",
-    "successBody": "ጥያቄዎ አሁን በChief Harena ግምገማ ላይ ነው። ይህ የቦታ ማስያዣ ማረጋገጫ አይደለም፤ ለቀንዎ መገኘታችንንም አያረጋግጥም።",
+    "successBody": "ጥያቄዎ አሁን በChef Harena ግምገማ ላይ ነው። ይህ የቦታ ማስያዣ ማረጋገጫ አይደለም፤ ለቀንዎ መገኘታችንንም አያረጋግጥም።",
     "referenceLabel": "መለያ ቁጥርዎ",
     "referenceHint": "እባክዎ ይህን መለያ ቁጥር ይያዙ፤ ሲያገኙን ይጥቀሱት።",
     "newInquiry": "ሌላ ጥያቄ ይላኩ"
   },
   "Privacy": {
     "metaTitle": "የግላዊነት መግለጫ",
-    "metaDescription": "የChief Harena ድረ-ገጽ በዝግጅት ጥያቄ ውስጥ የሚያጋሩትን መረጃ እንዴት እንደሚይዝ።",
+    "metaDescription": "የChef Harena ድረ-ገጽ በዝግጅት ጥያቄ ውስጥ የሚያጋሩትን መረጃ እንዴት እንደሚይዝ።",
     "eyebrow": "ግላዊነት",
-    "draftNotice": "ለግምገማ የቀረበ ረቂቅ። ይህ መግለጫ ድረ-ገጹ በአሁኑ ጊዜ የጥያቄ መረጃን እንዴት እንደሚይዝ ይገልጻል። ለግምገማ የተለዩ ነጥቦች በChief Harena መሞላት አለባቸው፤ መግለጫውም ከመጀመሩ በፊት ብቃት ባለው አማካሪ መታየት አለበት። በራሱ የሕግ ተገዢነትን አያረጋግጥም።",
+    "draftNotice": "ለግምገማ የቀረበ ረቂቅ። ይህ መግለጫ ድረ-ገጹ በአሁኑ ጊዜ የጥያቄ መረጃን እንዴት እንደሚይዝ ይገልጻል። ለግምገማ የተለዩ ነጥቦች በChef Harena መሞላት አለባቸው፤ መግለጫውም ከመጀመሩ በፊት ብቃት ባለው አማካሪ መታየት አለበት። በራሱ የሕግ ተገዢነትን አያረጋግጥም።",
     "reviewTag": "የባለቤቱ ግምገማ ያስፈልጋል",
     "lastUpdated": "ለመጨረሻ ጊዜ የተሻሻለው {date}"
   },
@@ -381,28 +379,28 @@
       "intro": "ለሠርግ፣ ለድርጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች የኢትዮጵያ ምግብ።",
       "more": "ተጨማሪ ያንብቡ",
       "emptyTitle": "የአገልግሎት መግለጫዎች በቅርቡ ይቀርባሉ",
-      "emptyBody": "ስለ ዝግጅትዎ አሁኑኑ ለ Chief Harena ማሳወቅ ይችላሉ።",
+      "emptyBody": "ስለ ዝግጅትዎ አሁኑኑ ለ Chef Harena ማሳወቅ ይችላሉ።",
       "back": "ሁሉም አገልግሎቶች",
       "inquire": "ስለዚህ አገልግሎት ይጠይቁ"
     },
     "menu": {
       "eyebrow": "ምናሌ",
       "title": "ምናሌው",
-      "intro": "የምግቦች ምርጫ። ለእያንዳንዱ ዝግጅት የሚቀርበው ምናሌ ከ Chief Harena ጋር ይወሰናል።",
+      "intro": "የምግቦች ምርጫ። ለእያንዳንዱ ዝግጅት የሚቀርበው ምናሌ ከ Chef Harena ጋር ይወሰናል።",
       "emptyTitle": "ምናሌው በቅርቡ ይወጣል",
-      "emptyBody": "ስለ ዝግጅትዎ ይንገሩን፤ Chief Harena የሚሆኑ ምግቦችን ይጠቁማሉ።"
+      "emptyBody": "ስለ ዝግጅትዎ ይንገሩን፤ Chef Harena የሚሆኑ ምግቦችን ይጠቁማሉ።"
     },
     "gallery": {
       "eyebrow": "ፎቶዎች",
       "title": "የፎቶ ማዕከል",
-      "intro": "በ Chief Harena የተዘጋጁ ምግቦችና ዝግጅቶች።",
+      "intro": "በ Chef Harena የተዘጋጁ ምግቦችና ዝግጅቶች።",
       "emptyTitle": "ፎቶዎች በቅርቡ ይቀርባሉ",
       "emptyBody": "እስከዚያው ስለ ዝግጅትዎ ሊነግሩን ይችላሉ።"
     },
     "journal": {
       "eyebrow": "ጽሑፎች",
       "title": "ጽሑፎች",
-      "intro": "ከ Chief Harena ማዕድ ቤት የተገኙ ታሪኮችና ማስታወሻዎች።",
+      "intro": "ከ Chef Harena ማዕድ ቤት የተገኙ ታሪኮችና ማስታወሻዎች።",
       "read": "ጽሑፉን ያንብቡ",
       "emptyTitle": "እስካሁን ጽሑፍ የለም",
       "emptyBody": "ጽሑፎች ሲታተሙ እዚህ ይታያሉ።",
@@ -600,7 +598,7 @@
       "menu_item": {
         "singular": "ምግብ",
         "plural": "ምግቦች",
-        "intro": "በሕዝብ ምናሌው ላይ የሚታዩ ምግቦች። Chief Harena ያረጋገጡትን ብቻ ይግለጹ።",
+        "intro": "በሕዝብ ምናሌው ላይ የሚታዩ ምግቦች። Chef Harena ያረጋገጡትን ብቻ ይግለጹ።",
         "new": "አዲስ ምግብ",
         "edit": "ምግብ አርትዕ",
         "empty": "እስካሁን ምግብ የለም።"
@@ -648,7 +646,7 @@
       },
       "dietary_tags": {
         "label": "የምግብ መረጃ",
-        "hint": "Chief Harena ለዚህ ምግብ ያረጋገጡትን ብቻ ምልክት ያድርጉ።"
+        "hint": "Chef Harena ለዚህ ምግብ ያረጋገጡትን ብቻ ምልክት ያድርጉ።"
       },
       "event_type": {
         "label": "በፎቶው ላይ ያለው የዝግጅት አይነት"

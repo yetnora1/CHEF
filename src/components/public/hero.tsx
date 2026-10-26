@@ -24,7 +24,7 @@ export async function Hero({ eyebrow, headline, lede, photoSubject, image }: Her
 
   return (
     <section aria-labelledby="hero-heading" className="relative overflow-hidden">
-      <div className="page-container grid items-center gap-12 pt-12 pb-16 md:pt-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pt-20 lg:pb-24">
+      <div className="page-container grid items-center gap-10 pt-10 pb-12 md:pt-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pt-16 lg:pb-16">
         <div className="max-w-2xl">
           {eyebrow && (
             <p className="eyebrow text-accent-ink" lang={eyebrow.lang}>

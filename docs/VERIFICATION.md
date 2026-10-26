@@ -373,7 +373,7 @@ item W10).
 ## Reproducing the local verification
 
 - `npm run test:db:pg` needs `TEST_POSTGRES_URL`: a superuser URL of a disposable local PostgreSQL
-  15+ server (17 recommended). It creates and drops its own `chief_test_*` databases and runs
+  15+ server (17 recommended). It creates and drops its own `chef_test_*` databases and runs
   migrations as a non-superuser owner. Add the `TEST_POSTGREST_*` variables to include the HTTP suite.
 - `npm run db:compare` with `DEPLOYED_DATABASE_URL` is read-only.
 - Stage 3 on Real PG17: create the reduced `storage` schema (the `storage` part of

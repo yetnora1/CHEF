@@ -2,7 +2,7 @@
 # https://supabase.com/docs/guides/local-development/cli/config
 # A string used to distinguish different Supabase projects on the same host. Defaults to the
 # working directory name when running `supabase init`.
-project_id = "chief-harena"
+project_id = "chef-harena"
 
 [api]
 enabled = true
@@ -174,7 +174,7 @@ enable_refresh_token_rotation = true
 # Requires enable_refresh_token_rotation = true.
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
-# Chief Harena: public registration is disabled. Staff accounts are created by an
+# Chef Harena: public registration is disabled. Staff accounts are created by an
 # authorized operator (Studio "Add user" locally; invitations in a later stage).
 enable_signup = false
 # Allow/disallow anonymous sign-ins to your project.

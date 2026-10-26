@@ -17,7 +17,7 @@ type PhotoSlotProps = {
 };
 
 /**
- * Fills a photo slot until Chief Harena's own photography is published: a
+ * Fills a photo slot until Chef Harena's own photography is published: a
  * sample photograph labelled "Sample photo" with its credit, or, where there
  * is no sample, a labelled placeholder naming the photograph to supply.
  * Neither can be mistaken for the chef's work.

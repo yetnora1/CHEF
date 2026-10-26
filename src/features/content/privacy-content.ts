@@ -5,7 +5,7 @@ import type { AppLocale } from "@/i18n/routing";
  * ---------------------------------------------------------------------------
  * Describes what the website actually does today (Stage 2). It names no legal
  * entity, address, privacy officer or certification, because none has been
- * provided. Sections with `review` need business decisions from Chief Harena.
+ * provided. Sections with `review` need business decisions from Chef Harena.
  * The Amharic text is a machine-assisted draft that also needs native-speaker
  * and legal review. Update LAST_UPDATED whenever the behaviour described here changes.
  */
@@ -31,13 +31,13 @@ export const privacyContent: Record<
   en: {
     title: "How we handle your inquiry information",
     intro:
-      "This notice explains what the Chief Harena website collects when you send an event inquiry, why, who can see it and what you can ask us to do with it.",
+      "This notice explains what the Chef Harena website collects when you send an event inquiry, why, who can see it and what you can ask us to do with it.",
     sections: [
       {
         id: "who",
         heading: "Who is responsible",
         paragraphs: [
-          "This website belongs to Chief Harena, an Ethiopian chef offering catering and culinary services for events.",
+          "This website belongs to Chef Harena, an Ethiopian chef offering catering and culinary services for events.",
         ],
         review: "Add the legal name of the business, its registration details (if any) and a postal address.",
       },
@@ -95,7 +95,7 @@ export const privacyContent: Record<
         heading: "Your choices",
         paragraphs: [
           "You can ask us to show you, correct or delete the information from your inquiry. Please mention your inquiry reference.",
-          "Contact details for these requests will be published here once Chief Harena has confirmed them.",
+          "Contact details for these requests will be published here once Chef Harena has confirmed them.",
         ],
         review: "Provide the contact address for privacy requests.",
       },
@@ -115,14 +115,14 @@ export const privacyContent: Record<
   am: {
     title: "የጥያቄዎን መረጃ እንዴት እንደምንይዝ",
     intro:
-      "ይህ መግለጫ የዝግጅት ጥያቄ ሲልኩ የChief Harena ድረ-ገጽ ምን እንደሚሰበስብ፣ ለምን፣ ማን ሊያየው እንደሚችል እና በእሱ ላይ ምን እንድናደርግ መጠየቅ እንደሚችሉ ያብራራል።",
+      "ይህ መግለጫ የዝግጅት ጥያቄ ሲልኩ የChef Harena ድረ-ገጽ ምን እንደሚሰበስብ፣ ለምን፣ ማን ሊያየው እንደሚችል እና በእሱ ላይ ምን እንድናደርግ መጠየቅ እንደሚችሉ ያብራራል።",
     translationNote:
       "የአማርኛው ትርጉም ረቂቅ ነው፤ ከመታተሙ በፊት በአማርኛ ተናጋሪና በሕግ ባለሙያ መገምገም አለበት። ልዩነት ካለ የእንግሊዝኛውን ጽሑፍ ይመልከቱ።",
     sections: [
       {
         id: "who",
         heading: "ኃላፊው ማን ነው",
-        paragraphs: ["ይህ ድረ-ገጽ ለዝግጅቶች የምግብ አገልግሎትና የምግብ ባህል ልምዶችን የሚያቀርቡት የኢትዮጵያዊው ሼፍ የChief Harena ነው።"],
+        paragraphs: ["ይህ ድረ-ገጽ ለዝግጅቶች የምግብ አገልግሎትና የምግብ ባህል ልምዶችን የሚያቀርቡት የኢትዮጵያዊው ሼፍ የChef Harena ነው።"],
         review: "የድርጅቱን ሕጋዊ ስም፣ የምዝገባ ዝርዝር (ካለ) እና የፖስታ አድራሻ ያክሉ።",
       },
       {
@@ -175,7 +175,7 @@ export const privacyContent: Record<
         heading: "ምርጫዎችዎ",
         paragraphs: [
           "ከጥያቄዎ ያለውን መረጃ እንድናሳይዎ፣ እንድናስተካክል ወይም እንድንሰርዝ መጠየቅ ይችላሉ። እባክዎ የጥያቄዎን መለያ ቁጥር ይጥቀሱ።",
-          "ለእነዚህ ጥያቄዎች የመገኛ አድራሻ Chief Harena ካረጋገጡ በኋላ እዚህ ይታተማል።",
+          "ለእነዚህ ጥያቄዎች የመገኛ አድራሻ Chef Harena ካረጋገጡ በኋላ እዚህ ይታተማል።",
         ],
         review: "ለግላዊነት ጥያቄዎች የመገኛ አድራሻ ያቅርቡ።",
       },

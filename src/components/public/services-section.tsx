@@ -43,7 +43,7 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
     <section
       id={HOME_SECTIONS.services}
       aria-labelledby="services-heading"
-      className="border-y border-border bg-surface py-20 md:py-28"
+      className="border-y border-border bg-surface py-14 md:py-20"
     >
       <div className="page-container">
         <div className="grid gap-6 md:grid-cols-[1fr_1fr] md:items-end">
@@ -59,7 +59,7 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
         </div>
 
         {/* Placeholder cards are not links; published services link to their page. */}
-        <ul className={cn("mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2", desktopColumns(services.length))}>
+        <ul className={cn("mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2", desktopColumns(services.length))}>
           {services.map((service) => (
             <li key={service.slug} className="group/card relative flex flex-col">
               {service.image ? (

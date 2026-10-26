@@ -18,7 +18,7 @@ export const instant = false;
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Admin");
   return {
-    title: { default: `${t("appName")} · Chief Harena`, template: `%s · Chief Harena ${t("appName")}` },
+    title: { default: `${t("appName")} · Chef Harena`, template: `%s · Chef Harena ${t("appName")}` },
     robots: { index: false, follow: false },
     referrer: "same-origin",
   };

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { isSameOriginRequest } from "@/lib/http";
 
 const request = (headers: Record<string, string>) =>
-  new Request("https://chiefharena.example/api/admin/media", { method: "POST", headers });
+  new Request("https://chefharena.example/api/admin/media", { method: "POST", headers });
 
 describe("isSameOriginRequest (CSRF guard for route handlers)", () => {
   it("accepts a same-origin browser request", () => {
@@ -10,8 +10,8 @@ describe("isSameOriginRequest (CSRF guard for route handlers)", () => {
       isSameOriginRequest(
         request({
           "sec-fetch-site": "same-origin",
-          origin: "https://chiefharena.example",
-          host: "chiefharena.example",
+          origin: "https://chefharena.example",
+          host: "chefharena.example",
         }),
       ),
     ).toBe(true);
@@ -23,8 +23,8 @@ describe("isSameOriginRequest (CSRF guard for route handlers)", () => {
         isSameOriginRequest(
           request({
             "sec-fetch-site": site,
-            origin: "https://chiefharena.example",
-            host: "chiefharena.example",
+            origin: "https://chefharena.example",
+            host: "chefharena.example",
           }),
         ),
         site,
@@ -34,36 +34,34 @@ describe("isSameOriginRequest (CSRF guard for route handlers)", () => {
 
   it("falls back to comparing Origin with the host when Fetch Metadata is missing", () => {
     expect(
-      isSameOriginRequest(request({ origin: "https://chiefharena.example", host: "chiefharena.example" })),
+      isSameOriginRequest(request({ origin: "https://chefharena.example", host: "chefharena.example" })),
     ).toBe(true);
-    expect(
-      isSameOriginRequest(request({ origin: "https://evil.example", host: "chiefharena.example" })),
-    ).toBe(false);
+    expect(isSameOriginRequest(request({ origin: "https://evil.example", host: "chefharena.example" }))).toBe(
+      false,
+    );
     expect(
       isSameOriginRequest(
-        request({ origin: "https://chiefharena.example.evil.example", host: "chiefharena.example" }),
+        request({ origin: "https://chefharena.example.evil.example", host: "chefharena.example" }),
       ),
     ).toBe(false);
   });
 
   it("compares with the forwarded host behind a proxy", () => {
-    const headers = { origin: "https://chiefharena.example", host: "internal:3000" };
+    const headers = { origin: "https://chefharena.example", host: "internal:3000" };
     expect(isSameOriginRequest(request(headers))).toBe(false);
-    expect(isSameOriginRequest(request({ ...headers, "x-forwarded-host": "chiefharena.example" }))).toBe(
-      true,
-    );
+    expect(isSameOriginRequest(request({ ...headers, "x-forwarded-host": "chefharena.example" }))).toBe(true);
   });
 
   it("refuses requests without any origin signal, and opaque or malformed origins", () => {
-    expect(isSameOriginRequest(request({ host: "chiefharena.example" }))).toBe(false);
-    expect(isSameOriginRequest(request({ origin: "null", host: "chiefharena.example" }))).toBe(false);
-    expect(isSameOriginRequest(request({ origin: "not a url", host: "chiefharena.example" }))).toBe(false);
-    expect(isSameOriginRequest(request({ origin: "https://chiefharena.example" }))).toBe(false);
+    expect(isSameOriginRequest(request({ host: "chefharena.example" }))).toBe(false);
+    expect(isSameOriginRequest(request({ origin: "null", host: "chefharena.example" }))).toBe(false);
+    expect(isSameOriginRequest(request({ origin: "not a url", host: "chefharena.example" }))).toBe(false);
+    expect(isSameOriginRequest(request({ origin: "https://chefharena.example" }))).toBe(false);
   });
 
   it("accepts same-origin Fetch Metadata without an Origin header", () => {
     expect(
-      isSameOriginRequest(request({ "sec-fetch-site": "same-origin", host: "chiefharena.example" })),
+      isSameOriginRequest(request({ "sec-fetch-site": "same-origin", host: "chefharena.example" })),
     ).toBe(true);
   });
 });

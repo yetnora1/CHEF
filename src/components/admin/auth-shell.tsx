@@ -14,7 +14,7 @@ export async function AuthShell({ children }: { children: ReactNode }) {
         <span className="inline-flex items-center gap-2.5 text-sm font-semibold">
           <Emblem className="size-8" />
           <span>
-            <span lang="en">Chief Harena</span>
+            <span lang="en">Chef Harena</span>
             <span className="text-muted-foreground"> · {t("appName")}</span>
           </span>
         </span>

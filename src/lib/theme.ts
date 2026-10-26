@@ -1,4 +1,4 @@
-export const THEME_STORAGE_KEY = "chief-harena:theme";
+export const THEME_STORAGE_KEY = "chef-harena:theme";
 
 /** Light is the default; dark applies only when chosen with the theme button. */
 export type Theme = "light" | "dark";

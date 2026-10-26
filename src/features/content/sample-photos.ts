@@ -8,10 +8,10 @@ import serviceSummits from "@/assets/samples/service-summits.jpg";
 import serviceWeddings from "@/assets/samples/service-weddings.jpg";
 
 /*
- * SAMPLE PHOTOGRAPHY — not Chief Harena's work
+ * SAMPLE PHOTOGRAPHY — not Chef Harena's work
  * ---------------------------------------------------------------------------
  * Openly licensed photographs from Wikimedia Commons that fill the photo slots
- * until Chief Harena's own photography is published through the media library
+ * until Chef Harena's own photography is published through the media library
  * (a published image always takes precedence). Every one is shown with a
  * visible "Sample photo" label and its credit, so none can be mistaken for the
  * chef's food or events. None shows an identifiable face.

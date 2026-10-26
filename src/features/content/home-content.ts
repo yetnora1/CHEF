@@ -12,7 +12,7 @@ import type { Localized } from "@/lib/localization/translations";
  *   - Amharic is a machine-assisted draft that needs native-speaker review
  *     before launch (docs/LOCALIZATION.md lists every string to review).
  *   - Photo subjects describe the photograph to commission or supply; no stock
- *     photo is presented as Chief Harena's work.
+ *     photo is presented as Chef Harena's work.
  */
 
 export type ServicePreview = {
@@ -20,7 +20,7 @@ export type ServicePreview = {
   title: Localized;
   summary: Localized;
   photoSubject: Localized;
-  /** False until Chief Harena confirms the offering exists. */
+  /** False until Chef Harena confirms the offering exists. */
   confirmed: boolean;
 };
 
@@ -35,8 +35,8 @@ export const homeContent = {
       am: "ለልዩ አጋጣሚዎችዎ የተዘጋጀ የኢትዮጵያ ምግብ።",
     },
     lede: {
-      en: "Chief Harena prepares Ethiopian food for weddings, corporate events, summits and private occasions.",
-      am: "Chief Harena ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች የኢትዮጵያ ምግብ ያዘጋጃሉ።",
+      en: "Chef Harena prepares Ethiopian food for weddings, corporate events, summits and private occasions.",
+      am: "Chef Harena ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች የኢትዮጵያ ምግብ ያዘጋጃሉ።",
     },
     photoSubject: {
       en: "a signature dish or a set event table",
@@ -45,16 +45,16 @@ export const homeContent = {
   },
   about: {
     title: {
-      en: "Meet Chief Harena",
-      am: "ከ Chief Harena ጋር ይተዋወቁ",
+      en: "Meet Chef Harena",
+      am: "ከ Chef Harena ጋር ይተዋወቁ",
     },
     body: {
-      en: "Chief Harena's story, training and culinary philosophy will appear here, in the chef's own words, once provided.",
-      am: "የ Chief Harena የሕይወት ታሪክ፣ ሥልጠና እና የምግብ ፍልስፍና ከሼፉ ሲደርስ በራሳቸው አገላለጽ እዚህ ይቀርባል።",
+      en: "Chef Harena's story, training and culinary philosophy will appear here, in the chef's own words, once provided.",
+      am: "የ Chef Harena የሕይወት ታሪክ፣ ሥልጠና እና የምግብ ፍልስፍና ከሼፉ ሲደርስ በራሳቸው አገላለጽ እዚህ ይቀርባል።",
     },
     photoSubject: {
-      en: "a portrait of Chief Harena",
-      am: "የ Chief Harena ምስል",
+      en: "a portrait of Chef Harena",
+      am: "የ Chef Harena ምስል",
     },
   },
   services: {
@@ -115,8 +115,8 @@ export const homeContent = {
       am: "በዓል ወይም ዝግጅት እያቀዱ ነው?",
     },
     body: {
-      en: "Share your date, guest count and occasion through the inquiry form, and Chief Harena will review your request.",
-      am: "በጥያቄ ቅጹ የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት ያጋሩ፤ Chief Harena ጥያቄዎን ይገመግማሉ።",
+      en: "Share your date, guest count and occasion through the inquiry form, and Chef Harena will review your request.",
+      am: "በጥያቄ ቅጹ የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት ያጋሩ፤ Chef Harena ጥያቄዎን ይገመግማሉ።",
     },
   },
 } as const;

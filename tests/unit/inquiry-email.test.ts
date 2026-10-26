@@ -12,9 +12,9 @@ import type { ClaimedNotification } from "@/features/bookings/server/store";
 const email: EmailConfig = {
   provider: "resend",
   apiKey: "re_test",
-  from: "Chief Harena <inquiries@mail.example>",
+  from: "Chef Harena <inquiries@mail.example>",
   staffRecipients: ["owner@example.test"],
-  siteUrl: new URL("https://chiefharena.example"),
+  siteUrl: new URL("https://chefharena.example"),
 };
 
 const summary = {
@@ -60,7 +60,7 @@ describe("email templates", () => {
   it("keep contact details out of staff alerts and link to the admin inbox", () => {
     const message = staffNewInquiry(summary, email.staffRecipients, email.siteUrl);
     expect(message.text).not.toContain("<script>");
-    expect(message.text).toContain("https://chiefharena.example/admin/bookings/CH-0123456789");
+    expect(message.text).toContain("https://chefharena.example/admin/bookings/CH-0123456789");
   });
 });
 

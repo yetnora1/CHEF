@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { TEST_PASSWORD, TEST_USERS } from "./support/fake-supabase";
+import { waitForHydration } from "./support/hydration";
 
 /*
  * Runs against a dev server whose Supabase URL points at the fake Supabase test
@@ -10,6 +11,7 @@ import { TEST_PASSWORD, TEST_USERS } from "./support/fake-supabase";
 
 async function signIn(page: Page, email: string, password = TEST_PASSWORD, path = "/admin/login") {
   await page.goto(path);
+  await waitForHydration(page);
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
@@ -129,6 +131,7 @@ test.describe("role-based admin access", () => {
     }
 
     await page.reload();
+    await waitForHydration(page);
     await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Needs attention" })).toBeVisible();
 
@@ -146,6 +149,7 @@ test.describe("role-based admin access", () => {
   test("the admin interface switches to Amharic", async ({ page, context }) => {
     await signIn(page, TEST_USERS.owner.email);
     await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible();
+    await waitForHydration(page);
     await page.getByRole("group", { name: "Language" }).first().getByRole("button", { name: "አማርኛ" }).click();
     await expect(page.locator("html")).toHaveAttribute("lang", "am");
     await expect(page.getByRole("heading", { level: 1, name: "አጠቃላይ እይታ" })).toBeVisible();

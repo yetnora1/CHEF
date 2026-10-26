@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { expect, test, type Page } from "@playwright/test";
 import { E2E_CLIENT_IP_HEADER } from "./support/constants";
 import { TEST_PASSWORD, TEST_USERS } from "./support/fake-supabase";
+import { waitForHydration } from "./support/hydration";
 
 /*
  * Runs against the dev server wired to the fake Supabase test double: Auth is
@@ -51,10 +52,12 @@ async function submitInquiry(page: Page, input: InquiryInput): Promise<string> {
 
 async function signIn(page: Page, email: string) {
   await page.goto("/admin/login");
+  await waitForHydration(page);
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(TEST_PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible({ timeout: 15_000 });
+  await waitForHydration(page);
 }
 
 async function signOut(page: Page) {

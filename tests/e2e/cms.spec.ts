@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import sharp from "sharp";
 import { TEST_PASSWORD, TEST_USERS } from "./support/fake-supabase";
+import { waitForHydration } from "./support/hydration";
 
 /*
  * Content management end to end: the dev server against the fake Supabase
@@ -20,10 +21,12 @@ const unique = (prefix: string) =>
 
 async function signIn(page: Page, email: string) {
   await page.goto("/admin/login");
+  await waitForHydration(page);
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(TEST_PASSWORD);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible({ timeout: 30_000 });
+  await waitForHydration(page);
 }
 
 const png = (width = 640, height = 480) =>
@@ -222,6 +225,7 @@ test.describe("editorial workflow", () => {
     );
 
     await second.reload();
+    await waitForHydration(second);
     await expect(languagePanel(second, "English").getByLabel(/^Summary/)).toHaveValue(
       "First editor's summary.",
     );

@@ -38,13 +38,31 @@ function focusFirstError(errors: ContactFieldErrors) {
   if (first) document.getElementById(ids(first))?.focus();
 }
 
-/** The contact form; "Send another message" remounts it with a fresh state and key. */
-export function ContactForm({ locale }: { locale: AppLocale }) {
+/**
+ * The contact form; "Send another message" remounts it with a fresh state and key.
+ * `defaultSubject` prefills the subject, e.g. the service a visitor chose.
+ */
+export function ContactForm({ locale, defaultSubject }: { locale: AppLocale; defaultSubject?: string }) {
   const [generation, setGeneration] = useState(0);
-  return <MessageForm key={generation} locale={locale} onReset={() => setGeneration((n) => n + 1)} />;
+  return (
+    <MessageForm
+      key={generation}
+      locale={locale}
+      defaultSubject={defaultSubject}
+      onReset={() => setGeneration((n) => n + 1)}
+    />
+  );
 }
 
-function MessageForm({ locale, onReset }: { locale: AppLocale; onReset: () => void }) {
+function MessageForm({
+  locale,
+  defaultSubject,
+  onReset,
+}: {
+  locale: AppLocale;
+  defaultSubject?: string;
+  onReset: () => void;
+}) {
   const t = useTranslations("ContactForm");
 
   // Idempotency key: reused for retries of the same message, replaced after success.
@@ -208,6 +226,7 @@ function MessageForm({ locale, onReset }: { locale: AppLocale; onReset: () => vo
               {...fieldAria(ids("subject"), { error: error("subject") })}
               name="subject"
               autoComplete="off"
+              defaultValue={defaultSubject}
               maxLength={CONTACT_LIMITS.subjectMax}
             />
           </Field>

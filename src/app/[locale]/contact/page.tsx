@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { getContactConfig } from "@/features/bookings/server/config";
 import { ContactForm } from "@/features/contact/components/contact-form";
+import { contactSubjectFor } from "@/features/contact/service-subject";
 import { contactDetails } from "@/features/content/contact-content";
 import { getClientMessages } from "@/i18n/client-messages";
 import { Link } from "@/i18n/navigation";
@@ -28,7 +29,7 @@ type Detail = { key: string; icon: LucideIcon; label: string; value: string; hre
  * Contact: the message form, beside a shortcut to the event inquiry form and
  * the phone, email and location shown only once confirmed in contact-content.ts.
  */
-export default async function ContactPage() {
+export default async function ContactPage({ searchParams }: PageProps<"/[locale]/contact">) {
   const locale = await getLocale();
   const [t, tHome] = await Promise.all([getTranslations("Contact"), getTranslations("Home")]);
 
@@ -66,7 +67,7 @@ export default async function ContactPage() {
 
         <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
           <Suspense fallback={<FormPlaceholder />}>
-            <ContactFormSection />
+            <ContactFormSection searchParams={searchParams} />
           </Suspense>
         </div>
 
@@ -121,8 +122,11 @@ export default async function ContactPage() {
   );
 }
 
-/** Reads the live server configuration, so it renders per request. */
-async function ContactFormSection() {
+/**
+ * Reads the live server configuration, so it renders per request. A service card
+ * links here with `?service=<slug>`, which prefills the subject (known services only).
+ */
+async function ContactFormSection({ searchParams }: Pick<PageProps<"/[locale]/contact">, "searchParams">) {
   await connection();
   const locale = await getLocale();
   // Storage only: the contact form uses no CAPTCHA (see getContactConfig).
@@ -138,11 +142,14 @@ async function ContactFormSection() {
     );
   }
 
-  const messages = await getClientMessages(["ContactForm"]);
+  const [messages, subject] = await Promise.all([
+    getClientMessages(["ContactForm"]),
+    searchParams.then(({ service }) => contactSubjectFor(service, locale)),
+  ]);
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <ContactForm locale={locale} />
+      <ContactForm locale={locale} defaultSubject={subject} />
     </NextIntlClientProvider>
   );
 }

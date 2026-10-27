@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-image";
 import { Link } from "@/i18n/navigation";
@@ -18,7 +19,9 @@ export type ServiceCard = {
   summary: ResolvedText;
   photoSubject: ResolvedText;
   confirmed: boolean;
-  /** Published services link to their page and may have an image. */
+  /** The contact form, opened with this service as the subject. */
+  contactHref: string;
+  /** Published services also link to their page and may have an image. */
   href?: string;
   image?: ImageView | null;
 };
@@ -37,7 +40,10 @@ function desktopColumns(count: number): string {
 }
 
 export async function ServicesSection({ title, lede, services }: ServicesSectionProps) {
-  const t = await getTranslations("Home");
+  const [t, tServices] = await Promise.all([
+    getTranslations("Home"),
+    getTranslations("PublicContent.services"),
+  ]);
 
   return (
     <section
@@ -58,17 +64,15 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
           </p>
         </div>
 
-        {/* Placeholder cards are not links; published services link to their page. */}
+        {/* Every card asks about its service on the contact form (subject prefilled). Without
+            a page of its own, that link covers the whole card; a published service's title
+            covers the card and links to its page instead, with the contact link above it. */}
         <ul className={cn("mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2", desktopColumns(services.length))}>
           {services.map((service) => (
             <li key={service.slug} className="group/card relative flex flex-col">
               {service.image ? (
                 <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-muted">
-                  <CmsImage
-                    image={service.image}
-                    sizes={SERVICE_IMAGE_SIZES}
-                    className={service.href ? CARD_IMAGE_HOVER : undefined}
-                  />
+                  <CmsImage image={service.image} sizes={SERVICE_IMAGE_SIZES} className={CARD_IMAGE_HOVER} />
                 </div>
               ) : (
                 <PhotoSlot
@@ -76,6 +80,7 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
                   sample={samplePhotoFor(service.slug)}
                   sizes={SERVICE_IMAGE_SIZES}
                   className="aspect-[4/3] w-full"
+                  imageClassName={CARD_IMAGE_HOVER}
                 />
               )}
               <h3 className="mt-5 display-md" lang={service.title.lang}>
@@ -99,6 +104,25 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
                   {t("serviceToBeConfirmed")}
                 </p>
               )}
+              <Link
+                href={service.contactHref}
+                className={cn(
+                  "mt-auto inline-flex w-fit items-center gap-1.5 pt-5 text-sm font-semibold underline-offset-4",
+                  service.href
+                    ? "relative z-10 hover:underline"
+                    : "group-hover/card:underline after:absolute after:inset-0",
+                )}
+              >
+                {tServices("inquire")}
+                {/* Names the service for screen readers: "Ask about this service: Weddings". */}
+                <span className="sr-only" lang={service.title.lang}>
+                  : {service.title.text}
+                </span>
+                <ArrowRight
+                  aria-hidden
+                  className="size-4 transition-transform duration-200 motion-safe:group-hover/card:translate-x-0.5"
+                />
+              </Link>
             </li>
           ))}
         </ul>

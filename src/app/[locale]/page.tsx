@@ -5,6 +5,7 @@ import { InquirySection } from "@/components/public/inquiry-section";
 import { ServicesSection, type ServiceCard } from "@/components/public/services-section";
 import { getPublicNavigation, getPublicPage, getPublicServices } from "@/features/cms/public-data";
 import { pageContent, serviceCards } from "@/features/cms/public-views";
+import { contactHrefFor } from "@/features/contact/service-subject";
 import { homeContent } from "@/features/content/home-content";
 import { resolveLocalized, type Localized, type ResolvedText } from "@/lib/localization/translations";
 
@@ -41,6 +42,7 @@ export default async function HomePage() {
         summary: card.summary ?? { text: "" },
         photoSubject: card.title,
         confirmed: true,
+        contactHref: contactHrefFor(card.key),
         href: card.href,
         image: card.image,
       }))
@@ -50,6 +52,7 @@ export default async function HomePage() {
         summary: placeholder(item.summary),
         photoSubject: placeholder(item.photoSubject),
         confirmed: item.confirmed,
+        contactHref: contactHrefFor(item.slug),
       }));
 
   return (

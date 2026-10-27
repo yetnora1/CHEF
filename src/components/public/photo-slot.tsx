@@ -14,6 +14,8 @@ type PhotoSlotProps = {
   sizes?: string;
   preload?: boolean;
   className?: string;
+  /** Extra classes for the sample photo itself, e.g. a hover zoom. */
+  imageClassName?: string;
 };
 
 /**
@@ -22,7 +24,14 @@ type PhotoSlotProps = {
  * is no sample, a labelled placeholder naming the photograph to supply.
  * Neither can be mistaken for the chef's work.
  */
-export async function PhotoSlot({ subject, sample, sizes = "100vw", preload, className }: PhotoSlotProps) {
+export async function PhotoSlot({
+  subject,
+  sample,
+  sizes = "100vw",
+  preload,
+  className,
+  imageClassName,
+}: PhotoSlotProps) {
   const t = await getTranslations("Common");
 
   if (sample) {
@@ -36,7 +45,7 @@ export async function PhotoSlot({ subject, sample, sizes = "100vw", preload, cla
           sizes={sizes}
           preload={preload}
           placeholder="blur"
-          className="h-full w-full object-cover"
+          className={cn("h-full w-full object-cover", imageClassName)}
         />
         {/* Above a linked card's full-card overlay, so the credit link stays clickable. */}
         <figcaption className="absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] rounded-md bg-background/90 px-2.5 py-1 text-[0.7rem] leading-snug text-foreground shadow-xs">

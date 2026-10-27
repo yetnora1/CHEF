@@ -66,6 +66,43 @@ test.describe("public contact form", () => {
     await expect(page.getByLabel("ሙሉ ስም")).toBeVisible();
   });
 
+  test("a homepage service card opens the form with that service as the subject", async ({ page }) => {
+    await page.goto("/en");
+    // The first card, whether a labelled placeholder or a published service.
+    const ask = page.getByRole("link", { name: /^Ask about this service\s*:/ }).first();
+    const service = (await ask.textContent())!
+      .replace(/\s+/g, " ")
+      .replace(/^.*?:\s*/, "")
+      .trim();
+    await ask.click();
+
+    await expect(page).toHaveURL(/\/en\/contact\?service=[a-z0-9-]+$/);
+    const form = page.getByRole("form", { name: "Send a message" });
+    await expect(form.getByLabel("Subject")).toHaveValue(service);
+  });
+
+  test("only a known service can fill the subject, in the visitor's language", async ({ page }) => {
+    const subject = page.locator('input[name="subject"]');
+
+    // Not published in the seed: the homepage placeholder's names are used.
+    await openContactPage(page, "/am/contact?service=culinary-experiences");
+    await expect(subject).toHaveValue("የምግብ ባህል ልምዶች");
+    await openContactPage(page, "/en/contact?service=culinary-experiences");
+    await expect(subject).toHaveValue("Culinary experiences");
+
+    // Published with an unreviewed (draft) Amharic version: the published English name.
+    await openContactPage(page, "/en/contact?service=weddings");
+    await expect(subject).toHaveValue("Weddings");
+    await openContactPage(page, "/am/contact?service=weddings");
+    await expect(subject).toHaveValue("Weddings");
+
+    // Unknown services and arbitrary text are ignored: a link cannot write into the form.
+    for (const value of ["no-such-service", encodeURIComponent("<b>Free food</b>")]) {
+      await openContactPage(page, `/en/contact?service=${value}`);
+      await expect(subject).toHaveValue("");
+    }
+  });
+
   test("checks the fields before sending and moves focus to the first problem", async ({ page }) => {
     await openContactPage(page);
     const form = page.getByRole("form", { name: "Send a message" });

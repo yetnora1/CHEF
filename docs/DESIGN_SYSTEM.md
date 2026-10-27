@@ -18,14 +18,15 @@ tint in the interface:
 | Band            | `#171717` (hero strip, inquiry band)    | the same                                |
 | Kept hues       | feedback colours, terracotta status dot | feedback colours, terracotta status dot |
 
-The brand palette survives in the logo only (`@theme` in `globals.css`):
+The original brand palette stays defined in `@theme` (`globals.css`), but the interface and the
+logo no longer use forest, gold or ivory:
 
 | Token                                           | Hex       | Used in                           |
 | ----------------------------------------------- | --------- | --------------------------------- |
-| Highland Forest `--color-highland-forest`       | `#173D32` | Logo tile                         |
-| Ceremonial Gold `--color-ceremonial-gold`       | `#D3A45B` | Logo lozenge                      |
+| Highland Forest `--color-highland-forest`       | `#173D32` | (unused, kept for reference)      |
+| Ceremonial Gold `--color-ceremonial-gold`       | `#D3A45B` | (unused, kept for reference)      |
 | Berbere Terracotta `--color-berbere-terracotta` | `#9D4135` | Status accents (light)            |
-| Injera Ivory `--color-injera-ivory`             | `#F5F0E6` | Logo strokes                      |
+| Injera Ivory `--color-injera-ivory`             | `#F5F0E6` | (unused, kept for reference)      |
 | Coffee Charcoal `--color-coffee-charcoal`       | `#171D1A` | Text on the band button, overlays |
 
 ## Semantic tokens and themes
@@ -123,18 +124,19 @@ regional pattern or meaning.
 
 ## Logo
 
-`src/components/brand/logo.tsx`: an "H" monogram (Harena) whose crossbar is the gold lozenge from
-the woven-border motif, in ivory and gold on a forest-green tile with 10/40 rounded corners. It is
-abstract by design, not a religious or civic symbol. Brand colours are fixed (palette tokens), so
-it is identical in both themes; in dark mode a hairline outline separates the tile from the dark
-background. Readable from 16px up.
+`src/components/brand/logo.tsx` (2026-10-27, replacing the "H" monogram): a white chef's toque on
+a black tile with 10/40 rounded corners, shaded for a clean 3D look: the tile darkens from top to
+bottom under a light rim, the hat is lit from the top left, and a soft drop shadow lifts it off the
+tile. Its colours are fixed `--color-logo-*` tokens, so it is identical in both themes; the rim
+keeps the tile's edge visible on dark backgrounds. Each instance gets unique gradient ids
+(`useId`). Readable from 16px up.
 
-| Where                                   | How                                                                  |
-| --------------------------------------- | -------------------------------------------------------------------- |
-| Public header and footer                | `Wordmark` (logo, "Chef Harena", tagline)                            |
-| Admin sidebar/header and sign-in screen | `Logo` at 32px beside "Chef Harena · Admin"                          |
-| Browser tab                             | `src/app/icon.svg`, the same drawing in fixed hex colours            |
-| Phone home screen                       | `src/app/apple-icon.png`, 180px, full-bleed (iOS rounds the corners) |
+| Where                                   | How                                                                          |
+| --------------------------------------- | ---------------------------------------------------------------------------- |
+| Public header and footer                | `Wordmark` (logo, "Chef Harena", tagline)                                    |
+| Admin sidebar/header and sign-in screen | `Logo` at 32px beside "Chef Harena · Admin"                                  |
+| Browser tab                             | `src/app/icon.svg`, the same drawing in fixed hex colours                    |
+| Phone home screen                       | `src/app/apple-icon.png`, 180px, full-bleed (iOS rounds the corners; no rim) |
 
 ## Two design languages
 

@@ -26,6 +26,17 @@
   --color-injera-ivory: #f5f0e6;
   --color-coffee-charcoal: #171d1a;
 
+  /* Logo artwork (src/components/brand/logo.tsx): a white chef's toque on a
+   * black tile, shaded for depth. Fixed, so the same in light and dark. */
+  --color-logo-tile-top: #3b3b3b;
+  --color-logo-tile-bottom: #0a0a0a;
+  --color-logo-hat: #ffffff;
+  --color-logo-hat-mid: #f2f2f2;
+  --color-logo-hat-shade: #bdbdbd;
+  --color-logo-band-top: #e6e6e6;
+  --color-logo-band-bottom: #b0b0b0;
+  --color-logo-shadow: #000000;
+
   /* Flag artwork for the language toggle: fixed national colours, not theme
    * roles, so they are the same in light and dark. */
   --color-flag-us-red: #b22234;

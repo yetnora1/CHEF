@@ -308,32 +308,6 @@
   }
 }
 
-/* ---------------------------------------------------------------------------
- * Ethiopian textile-inspired motifs
- * Geometric bands in the spirit of woven tilet borders, drawn as CSS masks so
- * they take any token colour via `background-color` (set with text/bg utilities).
- * ------------------------------------------------------------------------- */
-
-@utility tilet-band {
-  display: block;
-  height: 1.25rem;
-  background-color: currentColor;
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='20' viewBox='0 0 28 20'%3E%3Crect width='28' height='1.25'/%3E%3Crect y='18.75' width='28' height='1.25'/%3E%3Cpath d='M14 4.5 19.5 10 14 15.5 8.5 10Z M14 7.6 11.6 10 14 12.4 16.4 10Z' fill-rule='evenodd'/%3E%3Cpath d='M0 7.5 2.5 10 0 12.5Z M28 7.5 25.5 10 28 12.5Z'/%3E%3Cpath d='M4 3.5 7 3.5 5.5 5.5Z M21 3.5 24 3.5 22.5 5.5Z M4 16.5 7 16.5 5.5 14.5Z M21 16.5 24 16.5 22.5 14.5Z'/%3E%3C/svg%3E");
-  mask-repeat: repeat-x;
-  mask-position: center;
-  mask-size: auto 100%;
-}
-
-@utility tilet-rule {
-  display: block;
-  height: 0.5rem;
-  background-color: currentColor;
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' viewBox='0 0 16 8'%3E%3Cpath d='M8 1 11 4 8 7 5 4Z'/%3E%3Crect y='3.5' width='4' height='1'/%3E%3Crect x='12' y='3.5' width='4' height='1'/%3E%3C/svg%3E");
-  mask-repeat: repeat-x;
-  mask-position: center;
-  mask-size: auto 100%;
-}
-
 /* Fine dotted texture used by photography placeholders. */
 @utility dot-texture {
   background-image: radial-gradient(

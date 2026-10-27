@@ -40,7 +40,6 @@ export default async function AboutPage() {
           {content.title}
         </h1>
         <FallbackNote lang={content.lang} />
-        <span aria-hidden className="mt-7 tilet-rule block w-28 text-accent" />
       </header>
       <AboutView sections={aboutSections(content)} />
     </section>

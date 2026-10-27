@@ -113,14 +113,9 @@ every page `h1` and `display-md` for section headings, so operational screens st
 
 ## Motifs
 
-Geometric bands in the spirit of woven _tilet_ borders, drawn as CSS masks so they take any token
-colour. They are decorative only (`aria-hidden`), abstract, and make no claim about a specific
-regional pattern or meaning.
-
-- `tilet-band`: diamond chain with edge rules, used under the hero.
-- `tilet-rule`: small lozenge divider under headings.
-- `dot-texture`: fine dotted texture marking photography placeholders (only where no sample photo
-  exists).
+None: the woven _tilet_ bands (under the hero, on the sign-in screen) and the lozenge dividers under
+headings were removed on 2026-10-27 for a cleaner look. The only texture left is `dot-texture`, a
+fine dotted pattern marking photography placeholders (only where no sample photo exists).
 
 ## Logo
 
@@ -140,9 +135,9 @@ keeps the tile's edge visible on dark backgrounds. Each instance gets unique gra
 
 ## Two design languages
 
-| Public site                                                                            | Admin                                                                                                                                     |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Bold sans headlines, asymmetric grids, photo-led hero, brand band, generous whitespace | Sans-serif, compact density, sidebar plus sticky header, cards and badges, minimal ornament (wordmark and a single tilet band on sign-in) |
+| Public site                                                                            | Admin                                                                                                           |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Bold sans headlines, asymmetric grids, photo-led hero, brand band, generous whitespace | Sans-serif, compact density, sidebar plus sticky header, cards and badges, no ornament (logo and wordmark only) |
 
 ## Components
 

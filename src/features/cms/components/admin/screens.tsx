@@ -89,7 +89,7 @@ async function Pagination({
   const pages = Math.max(1, Math.ceil(total / CMS_PAGE_SIZE));
   if (pages <= 1) return null;
   const link =
-    "inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:border-border-strong";
+    "inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:border-border-strong";
   return (
     <nav aria-label={t("pagination")} className="flex items-center justify-between gap-3">
       {filters.page > 1 ? (
@@ -178,8 +178,12 @@ async function EntryRows({
                   {label.text}
                 </Link>
                 <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                  {showType ? `${t(`types.${row.type}.singular`)} · ` : ""}
-                  {row.slug && row.type !== "page" ? `/${row.slug}` : ""}
+                  {[
+                    showType ? t(`types.${row.type}.singular`) : null,
+                    row.slug && row.type !== "page" ? `/${row.slug}` : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -240,9 +244,9 @@ async function ListFilters({
         action={basePath}
         role="search"
         aria-label={t("list.filters")}
-        className="grid gap-4 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-5"
+        className="space-y-4 rounded-2xl border border-border bg-surface p-4"
       >
-        <label className="space-y-1.5 sm:col-span-2">
+        <label className="block space-y-1.5">
           <span className="text-xs font-semibold">{t("list.search")}</span>
           <span className="relative block">
             <Search
@@ -259,73 +263,74 @@ async function ListFilters({
             />
           </span>
         </label>
-        {types && (
+        {/* Each select gets at least 14rem, so its longest option is never cut off. */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(14rem,1fr))]">
+          {types && (
+            <label className="space-y-1.5">
+              <span className="text-xs font-semibold">{t("list.type")}</span>
+              <NativeSelect
+                name="type"
+                defaultValue={types.find((type) => type.selected)?.value ?? ""}
+                className="h-11"
+              >
+                <option value="">{t("list.anyType")}</option>
+                {types.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </NativeSelect>
+            </label>
+          )}
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold">{t("list.type")}</span>
-            <NativeSelect
-              name="type"
-              defaultValue={types.find((type) => type.selected)?.value ?? ""}
-              className="h-11"
-            >
-              <option value="">{t("list.anyType")}</option>
-              {types.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
+            <span className="text-xs font-semibold">{t("list.status")}</span>
+            <NativeSelect name="status" defaultValue={filters.status ?? ""} className="h-11">
+              <option value="">{t("list.anyStatus")}</option>
+              {PUBLICATION_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {tStatus(status)}
                 </option>
               ))}
             </NativeSelect>
           </label>
-        )}
-        <label className="space-y-1.5">
-          <span className="text-xs font-semibold">{t("list.status")}</span>
-          <NativeSelect name="status" defaultValue={filters.status ?? ""} className="h-11">
-            <option value="">{t("list.anyStatus")}</option>
-            {PUBLICATION_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {tStatus(status)}
-              </option>
-            ))}
-          </NativeSelect>
-        </label>
-        <label className="space-y-1.5">
-          <span className="text-xs font-semibold">{t("list.translation")}</span>
-          <NativeSelect name="translation" defaultValue={filters.translation ?? ""} className="h-11">
-            <option value="">{t("list.anyTranslation")}</option>
-            {TRANSLATION_FILTERS.map((filter) => (
-              <option key={filter} value={filter}>
-                {t(`list.translationFilters.${filter}`)}
-              </option>
-            ))}
-          </NativeSelect>
-        </label>
-        {categories && (
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold">{t("fields.category_id.label")}</span>
-            <NativeSelect name="parent" defaultValue={filters.parent ?? ""} className="h-11">
-              <option value="">{t("list.anyCategory")}</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.label}
+            <span className="text-xs font-semibold">{t("list.translation")}</span>
+            <NativeSelect name="translation" defaultValue={filters.translation ?? ""} className="h-11">
+              <option value="">{t("list.anyTranslation")}</option>
+              {TRANSLATION_FILTERS.map((filter) => (
+                <option key={filter} value={filter}>
+                  {t(`list.translationFilters.${filter}`)}
                 </option>
               ))}
             </NativeSelect>
           </label>
-        )}
-        <label className="space-y-1.5">
-          <span className="text-xs font-semibold">{t("list.sort")}</span>
-          <NativeSelect name="sort" defaultValue={filters.sort} className="h-11">
-            {LIST_SORTS.map((sort) => (
-              <option key={sort} value={sort}>
-                {t(`list.sorts.${sort}`)}
-              </option>
-            ))}
-          </NativeSelect>
-        </label>
-        <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-5">
-          <Button type="submit" size="sm">
-            {t("list.apply")}
-          </Button>
-          <Link href={basePath} className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          {categories && (
+            <label className="space-y-1.5">
+              <span className="text-xs font-semibold">{t("fields.category_id.label")}</span>
+              <NativeSelect name="parent" defaultValue={filters.parent ?? ""} className="h-11">
+                <option value="">{t("list.anyCategory")}</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.label}
+                  </option>
+                ))}
+              </NativeSelect>
+            </label>
+          )}
+          <label className="space-y-1.5">
+            <span className="text-xs font-semibold">{t("list.sort")}</span>
+            <NativeSelect name="sort" defaultValue={filters.sort} className="h-11">
+              {LIST_SORTS.map((sort) => (
+                <option key={sort} value={sort}>
+                  {t(`list.sorts.${sort}`)}
+                </option>
+              ))}
+            </NativeSelect>
+          </label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button type="submit">{t("list.apply")}</Button>
+          <Link href={basePath} className={buttonVariants({ variant: "ghost" })}>
             {t("list.reset")}
           </Link>
         </div>
@@ -348,7 +353,7 @@ async function MenuTabs({ active }: { active: ContentType }) {
           href={tab.href}
           aria-current={tab.type === active ? "page" : undefined}
           className={cn(
-            "rounded-full border px-3.5 py-1.5 text-sm font-medium",
+            "rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-colors",
             tab.type === active
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border bg-surface hover:border-border-strong",
@@ -382,7 +387,7 @@ export async function ContentListScreen({
 
   return (
     <CmsMessages>
-      <div className="mx-auto max-w-6xl space-y-6">
+      <div className="max-w-6xl space-y-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="admin-title">{t(`types.${type}.plural`)}</h1>
@@ -397,9 +402,12 @@ export async function ContentListScreen({
         </header>
         {def.module === "menu" && <MenuTabs active={type} />}
         {type !== "page" && <ListFilters basePath={def.basePath} filters={filters} categories={categories} />}
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {t("list.count", { count: list.total })}
-        </p>
+        {/* With no entries, the empty state below says so. */}
+        {list.total > 0 && (
+          <p className="text-sm text-muted-foreground" aria-live="polite">
+            {t("list.count", { count: list.total })}
+          </p>
+        )}
         {list.rows.length > 0 ? (
           <EntryRows rows={list.rows} hrefFor={(row) => `${def.basePath}/${row.id}`} />
         ) : (
@@ -433,7 +441,7 @@ export async function ContentCreateScreen({ type }: { type: ContentType }) {
 
   return (
     <CmsMessages>
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className="max-w-3xl space-y-6">
         <Link
           href={def.basePath}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground"
@@ -515,7 +523,7 @@ export async function ContentEditScreen({
 
   return (
     <CmsMessages>
-      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="max-w-4xl space-y-6">
         <Link
           href={def.basePath}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground"
@@ -733,15 +741,17 @@ export async function TranslationsScreen({
 
   return (
     <CmsMessages>
-      <div className="mx-auto max-w-6xl space-y-6">
+      <div className="max-w-6xl space-y-6">
         <header>
           <h1 className="admin-title">{t("translations.title")}</h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">{t("translations.intro")}</p>
         </header>
         <ListFilters basePath="/admin/translations" filters={effective} types={types} />
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {t("list.count", { count: list.total })}
-        </p>
+        {list.total > 0 && (
+          <p className="text-sm text-muted-foreground" aria-live="polite">
+            {t("list.count", { count: list.total })}
+          </p>
+        )}
         {list.rows.length > 0 ? (
           <EntryRows
             showType

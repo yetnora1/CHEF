@@ -114,7 +114,7 @@ export function MediaUploadForm() {
           name="file"
           accept={ACCEPT}
           required
-          className="block w-full text-sm file:mr-3 file:rounded-full file:border file:border-border-strong file:bg-surface file:px-4 file:py-2 file:text-sm file:font-semibold"
+          className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border-strong file:bg-surface file:px-4 file:py-2 file:text-sm file:font-semibold file:transition-colors hover:file:bg-surface-muted"
           onChange={(event) => setFileName(event.target.files?.[0]?.name ?? null)}
         />
       </Field>
@@ -166,7 +166,7 @@ export function ReplaceFileForm({ id, version }: { id: string; version: number }
           name="file"
           accept={ACCEPT}
           required
-          className="block w-full text-sm file:mr-3 file:rounded-full file:border file:border-border-strong file:bg-surface file:px-4 file:py-2 file:text-sm file:font-semibold"
+          className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border-strong file:bg-surface file:px-4 file:py-2 file:text-sm file:font-semibold file:transition-colors hover:file:bg-surface-muted"
         />
       </Field>
       <div className="flex flex-wrap items-center gap-3">

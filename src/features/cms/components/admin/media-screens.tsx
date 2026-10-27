@@ -54,7 +54,7 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
 
   return (
     <CmsMessages>
-      <div className="mx-auto max-w-6xl space-y-6">
+      <div className="max-w-6xl space-y-6">
         <header>
           <h1 className="admin-title">{t("media.title")}</h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">{t("media.intro")}</p>
@@ -113,14 +113,14 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
               ))}
             </NativeSelect>
           </label>
-          <Button type="submit" size="sm">
-            {t("list.apply")}
-          </Button>
+          <Button type="submit">{t("list.apply")}</Button>
         </form>
 
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {t("media.count", { count: list.total })}
-        </p>
+        {list.total > 0 && (
+          <p className="text-sm text-muted-foreground" aria-live="polite">
+            {t("media.count", { count: list.total })}
+          </p>
+        )}
 
         {list.rows.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border-strong p-8 text-center font-semibold">
@@ -217,7 +217,7 @@ export async function MediaDetailScreen({ id }: { id: string }) {
 
   return (
     <CmsMessages>
-      <div className="mx-auto max-w-5xl space-y-6">
+      <div className="max-w-5xl space-y-6">
         <Link
           href="/admin/media"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground"

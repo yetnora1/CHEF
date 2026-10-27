@@ -55,7 +55,6 @@ export async function AboutSection({
           <h2 id="about-heading" className="mt-5 display-lg" lang={title.lang}>
             {title.text}
           </h2>
-          <span aria-hidden className="mt-7 tilet-rule w-28 text-accent" />
           {formatted ? (
             <Markup text={body.text} lang={body.lang} headingBase={3} className="mt-7" />
           ) : (

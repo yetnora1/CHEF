@@ -76,7 +76,7 @@ export default async function AdminBookingDetailPage({ params }: PageProps<"/adm
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="max-w-6xl space-y-6">
       <BackLink label={t("detail.back")} />
 
       <header className="flex flex-wrap items-start justify-between gap-4">

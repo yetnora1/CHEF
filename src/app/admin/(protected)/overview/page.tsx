@@ -40,7 +40,7 @@ export default async function AdminOverviewPage() {
   const modules = modulesFor(session.permissions).filter((module) => module.key !== "overview");
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="max-w-6xl">
       <header className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
         <div>
           <p className="text-sm font-semibold text-accent-ink">{t("overview.welcome")}</p>

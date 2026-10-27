@@ -4,7 +4,7 @@ export default async function AdminLoading() {
   const t = await getTranslations("Common");
 
   return (
-    <div role="status" aria-live="polite" className="mx-auto max-w-6xl">
+    <div role="status" aria-live="polite" className="max-w-6xl">
       <span className="sr-only">{t("loading")}</span>
       <div aria-hidden className="animate-pulse space-y-4">
         <div className="h-4 w-24 rounded bg-surface-muted" />

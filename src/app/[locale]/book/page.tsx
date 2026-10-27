@@ -35,7 +35,6 @@ export default async function BookPage() {
             {t("title")}
           </h1>
           <p className="mt-5 text-lg text-muted-foreground">{t("intro")}</p>
-          <span aria-hidden className="mt-8 tilet-rule w-28 text-accent" />
           <div className="mt-8 rounded-2xl border border-border bg-surface p-5 sm:p-6">
             <h2 className="text-sm font-semibold">{t("processTitle")}</h2>
             <ol className="mt-4 space-y-3 text-sm leading-relaxed">

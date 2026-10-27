@@ -40,13 +40,13 @@ export async function Hero({ eyebrow, headline, lede, photoSubject, image }: Her
             </p>
           )}
           <div className="mt-10 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="w-full sm:w-auto">
               <Link href="/book">
                 {t("heroPrimaryCta")}
                 <ArrowRight aria-hidden className="motion-safe:group-hover/button:translate-x-0.5" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
               <Link href={{ pathname: "/", hash: HOME_SECTIONS.services }}>
                 {t("heroSecondaryCta")}
                 <ArrowDown aria-hidden className="motion-safe:group-hover/button:translate-y-0.5" />
@@ -70,10 +70,6 @@ export async function Hero({ eyebrow, headline, lede, photoSubject, image }: Her
             />
           )}
         </div>
-      </div>
-
-      <div aria-hidden className="bg-band py-2.5 text-band-accent">
-        <span className="tilet-band" />
       </div>
     </section>
   );

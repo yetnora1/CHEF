@@ -32,7 +32,6 @@ export async function AuthShell({ children }: { children: ReactNode }) {
           {children}
         </div>
       </main>
-      <span aria-hidden className="tilet-band text-accent/50" />
     </div>
   );
 }

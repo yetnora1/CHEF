@@ -187,7 +187,7 @@ export async function PreviewScreen({
   const translationStatus = resolved ? entry.translations[lang ?? locale]?.status : null;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="max-w-6xl space-y-6">
       <div
         role="note"
         className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-warning/60 bg-surface p-4"

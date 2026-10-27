@@ -31,7 +31,6 @@ export async function PageHeader({
       <h1 className="mt-5 display-lg" lang={title.lang}>
         {title.text}
       </h1>
-      <span aria-hidden className="mt-7 tilet-rule block w-28 text-accent" />
       {intro && (
         <p className="mt-7 text-lg text-muted-foreground" lang={intro.lang}>
           {intro.text}

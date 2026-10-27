@@ -38,13 +38,24 @@ export const getStaffSession = cache(async (): Promise<StaffSession> => {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { status: "unconfigured" };
 
+  // Reads the session cookie (refreshing an expired token). It is not trusted:
+  // without one there is nothing to validate, so skip both requests below.
   const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) return { status: "signed-out" };
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) return { status: "signed-out" };
 
-  const { data, error } = await supabase.rpc("get_my_access").single();
+  // Both requests carry the same session JWT, so they run in parallel (one
+  // round trip instead of two). The roles are only used once getUser() has
+  // confirmed the session with Supabase Auth; otherwise they are discarded.
+  const [
+    {
+      data: { user },
+      error: userError,
+    },
+    { data, error },
+  ] = await Promise.all([supabase.auth.getUser(), supabase.rpc("get_my_access").single()]);
+  if (userError || !user) return { status: "signed-out" };
   if (error) throw new AccessLookupError(error);
 
   const parsed = accessRowSchema.safeParse(data);

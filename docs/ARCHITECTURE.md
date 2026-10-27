@@ -32,12 +32,17 @@ src/proxy.ts  (Next.js 16 "proxy", formerly middleware; Node runtime)
   ▼
 Root layout ([locale] or admin) → nested layouts → page
   │   admin: authorizeAdmin(permission) in the layout AND every page / server action
-  │          ├ getUser()  (validated by Supabase Auth on every request)
-  │          └ rpc('get_my_access') → roles + permissions from Postgres
+  │          ├ getUser()  (validated by Supabase Auth on every request)  ┐ in parallel; roles are
+  │          └ rpc('get_my_access') → roles + permissions from Postgres ┘ used only for a valid user
   ▼
 Supabase (PostgREST + Postgres)
       every query carries the user's JWT → RLS policies call private.has_permission()
 ```
+
+**Region.** `vercel.json` pins the server functions to Vercel's `fra1` (Frankfurt), the region of
+the Supabase project (`eu-central-1`). Every admin request makes several sequential calls to
+Supabase; in the default `iad1` (Washington) each one crossed the Atlantic. Keep the two regions
+together if the Supabase project ever moves.
 
 ## Authorization layers
 

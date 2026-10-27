@@ -24,6 +24,7 @@ export async function SiteFooter() {
     ...(await siteNavigation(await getLocale())).map((link) => ({ ...link, label: tNav(link.key) })),
     { key: "book", href: "/book", label: tNav("planEvent") },
     { key: "privacy", href: "/privacy", label: tNav("privacy") },
+    { key: "credits", href: "/credits", label: tNav("credits") },
   ];
 
   return (

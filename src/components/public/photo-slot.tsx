@@ -19,10 +19,11 @@ type PhotoSlotProps = {
 };
 
 /**
- * Fills a photo slot until Chef Harena's own photography is published: a
- * sample photograph labelled "Sample photo" with its credit, or, where there
- * is no sample, a labelled placeholder naming the photograph to supply.
- * Neither can be mistaken for the chef's work.
+ * Fills a photo slot until Chef Harena's own photography is published: an
+ * openly licensed sample photograph, or, where there is no sample, a labelled
+ * placeholder naming the photograph to supply. Samples carry no caption; their
+ * photographers, licences and the note that they are not the chef's work are
+ * on the credits page (/credits, linked from the footer).
  */
 export async function PhotoSlot({
   subject,
@@ -47,19 +48,6 @@ export async function PhotoSlot({
           placeholder="blur"
           className={cn("h-full w-full object-cover", imageClassName)}
         />
-        {/* Above a linked card's full-card overlay, so the credit link stays clickable. */}
-        <figcaption className="absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] rounded-md bg-background/90 px-2.5 py-1 text-[0.7rem] leading-snug text-foreground shadow-xs">
-          <span className="font-semibold">{t("samplePhoto")}</span>
-          {" · "}
-          {/* The source page names the photographer and links the licence. */}
-          <a
-            href={sample.credit.source}
-            lang="en"
-            className="text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-          >
-            {sample.credit.author}, {sample.credit.license}
-          </a>
-        </figcaption>
       </figure>
     );
   }

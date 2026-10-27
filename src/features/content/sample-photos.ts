@@ -12,9 +12,10 @@ import serviceWeddings from "@/assets/samples/service-weddings.jpg";
  * ---------------------------------------------------------------------------
  * Openly licensed photographs from Wikimedia Commons that fill the photo slots
  * until Chef Harena's own photography is published through the media library
- * (a published image always takes precedence). Every one is shown with a
- * visible "Sample photo" label and its credit, so none can be mistaken for the
- * chef's food or events. None shows an identifiable face.
+ * (a published image always takes precedence). The images carry no caption: the
+ * credits page (/credits, linked from every page's footer) names each
+ * photographer, licence and source, and says plainly that these are samples, not
+ * the chef's food or events. None shows an identifiable face.
  *
  * Files in src/assets/samples are resized to 1600px on the long edge; the
  * licences (CC BY / CC BY-SA) allow this with attribution, and the resized

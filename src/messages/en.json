@@ -38,7 +38,8 @@
     "menu": "Menu",
     "gallery": "Gallery",
     "journal": "Journal",
-    "contact": "Contact"
+    "contact": "Contact",
+    "credits": "Photo credits"
   },
   "Language": {
     "label": "Language",
@@ -911,5 +912,16 @@
       "noText": "There is no text in this language yet.",
       "back": "Back to editing"
     }
+  },
+  "Credits": {
+    "metaTitle": "Photo credits",
+    "metaDescription": "Who took the openly licensed sample photographs on this website, and under which licence.",
+    "eyebrow": "Credits",
+    "title": "Photo credits",
+    "intro": "The photographs on this website are openly licensed samples, shown until Chef Harena's own photography is ready. They are not Chef Harena's work.",
+    "changes": "Each photograph was resized for the web; nothing else was changed.",
+    "by": "By {author}",
+    "license": "Licence",
+    "source": "Original on Wikimedia Commons"
   }
 }

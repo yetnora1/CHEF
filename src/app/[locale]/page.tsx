@@ -94,6 +94,7 @@ export default async function HomePage() {
         <AboutSection
           title={placeholder(about.title)}
           body={placeholder(about.body)}
+          pending={false}
           photoSubject={placeholder(about.photoSubject)}
           moreHref={navigation?.[locale].about ? "/about" : null}
         />

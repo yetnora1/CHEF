@@ -49,8 +49,9 @@ export const homeContent = {
       am: "ከ Chef Harena ጋር ይተዋወቁ",
     },
     body: {
-      en: "Chef Harena's story, training and culinary philosophy will appear here, in the chef's own words, once provided.",
-      am: "የ Chef Harena የሕይወት ታሪክ፣ ሥልጠና እና የምግብ ፍልስፍና ከሼፉ ሲደርስ በራሳቸው አገላለጽ እዚህ ይቀርባል።",
+      // No invented biography: the chef's own story replaces this through the CMS (Pages → Homepage).
+      en: "Ethiopian food is made to be shared: injera is spread across the table and the stews are served side by side, so every guest eats from the same platter. Chef Harena prepares this food for weddings, corporate events, summits and private occasions. Share your date, guest count and occasion, and Chef Harena will review your request.",
+      am: "የኢትዮጵያ ምግብ በጋራ የሚበላ ነው፤ እንጀራ በገበታው ላይ ይዘረጋል፣ ወጦቹም ጎን ለጎን ይቀርባሉ፤ ሁሉም እንግዳ ከአንድ ገበታ ይቋደሳል። Chef Harena ይህንን ምግብ ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች ያዘጋጃሉ። የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት ያጋሩ፤ Chef Harena ጥያቄዎን ይገመግማሉ።",
     },
     photoSubject: {
       en: "a portrait of Chef Harena",

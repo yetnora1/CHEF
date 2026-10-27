@@ -209,13 +209,20 @@ admin rights, so it must stay in the host's secret store; rotate it if it leaks.
 ## Contact messages
 
 The form on `/[locale]/contact` is for questions that are not an event inquiry: name, email, optional
-phone and subject, a message (10–3,000 characters) and consent. It opens and closes with the inquiry
-form (same configuration) and runs the same pipeline with two differences:
+phone and subject, a message (10–3,000 characters) and consent. It runs the same pipeline as
+inquiries with two differences:
 
-- its rate limits use their own `contact:` buckets (same limits), so sending one form never uses up
-  the other's budget; a solved CAPTCHA token is still accepted only once across both forms;
-- the Turnstile widget uses action `contact`, and the server refuses a token minted for `inquiry`
-  (and the other way round).
+- **no CAPTCHA** (owner's decision, Stage 3.7): its abuse protection is the hidden honeypot field,
+  server-side validation and the rate limits. That is acceptable because a message only lands in the
+  private admin inbox: nothing is emailed, so the form cannot be used to send mail to anyone;
+- its rate limits use their own `contact:` buckets (same limits as inquiries), so sending one form
+  never uses up the other's budget. With no CAPTCHA in front of them, the mailbox and site-wide
+  limits count every valid message.
+
+It therefore needs only storage, not Turnstile (`getContactConfig`): `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY`, plus `CLIENT_IP_HEADER` in
+production (the per-IP limits are its main defence, so a header the client controls is refused).
+The contact form can be open while the inquiry form is still closed for lack of Turnstile keys.
 
 `public.submit_contact_message` (service_role only) stores the message with a `CM-` reference and is
 idempotent per submission key, like inquiries. **No email is sent**: owners and admins

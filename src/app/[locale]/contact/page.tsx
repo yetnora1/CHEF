@@ -5,8 +5,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
-import { getInquiryConfig } from "@/features/bookings/server/config";
-import { ContactForm, type ContactCaptcha } from "@/features/contact/components/contact-form";
+import { getContactConfig } from "@/features/bookings/server/config";
+import { ContactForm } from "@/features/contact/components/contact-form";
 import { contactDetails } from "@/features/content/contact-content";
 import { getClientMessages } from "@/i18n/client-messages";
 import { Link } from "@/i18n/navigation";
@@ -125,7 +125,8 @@ export default async function ContactPage() {
 async function ContactFormSection() {
   await connection();
   const locale = await getLocale();
-  const config = getInquiryConfig();
+  // Storage only: the contact form uses no CAPTCHA (see getContactConfig).
+  const config = getContactConfig();
 
   if (!config.available) {
     const t = await getTranslations("ContactForm");
@@ -137,16 +138,11 @@ async function ContactFormSection() {
     );
   }
 
-  // Only the public site key and mode reach the browser; secrets stay here.
-  const captcha: ContactCaptcha =
-    config.captcha.mode === "turnstile"
-      ? { mode: "turnstile", siteKey: config.captcha.siteKey }
-      : { mode: "local-bypass" };
   const messages = await getClientMessages(["ContactForm"]);
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <ContactForm locale={locale} captcha={captcha} />
+      <ContactForm locale={locale} />
     </NextIntlClientProvider>
   );
 }

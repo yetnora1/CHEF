@@ -6,8 +6,8 @@ import { waitForHydration } from "./support/hydration";
 
 /*
  * Runs against the dev server wired to the fake Supabase test double: every
- * data call executes the real SQL functions, grants and RLS on PGlite, with
- * CAPTCHA in the explicit local-bypass mode (see inquiries.spec.ts).
+ * data call executes the real SQL functions, grants and RLS on PGlite. The
+ * contact form uses no CAPTCHA (honeypot and rate limits only).
  */
 
 test.beforeEach(async ({ page }) => {
@@ -55,6 +55,11 @@ test.describe("public contact form", () => {
     await openContactPage(page);
     await expect(page.getByRole("heading", { level: 2, name: "Send a message" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Planning an event?" })).toBeVisible();
+    // No CAPTCHA: no security-check widget and no development-mode notice.
+    const form = page.getByRole("form", { name: "Send a message" });
+    await expect(form.getByText("Security check")).toHaveCount(0);
+    await expect(form.getByText(/Development mode/)).toHaveCount(0);
+    await expect(page.locator('iframe[src*="challenges.cloudflare.com"]')).toHaveCount(0);
 
     await openContactPage(page, "/am/contact");
     await expect(page.getByRole("heading", { level: 2, name: "መልእክት ይላኩ" })).toBeVisible();

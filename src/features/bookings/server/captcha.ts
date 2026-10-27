@@ -8,7 +8,6 @@ import "server-only";
  */
 
 export const TURNSTILE_ACTION = "inquiry";
-export const CONTACT_TURNSTILE_ACTION = "contact";
 const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const MAX_TOKEN_LENGTH = 2048;
 
@@ -28,7 +27,6 @@ export async function verifyTurnstile({
   remoteIp,
   idempotencyKey,
   expectedHostname = null,
-  expectedAction = TURNSTILE_ACTION,
   fetchImpl = fetch,
   timeoutMs = 8000,
 }: {
@@ -38,8 +36,6 @@ export async function verifyTurnstile({
   idempotencyKey: string;
   /** When set, a token solved on any other hostname is refused. */
   expectedHostname?: string | null;
-  /** The action the form's widget was rendered with. */
-  expectedAction?: string;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
 }): Promise<CaptchaResult> {
@@ -72,9 +68,9 @@ export async function verifyTurnstile({
     return { ok: false, reason: serverSide ? "unavailable" : "rejected" };
   }
 
-  // Each form renders its widget with its own action ("inquiry", "contact"); a
-  // token minted for another form (or another site using this secret) is refused.
-  if (typeof data.action === "string" && data.action !== "" && data.action !== expectedAction) {
+  // The widget is rendered with action "inquiry"; a token minted for another
+  // action (or another site using this secret) is refused.
+  if (typeof data.action === "string" && data.action !== "" && data.action !== TURNSTILE_ACTION) {
     return { ok: false, reason: "rejected" };
   }
 

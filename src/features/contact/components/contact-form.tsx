@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, ExternalLink, Info, LoaderCircle, Send } from "lucide-react";
+import { AlertCircle, CheckCircle2, ExternalLink, LoaderCircle, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   startTransition,
@@ -14,7 +14,6 @@ import {
 } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, fieldAria, Input, Textarea } from "@/components/ui/form-controls";
-import { TurnstileWidget } from "@/features/bookings/components/turnstile-widget";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import {
@@ -26,8 +25,6 @@ import {
 } from "../message-schema";
 import type { ContactFormState } from "../server/submission";
 import { submitContactAction } from "../submit-action";
-
-export type ContactCaptcha = { mode: "turnstile"; siteKey: string } | { mode: "local-bypass" };
 
 type ClientState = ContactFormState | { status: "network_error" };
 
@@ -42,28 +39,17 @@ function focusFirstError(errors: ContactFieldErrors) {
 }
 
 /** The contact form; "Send another message" remounts it with a fresh state and key. */
-export function ContactForm(props: { locale: AppLocale; captcha: ContactCaptcha }) {
+export function ContactForm({ locale }: { locale: AppLocale }) {
   const [generation, setGeneration] = useState(0);
-  return <MessageForm key={generation} {...props} onReset={() => setGeneration((n) => n + 1)} />;
+  return <MessageForm key={generation} locale={locale} onReset={() => setGeneration((n) => n + 1)} />;
 }
 
-function MessageForm({
-  locale,
-  captcha,
-  onReset,
-}: {
-  locale: AppLocale;
-  captcha: ContactCaptcha;
-  onReset: () => void;
-}) {
+function MessageForm({ locale, onReset }: { locale: AppLocale; onReset: () => void }) {
   const t = useTranslations("ContactForm");
 
   // Idempotency key: reused for retries of the same message, replaced after success.
   const submissionKey = useRef<string | null>(null);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaGeneration, setCaptchaGeneration] = useState(0);
   const [clientErrors, setClientErrors] = useState<ContactFieldErrors | null>(null);
-  const [captchaMissing, setCaptchaMissing] = useState(false);
   const [messageLength, setMessageLength] = useState(0);
   // Until React has hydrated, a native submit would bypass the action, so the
   // button stays disabled (and method="post" keeps fields out of the URL).
@@ -76,17 +62,13 @@ function MessageForm({
   const resultRef = useRef<HTMLDivElement>(null);
 
   const [state, dispatch, pending] = useActionState(async (previous: ClientState, formData: FormData) => {
-    let next: ClientState;
     try {
-      next = await submitContactAction(previous as ContactFormState, formData);
+      const next = await submitContactAction(previous as ContactFormState, formData);
+      if (next.status === "success") submissionKey.current = null;
+      return next;
     } catch {
-      next = { status: "network_error" };
+      return { status: "network_error" } as ClientState;
     }
-    // CAPTCHA tokens are single-use: request a fresh one after every attempt.
-    setCaptchaToken(null);
-    setCaptchaGeneration((n) => n + 1);
-    if (next.status === "success") submissionKey.current = null;
-    return next;
   }, IDLE);
 
   // Move focus to the first problem or to the outcome, so keyboard and
@@ -120,17 +102,10 @@ function MessageForm({
     }
     setClientErrors(null);
 
-    if (captcha.mode === "turnstile" && !captchaToken) {
-      setCaptchaMissing(true);
-      return;
-    }
-    setCaptchaMissing(false);
-
     const formData = new FormData(event.currentTarget);
     submissionKey.current ??= crypto.randomUUID();
     formData.set("submissionKey", submissionKey.current);
     formData.set("locale", locale);
-    if (captchaToken) formData.set("cf-turnstile-response", captchaToken);
     startTransition(() => dispatch(formData));
   }
 
@@ -189,13 +164,6 @@ function MessageForm({
         aria-label={t("title")}
         className="mt-8 space-y-6"
       >
-        {captcha.mode === "local-bypass" && (
-          <p className="flex items-start gap-2.5 rounded-xl border border-dashed border-warning/60 p-3.5 text-sm text-warning">
-            <Info aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {t("localBypassNotice")}
-          </p>
-        )}
-
         <ServerMessage state={state} resultRef={resultRef} />
 
         {/* Every field is required unless its label says "optional". */}
@@ -305,26 +273,6 @@ function MessageForm({
           )}
         </div>
 
-        {captcha.mode === "turnstile" && (
-          <div className="space-y-2">
-            <p className="text-sm font-semibold">{t("captchaLabel")}</p>
-            <TurnstileWidget
-              key={captchaGeneration}
-              siteKey={captcha.siteKey}
-              action="contact"
-              onToken={(token) => {
-                setCaptchaToken(token);
-                if (token) setCaptchaMissing(false);
-              }}
-            />
-            {captchaMissing && (
-              <p role="alert" className="text-sm font-medium text-danger">
-                {t("captchaFailed")}
-              </p>
-            )}
-          </div>
-        )}
-
         <Button
           type="submit"
           size="lg"
@@ -352,9 +300,6 @@ function ServerMessage({
   switch (state.status) {
     case "rate_limited":
       message = t("rateLimited", { minutes: state.retryAfterMinutes });
-      break;
-    case "captcha_failed":
-      message = t("captchaFailed");
       break;
     case "conflict":
       message = t("conflict");

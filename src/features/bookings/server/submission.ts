@@ -37,14 +37,24 @@ export type PublicFormState<FieldErrors> =
 
 export type InquiryFormState = PublicFormState<InquiryFieldErrors>;
 
+/** What the shared pipeline needs, regardless of which form: whether it is open,
+ *  the server secret (for hashing rate-limit identifiers) and whether to run a
+ *  CAPTCHA. The contact form passes "skip"; the inquiry form "turnstile". */
+export type FormConfig =
+  | { available: false; reason: string }
+  | { available: true; secretKey: string; captcha: "turnstile" | "skip" };
+
+export type VerifyCaptcha = (
+  token: string | undefined,
+  remoteIp: string | null,
+  idempotencyKey: string,
+) => Promise<CaptchaResult>;
+
 export type PublicSubmissionDeps = {
-  config: InquiryConfig;
+  config: FormConfig;
   consumeRateLimit: ConsumeRateLimit;
-  verifyCaptcha: (
-    token: string | undefined,
-    remoteIp: string | null,
-    idempotencyKey: string,
-  ) => Promise<CaptchaResult>;
+  /** Required only when config.captcha is "turnstile". */
+  verifyCaptcha?: VerifyCaptcha;
   clientIp: string | null;
   log?: (event: string, detail?: string) => void;
 };
@@ -118,9 +128,9 @@ export async function processPublicSubmission<Data extends { email: string }, Fi
   const ipBlocked = await limited(PRE_CAPTCHA_LIMITS);
   if (ipBlocked) return ipBlocked;
 
-  if (config.captcha.mode === "turnstile") {
+  if (config.captcha === "turnstile") {
     const token = raw["cf-turnstile-response"];
-    const captcha = await deps.verifyCaptcha(token, deps.clientIp, raw.submissionKey);
+    const captcha = await deps.verifyCaptcha!(token, deps.clientIp, raw.submissionKey);
     if (!captcha.ok) {
       log("rejected", `captcha ${captcha.reason}`);
       return captcha.reason === "unavailable" ? { status: "error" } : { status: "captcha_failed" };
@@ -165,11 +175,25 @@ export async function processPublicSubmission<Data extends { email: string }, Fi
   }
 }
 
-export type SubmissionDeps = Omit<PublicSubmissionDeps, "consumeRateLimit"> & {
+export type SubmissionDeps = {
+  config: InquiryConfig;
   store: Pick<InquiryStore, "consumeRateLimit" | "submitInquiry">;
+  verifyCaptcha: VerifyCaptcha;
+  clientIp: string | null;
   /** Queues email delivery to run after the response (only called when email is enabled). */
   scheduleDelivery: () => void;
+  log?: (event: string, detail?: string) => void;
 };
+
+/** Collapses the full inquiry configuration into what the shared pipeline needs. */
+function inquiryFormConfig(config: InquiryConfig): FormConfig {
+  if (!config.available) return { available: false, reason: config.reason };
+  return {
+    available: true,
+    secretKey: config.secretKey,
+    captcha: config.captcha.mode === "turnstile" ? "turnstile" : "skip",
+  };
+}
 
 export function processInquirySubmission(
   raw: Record<string, string>,
@@ -178,7 +202,13 @@ export function processInquirySubmission(
   const notify = deps.config.available && deps.config.email !== null;
   return processPublicSubmission(
     raw,
-    { ...deps, consumeRateLimit: deps.store.consumeRateLimit },
+    {
+      config: inquiryFormConfig(deps.config),
+      consumeRateLimit: deps.store.consumeRateLimit,
+      verifyCaptcha: deps.verifyCaptcha,
+      clientIp: deps.clientIp,
+      log: deps.log,
+    },
     {
       namespace: "inquiry",
       logPrefix: "inquiries",

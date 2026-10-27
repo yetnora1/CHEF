@@ -1,25 +1,22 @@
 import { describe, expect, it, vi } from "vitest";
-import type { InquiryConfig } from "@/features/bookings/server/config";
+import type { ContactConfig } from "@/features/bookings/server/config";
 import { InquiryKeyConflictError } from "@/features/bookings/server/store";
 import { processContactSubmission, type ContactSubmissionDeps } from "@/features/contact/server/submission";
 
 /*
  * The contact form shares the inquiry pipeline (every branch is covered in
- * inquiry-submission.test.ts); these tests pin what is specific to it.
+ * inquiry-submission.test.ts); these tests pin what is specific to it: its own
+ * rate-limit buckets and no CAPTCHA (honeypot + rate limits only).
  */
 
 const SECRET = "sb_secret_unit_test_secret_value";
 
-const config = (overrides: Partial<Extract<InquiryConfig, { available: true }>> = {}): InquiryConfig => ({
+const config = (): ContactConfig => ({
   available: true,
   supabaseUrl: "https://project.supabase.co",
   secretKey: SECRET,
-  captcha: { mode: "turnstile", siteKey: "site", secretKey: "captcha-secret", expectedHostname: null },
-  email: null,
-  emailProblem: null,
   clientIpHeader: "x-forwarded-for",
   clientIpTrustedHops: 1,
-  ...overrides,
 });
 
 const form = (overrides: Record<string, string> = {}) => ({
@@ -30,7 +27,6 @@ const form = (overrides: Record<string, string> = {}) => ({
   subject: "Menu question",
   message: "Do you cater small family dinners at home?",
   consent: "on",
-  "cf-turnstile-response": "token",
   ...overrides,
 });
 
@@ -42,7 +38,6 @@ function deps(overrides: Partial<ContactSubmissionDeps> = {}) {
   const all = {
     config: config(),
     store,
-    verifyCaptcha: vi.fn().mockResolvedValue({ ok: true }),
     clientIp: "203.0.113.9",
     ...overrides,
     log: vi.fn(),
@@ -51,7 +46,7 @@ function deps(overrides: Partial<ContactSubmissionDeps> = {}) {
 }
 
 describe("processContactSubmission", () => {
-  it("stores a valid message and returns only the public reference", async () => {
+  it("stores a valid message without any CAPTCHA and returns only the public reference", async () => {
     const d = deps();
     expect(await processContactSubmission(form(), d)).toEqual({
       status: "success",
@@ -70,18 +65,27 @@ describe("processContactSubmission", () => {
     });
   });
 
-  it("counts against its own rate-limit buckets, not the inquiry form's", async () => {
+  it("counts against its own rate-limit buckets and charges no CAPTCHA token", async () => {
     const d = deps();
     await processContactSubmission(form(), d);
     const buckets = d.store.consumeRateLimit.mock.calls.map(([bucket]) => String(bucket));
-    // ip ×2, the single-use CAPTCHA token, then mailbox and site-wide.
+    // Per-IP twice, then mailbox and site-wide; never the inquiry form's, never a CAPTCHA bucket.
     expect(buckets.map((b) => b.split(":").slice(0, 2).join(":"))).toEqual([
       "contact:ip",
       "contact:ip",
-      "inquiry:captcha",
       "contact:email",
       "contact:global",
     ]);
+  });
+
+  it("is still rate limited per IP, with a retry time and nothing stored", async () => {
+    const d = deps();
+    d.store.consumeRateLimit.mockResolvedValueOnce({ allowed: false, retryAfterSeconds: 300 });
+    expect(await processContactSubmission(form(), d)).toEqual({
+      status: "rate_limited",
+      retryAfterMinutes: 5,
+    });
+    expect(d.store.submitContactMessage).not.toHaveBeenCalled();
   });
 
   it("returns field codes and stores nothing for an invalid message", async () => {
@@ -94,22 +98,18 @@ describe("processContactSubmission", () => {
     expect(d.store.submitContactMessage).not.toHaveBeenCalled();
   });
 
-  it("stays closed when submissions are not configured", async () => {
+  it("stays closed when storage is not configured", async () => {
     const d = deps({ config: { available: false, reason: "storage-not-configured" } });
     expect(await processContactSubmission(form(), d)).toEqual({ status: "unavailable" });
     expect(d.store.submitContactMessage).not.toHaveBeenCalled();
   });
 
-  it("rejects the honeypot, a failed CAPTCHA and a reused key without leaking details", async () => {
-    expect(await processContactSubmission(form({ website: "https://spam.test" }), deps())).toEqual({
+  it("rejects the honeypot and a reused key without leaking details", async () => {
+    const honeypot = deps();
+    expect(await processContactSubmission(form({ website: "https://spam.test" }), honeypot)).toEqual({
       status: "error",
     });
-    expect(
-      await processContactSubmission(
-        form(),
-        deps({ verifyCaptcha: vi.fn().mockResolvedValue({ ok: false, reason: "rejected" }) }),
-      ),
-    ).toEqual({ status: "captcha_failed" });
+    expect(honeypot.store.submitContactMessage).not.toHaveBeenCalled();
 
     const conflicting = deps();
     conflicting.store.submitContactMessage.mockRejectedValue(new InquiryKeyConflictError());

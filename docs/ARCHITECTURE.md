@@ -149,6 +149,6 @@ see [VERIFICATION.md](VERIFICATION.md).
 
 See [INQUIRIES.md](INQUIRIES.md): browser → server action (validation, rate limits, Turnstile) →
 `public.submit_inquiry` with the server secret key → optional email outbox delivered after the
-response. The contact form runs the same pipeline (its own rate-limit buckets and Turnstile action)
-and calls `public.submit_contact_message`; it queues no email. The secret key is used only in
+response. The contact form runs the same pipeline with its own rate-limit buckets and **no
+CAPTCHA**, and calls `public.submit_contact_message`; it queues no email. The secret key is used only in
 `src/features/bookings/server/store.ts`.

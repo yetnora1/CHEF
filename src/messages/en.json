@@ -276,8 +276,6 @@
     "optional": "optional",
     "consent": "I agree that Chef Harena may use these details to reply to my message, as described in the <link>privacy notice</link>.",
     "opensInNewTab": "opens in a new tab",
-    "captchaLabel": "Security check",
-    "localBypassNotice": "Development mode: the security check (CAPTCHA) is switched off for local testing.",
     "submit": "Send message",
     "submitting": "Sending…",
     "errors": {
@@ -289,7 +287,6 @@
       "consentRequired": "Please accept to send your message."
     },
     "rateLimited": "Too many messages have been sent from this connection or email address. Please try again in about {minutes, plural, one {# minute} other {# minutes}}.",
-    "captchaFailed": "We could not verify that this request came from a person. Please complete the security check and try again.",
     "conflict": "This form was already sent with different details. Please reload the page to send a new message.",
     "unavailableTitle": "The contact form is not open yet",
     "unavailableBody": "Online messages have not been switched on for this website yet. Please check back soon.",

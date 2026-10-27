@@ -100,18 +100,22 @@ export function isTurnstileTestSecret(secret: string): boolean {
   return /^[123]x0{20,}AA$/.test(secret);
 }
 
-export function resolveInquiryConfig(
-  rawEnv: Record<string, string | undefined>,
-  { production }: { production: boolean },
-): InquiryConfig {
-  // Each variable is parsed on its own: an invalid value disables only the
-  // feature that needs it (e.g. a malformed sender address disables email).
-  const env = Object.fromEntries(
+// Each variable is parsed on its own: an invalid value disables only the
+// feature that needs it (e.g. a malformed sender address disables email).
+function parseEnv(rawEnv: Record<string, string | undefined>): z.infer<typeof envSchema> {
+  return Object.fromEntries(
     Object.entries(envSchema.shape).map(([key, schema]) => {
       const result = schema.safeParse(rawEnv[key]);
       return [key, result.success ? result.data : undefined];
     }),
   ) as z.infer<typeof envSchema>;
+}
+
+export function resolveInquiryConfig(
+  rawEnv: Record<string, string | undefined>,
+  { production }: { production: boolean },
+): InquiryConfig {
+  const env = parseEnv(rawEnv);
 
   const supabase = parseSupabasePublicConfig({
     url: rawEnv.NEXT_PUBLIC_SUPABASE_URL,
@@ -199,6 +203,69 @@ export function getInquiryConfig(): InquiryConfig {
   if (warning && warning !== warnedReason) {
     warnedReason = warning;
     console.warn(`[inquiries] ${warning}: see README → Event inquiries configuration`);
+  }
+  return config;
+}
+
+/*
+ * Contact form configuration. The contact form stores messages but sends no
+ * email and does NOT use a CAPTCHA: a hidden honeypot and the per-IP, per-
+ * mailbox and site-wide rate limits are its abuse protection. So it needs only
+ * storage (and, in production, a trusted client-IP header for the rate limits);
+ * it never requires Cloudflare Turnstile.
+ */
+export type ContactConfig =
+  | {
+      available: false;
+      reason: "storage-not-configured" | "storage-key-not-privileged" | "client-ip-header-not-configured";
+    }
+  | {
+      available: true;
+      supabaseUrl: string;
+      secretKey: string;
+      clientIpHeader: string;
+      clientIpTrustedHops: number;
+    };
+
+export function resolveContactConfig(
+  rawEnv: Record<string, string | undefined>,
+  { production }: { production: boolean },
+): ContactConfig {
+  const env = parseEnv(rawEnv);
+
+  const supabase = parseSupabasePublicConfig({
+    url: rawEnv.NEXT_PUBLIC_SUPABASE_URL,
+    publishableKey: rawEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  });
+  if (!supabase.ok || !env.SUPABASE_SECRET_KEY) return { available: false, reason: "storage-not-configured" };
+  if (!isPrivilegedKey(env.SUPABASE_SECRET_KEY)) {
+    return { available: false, reason: "storage-key-not-privileged" };
+  }
+
+  // Per-IP rate limits are only meaningful with a header the platform's proxy
+  // sets; without CAPTCHA they are the main defence, so this stays required.
+  if (production && !env.CLIENT_IP_HEADER) {
+    return { available: false, reason: "client-ip-header-not-configured" };
+  }
+
+  return {
+    available: true,
+    supabaseUrl: supabase.config.url,
+    secretKey: env.SUPABASE_SECRET_KEY,
+    clientIpHeader: (env.CLIENT_IP_HEADER ?? "x-forwarded-for").toLowerCase(),
+    clientIpTrustedHops: env.CLIENT_IP_TRUSTED_HOPS ?? 1,
+  };
+}
+
+let warnedContactReason: string | null = null;
+
+export function getContactConfig(): ContactConfig {
+  const config = resolveContactConfig(process.env as Record<string, string | undefined>, {
+    production: process.env.NODE_ENV === "production",
+  });
+  if (!config.available && config.reason !== warnedContactReason) {
+    warnedContactReason = config.reason;
+    console.warn(`[contact] ${config.reason}: see README → Event inquiries configuration`);
   }
   return config;
 }

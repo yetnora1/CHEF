@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { isTurnstileTestSecret, resolveInquiryConfig } from "@/features/bookings/server/config";
+import {
+  isTurnstileTestSecret,
+  resolveContactConfig,
+  resolveInquiryConfig,
+} from "@/features/bookings/server/config";
 
 const base = {
   NEXT_PUBLIC_SUPABASE_URL: "https://project.supabase.co",
@@ -161,5 +165,63 @@ describe("resolveInquiryConfig", () => {
         resolveInquiryConfig({ ...base, CLIENT_IP_TRUSTED_HOPS: hops }, { production: true }),
       ).toMatchObject({ clientIpTrustedHops: 1 });
     }
+  });
+});
+
+describe("resolveContactConfig", () => {
+  // The contact form has no CAPTCHA: storage plus, in production, a trusted IP header.
+  const storageOnly = {
+    NEXT_PUBLIC_SUPABASE_URL: base.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: base.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    SUPABASE_SECRET_KEY: base.SUPABASE_SECRET_KEY,
+    CLIENT_IP_HEADER: "X-Real-IP",
+  };
+
+  it("is available in production with storage and no Turnstile keys or site URL", () => {
+    expect(resolveContactConfig(storageOnly, { production: true })).toEqual({
+      available: true,
+      supabaseUrl: "https://project.supabase.co",
+      secretKey: base.SUPABASE_SECRET_KEY,
+      clientIpHeader: "x-real-ip",
+      clientIpTrustedHops: 1,
+    });
+  });
+
+  it("stays open when the inquiry form's CAPTCHA settings would close it", () => {
+    for (const env of [
+      { ...storageOnly, TURNSTILE_SECRET_KEY: PASS_SECRET, NEXT_PUBLIC_TURNSTILE_SITE_KEY: PASS_SITE },
+      { ...storageOnly, TURNSTILE_SECRET_KEY: base.TURNSTILE_SECRET_KEY },
+    ]) {
+      expect(resolveInquiryConfig(env, { production: true })).toMatchObject({ available: false });
+      expect(resolveContactConfig(env, { production: true })).toMatchObject({ available: true });
+    }
+  });
+
+  it("fails closed without storage or with a non-secret server key", () => {
+    expect(resolveContactConfig({ ...storageOnly, SUPABASE_SECRET_KEY: "" }, { production: true })).toEqual({
+      available: false,
+      reason: "storage-not-configured",
+    });
+    expect(
+      resolveContactConfig({ ...storageOnly, NEXT_PUBLIC_SUPABASE_URL: "" }, { production: true }),
+    ).toEqual({ available: false, reason: "storage-not-configured" });
+    expect(
+      resolveContactConfig(
+        { ...storageOnly, SUPABASE_SECRET_KEY: storageOnly.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY },
+        { production: true },
+      ),
+    ).toEqual({ available: false, reason: "storage-key-not-privileged" });
+  });
+
+  it("requires a proxy-set client IP header in production only, since rate limits are its defence", () => {
+    const noHeader = { ...storageOnly, CLIENT_IP_HEADER: undefined };
+    expect(resolveContactConfig(noHeader, { production: true })).toEqual({
+      available: false,
+      reason: "client-ip-header-not-configured",
+    });
+    expect(resolveContactConfig(noHeader, { production: false })).toMatchObject({
+      available: true,
+      clientIpHeader: "x-forwarded-for",
+    });
   });
 });

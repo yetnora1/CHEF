@@ -371,6 +371,29 @@
   }
 }
 
+/*
+ * Translucent "watercolour" glass for sticky headers: the page shows through,
+ * blurred, under soft washes of the button colours (orange, gold, blue). The
+ * washes are faint, so header text keeps its contrast in both themes.
+ */
+@utility glass-wash {
+  background-color: color-mix(in oklab, var(--background) 70%, transparent);
+  background-image:
+    radial-gradient(45% 160% at 8% 0%, color-mix(in oklab, var(--cta-top) 16%, transparent), transparent 70%),
+    radial-gradient(
+      40% 160% at 55% 120%,
+      color-mix(in oklab, var(--positive-top) 14%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 160% at 96% 0%,
+      color-mix(in oklab, var(--action-top) 14%, transparent),
+      transparent 70%
+    );
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+}
+
 /* Fine dotted texture used by photography placeholders. */
 @utility dot-texture {
   background-image: radial-gradient(

@@ -19,7 +19,7 @@ export function MobileNav({ links, labels }: MobileNavProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden" aria-label={labels.open}>
+        <Button variant="soft" size="icon" className="lg:hidden" aria-label={labels.open}>
           <Menu aria-hidden className="size-5" />
         </Button>
       </SheetTrigger>

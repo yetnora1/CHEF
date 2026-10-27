@@ -47,7 +47,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   return (
     <Button
-      variant="ghost"
+      variant="soft"
       size="icon"
       className={cn("text-current", className)}
       aria-label={t("dark")}

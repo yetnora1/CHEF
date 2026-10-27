@@ -18,7 +18,7 @@ export function AdminMobileNav({ openLabel, closeLabel, title, ...navProps }: Ad
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden" aria-label={openLabel}>
+        <Button variant="soft" size="icon" className="lg:hidden" aria-label={openLabel}>
           <Menu aria-hidden className="size-5" />
         </Button>
       </SheetTrigger>

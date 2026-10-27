@@ -34,7 +34,7 @@ export function UserMenu({ email, roleLabels, labels }: UserMenuProps) {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2 px-2.5" aria-label={labels.menu}>
+        <Button variant="soft" size="sm" className="gap-2 px-2.5" aria-label={labels.menu}>
           <CircleUser aria-hidden className="size-5!" />
           <span className="hidden max-w-[12rem] truncate text-sm font-medium md:inline">{email}</span>
           <ChevronDown aria-hidden className="text-muted-foreground" />

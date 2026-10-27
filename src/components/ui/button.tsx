@@ -14,7 +14,8 @@ import { cn } from "@/lib/utils";
  *   positive – publish or mark done (saffron gold)
  *   danger   – a confirmed delete, archive or decline (berbere red)
  *   neutral  – utilities such as Apply or Search, and the default (black / white)
- * Secondary choices are `outline`; quiet ones (icons, Clear) are `ghost`.
+ * Secondary choices are `outline`; header controls (icon toggles, menus) are `soft`;
+ * quiet ones (Clear, close) are `ghost`.
  */
 const lift =
   "shadow-xs hover:shadow-md active:shadow-xs motion-safe:hover:-translate-y-px motion-safe:active:translate-y-0";
@@ -54,6 +55,12 @@ export const buttonVariants = cva(
         ),
         outline: cn(
           "border border-border-strong bg-surface from-control-top to-control-bottom text-foreground hover:border-foreground active:from-control-bottom",
+          shine,
+          lift,
+        ),
+        // A lighter outline for header controls (icon toggles, menus): shaded face, soft border.
+        soft: cn(
+          "border border-border bg-surface from-control-top to-control-bottom text-foreground hover:border-border-strong active:from-control-bottom",
           shine,
           lift,
         ),

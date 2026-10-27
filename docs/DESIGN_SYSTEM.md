@@ -121,9 +121,8 @@ fine dotted pattern marking photography placeholders (only where no sample photo
 
 The public header and the admin top bar are sticky `glass-wash` surfaces (`globals.css`): light
 blue "watercolour" glass (`--header-water*`, deep blue in dark) at 80%, a 16px backdrop blur and
-soft blooms of lighter and deeper blue, so the page shows through. Every header control is a
-`tint` button with its own `hue-*` colour: The chef rose, Services amber, Contact violet (menu sky,
-gallery teal, journal indigo once published), language flag teal, theme toggle indigo, phone menu
+soft blooms of lighter and deeper blue, so the page shows through. `tint` button with its own `hue-*` colour: the navigation links (The chef, Services, Contact,
+and menu, gallery, journal once published) light green in both themes, language flag teal, theme toggle indigo, phone menu
 amber, admin account menu violet; Plan an event stays the orange `primary`. The current page
 carries a ring in its hue.
 

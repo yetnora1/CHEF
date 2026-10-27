@@ -185,6 +185,11 @@
   --sky-bottom: light-dark(#bae6fd, #062538);
   --sky-border: light-dark(#7dd3fc, #0369a1);
   --sky-text: light-dark(#075985, #bae6fd);
+  /* Light green for the header navigation links: light in both themes (owner's request). */
+  --green-top: light-dark(#dcfce7, #dcfce7);
+  --green-bottom: light-dark(#bbf7d0, #bbf7d0);
+  --green-border: light-dark(#86efac, #86efac);
+  --green-text: light-dark(#166534, #166534);
 }
 
 :root[data-theme="dark"] {
@@ -468,6 +473,12 @@
   --tint-bottom: var(--sky-bottom);
   --tint-border: var(--sky-border);
   --tint-text: var(--sky-text);
+}
+@utility hue-green {
+  --tint-top: var(--green-top);
+  --tint-bottom: var(--green-bottom);
+  --tint-border: var(--green-border);
+  --tint-text: var(--green-text);
 }
 
 /* Fine dotted texture used by photography placeholders. */

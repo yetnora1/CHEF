@@ -53,7 +53,7 @@ const PAIRS: [string, string, number][] = [
   ["muted-foreground", "header-water", 4.5],
   ["muted-foreground", "header-water-deep", 4.5],
   // Tinted header buttons: each hue's text on both ends of its face.
-  ...(["rose", "amber", "violet", "indigo", "teal", "sky"] as const).flatMap((hue) =>
+  ...(["rose", "amber", "violet", "indigo", "teal", "sky", "green"] as const).flatMap((hue) =>
     (["top", "bottom"] as const).map((stop): [string, string, number] => [
       `${hue}-text`,
       `${hue}-${stop}`,

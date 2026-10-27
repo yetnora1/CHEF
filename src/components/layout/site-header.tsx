@@ -9,15 +9,14 @@ import { LocaleSwitcher } from "./locale-switcher";
 import { MobileNav, type NavItem } from "./mobile-nav";
 import { NavLink } from "./nav-link";
 
-// One colour per header link (the flag is teal and the theme toggle indigo, so the
-// links visible today never share a colour with them).
+// The header links are all light green (owner's request); the flag and theme toggle keep their own hues.
 const NAV_HUES: Record<string, string> = {
-  about: "hue-rose",
-  services: "hue-amber",
-  menu: "hue-sky",
-  gallery: "hue-teal",
-  journal: "hue-indigo",
-  contact: "hue-violet",
+  about: "hue-green",
+  services: "hue-green",
+  menu: "hue-green",
+  gallery: "hue-green",
+  journal: "hue-green",
+  contact: "hue-green",
 } satisfies Record<SiteNavKey, string>;
 
 export async function SiteHeader() {

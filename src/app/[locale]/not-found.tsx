@@ -11,10 +11,10 @@ export default async function LocalizedNotFound() {
       <h1 className="mt-5 max-w-2xl display-lg">{t("notFoundTitle")}</h1>
       <p className="mt-5 max-w-xl text-lg text-muted-foreground">{t("notFoundBody")}</p>
       <div className="mt-10 flex flex-wrap gap-3">
-        <Button asChild>
+        <Button asChild variant="outline">
           <Link href="/">{t("backHome")}</Link>
         </Button>
-        <Button asChild variant="outline">
+        <Button asChild variant="primary">
           <Link href="/book">{tNav("planEvent")}</Link>
         </Button>
       </div>

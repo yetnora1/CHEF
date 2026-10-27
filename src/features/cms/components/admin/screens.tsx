@@ -352,7 +352,7 @@ async function MenuTabs({ active }: { active: ContentType }) {
           href={tab.href}
           aria-current={tab.type === active ? "page" : undefined}
           className={cn(
-            buttonVariants({ variant: tab.type === active ? "primary" : "outline", size: "sm" }),
+            buttonVariants({ variant: tab.type === active ? "neutral" : "outline", size: "sm" }),
             "px-3.5",
           )}
         >
@@ -391,7 +391,7 @@ export async function ContentListScreen({
             <p className="mt-3 max-w-3xl text-muted-foreground">{t(`types.${type}.intro`)}</p>
           </div>
           {canCreate && (
-            <Link href={`${def.basePath}/new`} className={buttonVariants()}>
+            <Link href={`${def.basePath}/new`} className={buttonVariants({ variant: "action" })}>
               <Plus aria-hidden />
               {t(`types.${type}.new`)}
             </Link>
@@ -416,7 +416,10 @@ export async function ContentListScreen({
               </Link>
             ) : (
               canCreate && (
-                <Link href={`${def.basePath}/new`} className={cn(buttonVariants({ size: "sm" }), "mt-4")}>
+                <Link
+                  href={`${def.basePath}/new`}
+                  className={cn(buttonVariants({ variant: "action", size: "sm" }), "mt-4")}
+                >
                   <Plus aria-hidden />
                   {t(`types.${type}.new`)}
                 </Link>

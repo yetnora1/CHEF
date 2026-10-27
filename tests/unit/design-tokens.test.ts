@@ -39,6 +39,14 @@ const PAIRS: [string, string, number][] = [
   ["primary-foreground", "primary-hover-bottom", 4.5],
   ["foreground", "control-top", 4.5],
   ["foreground", "control-bottom", 4.5],
+  // Role-coloured buttons: their text against every stop, at rest and on hover.
+  ...(["cta", "action", "positive", "destructive"] as const).flatMap((role) =>
+    (["top", "bottom", "hover-top", "hover-bottom"] as const).map((stop): [string, string, number] => [
+      `${role}-foreground`,
+      `${role}-${stop}`,
+      4.5,
+    ]),
+  ),
   ["accent-ink", "background", 4.5],
   ["accent-ink", "surface", 4.5],
   ["accent-ink", "surface-muted", 4.5],

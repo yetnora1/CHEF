@@ -48,10 +48,7 @@ export function AlertDialogContent({
           </AlertDialogPrimitive.Cancel>
           <AlertDialogPrimitive.Action
             onClick={onConfirm}
-            className={cn(
-              buttonVariants({ variant: "primary" }),
-              tone === "danger" && "bg-danger text-background hover:bg-danger/90",
-            )}
+            className={buttonVariants({ variant: tone === "danger" ? "danger" : "action" })}
           >
             {confirmLabel}
           </AlertDialogPrimitive.Action>

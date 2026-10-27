@@ -43,7 +43,7 @@ export async function SiteHeader() {
         <div className="flex items-center gap-1.5 sm:gap-2">
           <LocaleSwitcher className="hidden sm:inline-flex" />
           <ThemeToggle />
-          <Button asChild size="sm" className="ml-1 hidden sm:inline-flex">
+          <Button asChild size="sm" variant="primary" className="ml-1 hidden sm:inline-flex">
             <NavLink href="/book">{t("planEvent")}</NavLink>
           </Button>
           <MobileNav

@@ -40,7 +40,7 @@ export async function Hero({ eyebrow, headline, lede, photoSubject, image }: Her
             </p>
           )}
           <div className="mt-10 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" className="w-full sm:w-auto">
+            <Button asChild size="lg" variant="primary" className="w-full sm:w-auto">
               <Link href="/book">
                 {t("heroPrimaryCta")}
                 <ArrowRight aria-hidden className="motion-safe:group-hover/button:translate-x-0.5" />

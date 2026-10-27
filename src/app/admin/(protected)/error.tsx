@@ -26,7 +26,9 @@ export default function AdminError({ error, retry }: { error: unknown; retry: ()
           {t("errorReference", { reference: digest })}
         </p>
       )}
-      <Button onClick={() => retry()}>{t("tryAgain")}</Button>
+      <Button variant="action" onClick={() => retry()}>
+        {t("tryAgain")}
+      </Button>
     </div>
   );
 }

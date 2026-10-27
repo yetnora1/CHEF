@@ -128,6 +128,30 @@
   --primary-hover-bottom: light-dark(#1f1f1f, #cccccc);
   --control-top: light-dark(#ffffff, #262626);
   --control-bottom: light-dark(#f0f0f0, #171717);
+
+  /* Button colours by role, the same in both themes (each passes 4.5:1 with its text):
+   * cta = book or contact (spice orange), action = save or create (royal blue),
+   * positive = publish or done (saffron gold), destructive = confirmed delete (berbere red). */
+  --cta-top: light-dark(#c2410c, #c2410c);
+  --cta-bottom: light-dark(#a8380a, #a8380a);
+  --cta-hover-top: light-dark(#c94a10, #c94a10);
+  --cta-hover-bottom: light-dark(#b23c0b, #b23c0b);
+  --cta-foreground: light-dark(#ffffff, #ffffff);
+  --action-top: light-dark(#3f51e6, #3f51e6);
+  --action-bottom: light-dark(#2f3cc4, #2f3cc4);
+  --action-hover-top: light-dark(#4a5cf0, #4a5cf0);
+  --action-hover-bottom: light-dark(#3646d8, #3646d8);
+  --action-foreground: light-dark(#ffffff, #ffffff);
+  --positive-top: light-dark(#fbbf24, #fbbf24);
+  --positive-bottom: light-dark(#e79a0c, #e79a0c);
+  --positive-hover-top: light-dark(#fcc93f, #fcc93f);
+  --positive-hover-bottom: light-dark(#f0a515, #f0a515);
+  --positive-foreground: light-dark(#1a1206, #1a1206);
+  --destructive-top: light-dark(#c81e1e, #c81e1e);
+  --destructive-bottom: light-dark(#9b1414, #9b1414);
+  --destructive-hover-top: light-dark(#d62828, #d62828);
+  --destructive-hover-bottom: light-dark(#a91818, #a91818);
+  --destructive-foreground: light-dark(#ffffff, #ffffff);
 }
 
 :root[data-theme="dark"] {
@@ -163,6 +187,26 @@
   --color-primary-hover-bottom: var(--primary-hover-bottom);
   --color-control-top: var(--control-top);
   --color-control-bottom: var(--control-bottom);
+  --color-cta-top: var(--cta-top);
+  --color-cta-bottom: var(--cta-bottom);
+  --color-cta-hover-top: var(--cta-hover-top);
+  --color-cta-hover-bottom: var(--cta-hover-bottom);
+  --color-cta-foreground: var(--cta-foreground);
+  --color-action-top: var(--action-top);
+  --color-action-bottom: var(--action-bottom);
+  --color-action-hover-top: var(--action-hover-top);
+  --color-action-hover-bottom: var(--action-hover-bottom);
+  --color-action-foreground: var(--action-foreground);
+  --color-positive-top: var(--positive-top);
+  --color-positive-bottom: var(--positive-bottom);
+  --color-positive-hover-top: var(--positive-hover-top);
+  --color-positive-hover-bottom: var(--positive-hover-bottom);
+  --color-positive-foreground: var(--positive-foreground);
+  --color-destructive-top: var(--destructive-top);
+  --color-destructive-bottom: var(--destructive-bottom);
+  --color-destructive-hover-top: var(--destructive-hover-top);
+  --color-destructive-hover-bottom: var(--destructive-hover-bottom);
+  --color-destructive-foreground: var(--destructive-foreground);
 
   /* The device's own UI font for Latin (Segoe UI, San Francisco, Roboto…); the
    * browser falls through to Noto Sans Ethiopic for each Ethiopic glyph.

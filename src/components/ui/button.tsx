@@ -7,6 +7,14 @@ import { cn } from "@/lib/utils";
  * Every button is shaded the same way: a soft top-to-bottom gradient (tokens in
  * globals.css) with a hairline of light on its top edge. On hover it brightens,
  * rises a pixel and its shadow deepens; pressed, it flattens and settles.
+ *
+ * Solid colours follow the button's role, so a colour always means the same thing:
+ *   primary  – book or contact, the visitor's main action (spice orange)
+ *   action   – save, create, upload, sign in (royal blue)
+ *   positive – publish or mark done (saffron gold)
+ *   danger   – a confirmed delete, archive or decline (berbere red)
+ *   neutral  – utilities such as Apply or Search, and the default (black / white)
+ * Secondary choices are `outline`; quiet ones (icons, Clear) are `ghost`.
  */
 const lift =
   "shadow-xs hover:shadow-md active:shadow-xs motion-safe:hover:-translate-y-px motion-safe:active:translate-y-0";
@@ -20,6 +28,26 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary: cn(
+          "bg-cta-bottom from-cta-top to-cta-bottom text-cta-foreground hover:from-cta-hover-top hover:to-cta-hover-bottom active:from-cta-bottom",
+          shine,
+          lift,
+        ),
+        action: cn(
+          "bg-action-bottom from-action-top to-action-bottom text-action-foreground hover:from-action-hover-top hover:to-action-hover-bottom active:from-action-bottom",
+          shine,
+          lift,
+        ),
+        positive: cn(
+          "bg-positive-bottom from-positive-top to-positive-bottom text-positive-foreground hover:from-positive-hover-top hover:to-positive-hover-bottom active:from-positive-bottom",
+          shine,
+          lift,
+        ),
+        danger: cn(
+          "bg-destructive-bottom from-destructive-top to-destructive-bottom text-destructive-foreground hover:from-destructive-hover-top hover:to-destructive-hover-bottom active:from-destructive-bottom",
+          shine,
+          lift,
+        ),
+        neutral: cn(
           "bg-primary from-primary-top to-primary-bottom text-primary-foreground hover:from-primary-hover-top hover:to-primary-hover-bottom active:from-primary-bottom",
           shine,
           lift,
@@ -32,15 +60,6 @@ export const buttonVariants = cva(
         // Flat until hovered, then it takes the outline button's face.
         ghost:
           "from-transparent to-transparent text-foreground hover:from-control-top hover:to-control-bottom hover:shadow-xs hover:ring-1 hover:ring-border active:from-control-bottom active:shadow-none",
-        // For use on the dark band.
-        band: cn(
-          "bg-band-accent from-shine to-band-accent text-coffee-charcoal hover:to-shine active:from-band-accent",
-          lift,
-        ),
-        "band-outline": cn(
-          "border border-band-muted/60 from-shine/8 to-transparent text-band-foreground hover:border-band-foreground hover:from-shine/16 hover:to-shine/4",
-          lift,
-        ),
       },
       size: {
         sm: "h-9 px-4 text-sm",
@@ -50,7 +69,8 @@ export const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "primary",
+      // Unassigned buttons stay neutral; a colour is chosen for its role.
+      variant: "neutral",
       size: "md",
     },
   },

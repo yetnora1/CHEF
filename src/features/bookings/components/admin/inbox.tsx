@@ -61,7 +61,7 @@ export async function StatusTabs({
                 href={inboxHref({ ...filters, status: tab.key, page: 1 })}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  buttonVariants({ variant: active ? "primary" : "outline", size: "sm" }),
+                  buttonVariants({ variant: active ? "neutral" : "outline", size: "sm" }),
                   "px-3.5",
                 )}
               >

@@ -79,7 +79,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/servi
         </Link>
       }
       footer={
-        <Button asChild size="lg">
+        <Button asChild size="lg" variant="primary">
           <Link href="/book">
             {t("inquire")}
             <ArrowRight aria-hidden />

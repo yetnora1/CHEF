@@ -57,7 +57,7 @@ export async function EmptyState({ title, body }: { title: string; body: string 
     <div className="mt-12 rounded-2xl border border-dashed border-border-strong bg-surface p-8 text-center sm:p-12">
       <p className="display-md">{title}</p>
       <p className="mx-auto mt-3 max-w-xl text-muted-foreground">{body}</p>
-      <Button asChild className="mt-6">
+      <Button asChild variant="primary" className="mt-6">
         <Link href="/book">
           {t("planEvent")}
           <ArrowRight aria-hidden />

@@ -82,7 +82,7 @@ function SubmitButton({
   disabled?: boolean;
 }) {
   return (
-    <Button type="submit" disabled={pending || disabled}>
+    <Button type="submit" variant="action" disabled={pending || disabled}>
       {pending && <LoaderCircle aria-hidden className="animate-spin" />}
       {children}
     </Button>
@@ -470,7 +470,7 @@ export function StatusActions({
             key={to}
             type="button"
             size="sm"
-            variant={to === "published" ? "primary" : "outline"}
+            variant={to === "published" ? "positive" : "outline"}
             disabled={pending}
             onClick={() => (needsPublishPermission(status, to) ? setConfirming(to) : run(to))}
           >

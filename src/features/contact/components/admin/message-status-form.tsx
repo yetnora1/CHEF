@@ -35,7 +35,7 @@ export function MessageStatusForm({
       <Button
         type="submit"
         size="sm"
-        variant={toStatus === "handled" ? "primary" : "outline"}
+        variant={toStatus === "handled" ? "positive" : "outline"}
         disabled={pending}
       >
         {pending ? (

@@ -30,7 +30,7 @@ export async function InquirySection({ title, body }: InquirySectionProps) {
           </p>
         </div>
         <div className="shrink-0 space-y-2">
-          <Button asChild variant="band">
+          <Button asChild variant="primary">
             <Link href="/book">
               {t("inquiryCta")}
               <ArrowRight aria-hidden className="motion-safe:group-hover/button:translate-x-0.5" />

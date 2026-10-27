@@ -275,6 +275,7 @@ function MessageForm({ locale, onReset }: { locale: AppLocale; onReset: () => vo
 
         <Button
           type="submit"
+          variant="primary"
           size="lg"
           disabled={pending || !hydrated}
           aria-disabled={pending || !hydrated}

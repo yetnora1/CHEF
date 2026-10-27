@@ -111,7 +111,7 @@ export function StatusForm({
         <Textarea id="status-note" name="note" rows={2} maxLength={1000} className="min-h-20" />
       </Field>
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" size="sm" disabled={pending || !target}>
+        <Button type="submit" variant="action" size="sm" disabled={pending || !target}>
           {pending && <LoaderCircle aria-hidden className="animate-spin" />}
           {labels.submit}
         </Button>

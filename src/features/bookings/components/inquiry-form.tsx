@@ -425,6 +425,7 @@ export function InquiryForm({ locale, captcha }: { locale: AppLocale; captcha: I
 
         <Button
           type="submit"
+          variant="primary"
           size="lg"
           disabled={pending || !hydrated}
           aria-disabled={pending || !hydrated}

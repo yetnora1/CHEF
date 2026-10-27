@@ -106,7 +106,14 @@ export function LoginForm({ next }: { next: string }) {
         input={{ name: "password", type: "password", autoComplete: "current-password", required: true }}
       />
 
-      <Button type="submit" size="lg" className="w-full" disabled={pending} aria-disabled={pending}>
+      <Button
+        type="submit"
+        variant="action"
+        size="lg"
+        className="w-full"
+        disabled={pending}
+        aria-disabled={pending}
+      >
         {pending && <LoaderCircle aria-hidden className="animate-spin" />}
         {pending ? t("submitting") : t("submit")}
       </Button>

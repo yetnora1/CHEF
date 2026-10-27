@@ -124,7 +124,7 @@ export function MediaUploadForm() {
       <Field id="upload-alt" label={t("altEn")} optionalLabel={t("optional")}>
         <Input id="upload-alt" name="alt_en" maxLength={300} lang="en" className="h-11" />
       </Field>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" variant="action" disabled={pending}>
         {pending ? <LoaderCircle aria-hidden className="animate-spin" /> : <Upload aria-hidden />}
         {pending ? t("uploading") : t("submit")}
       </Button>
@@ -250,7 +250,7 @@ export function MediaDetailsForm({
         />
       </Field>
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" variant="action" disabled={pending}>
           {pending && <LoaderCircle aria-hidden className="animate-spin" />}
           {t("save")}
         </Button>

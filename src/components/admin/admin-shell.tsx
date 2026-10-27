@@ -54,7 +54,7 @@ export async function AdminShell({
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border/60 glass-wash px-4 sm:px-6 lg:px-10">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b glass-wash px-4 sm:px-6 lg:px-10">
           <AdminMobileNav
             {...navProps}
             openLabel={t("openNavigation")}

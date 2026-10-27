@@ -47,6 +47,19 @@ const PAIRS: [string, string, number][] = [
       4.5,
     ]),
   ),
+  // Header text on the light-blue (dark: deep blue) glass.
+  ["foreground", "header-water", 4.5],
+  ["foreground", "header-water-deep", 4.5],
+  ["muted-foreground", "header-water", 4.5],
+  ["muted-foreground", "header-water-deep", 4.5],
+  // Tinted header buttons: each hue's text on both ends of its face.
+  ...(["rose", "amber", "violet", "indigo", "teal", "sky"] as const).flatMap((hue) =>
+    (["top", "bottom"] as const).map((stop): [string, string, number] => [
+      `${hue}-text`,
+      `${hue}-${stop}`,
+      4.5,
+    ]),
+  ),
   ["accent-ink", "background", 4.5],
   ["accent-ink", "surface", 4.5],
   ["accent-ink", "surface-muted", 4.5],

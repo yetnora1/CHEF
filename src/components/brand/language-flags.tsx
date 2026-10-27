@@ -1,6 +1,7 @@
 import type { ComponentType, SVGProps } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import type { AppLocale } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
 
 type FlagProps = SVGProps<SVGSVGElement>;
 
@@ -50,7 +51,7 @@ function EthiopiaFlag(props: FlagProps) {
 const LOCALE_FLAGS: Record<AppLocale, ComponentType<FlagProps>> = { en: UsFlag, am: EthiopiaFlag };
 
 /** The language toggle: an icon-sized button around one flag, like the theme toggle beside it. */
-export const languageToggleClassName = buttonVariants({ variant: "soft", size: "icon" });
+export const languageToggleClassName = cn(buttonVariants({ variant: "tint", size: "icon" }), "hue-teal");
 
 /**
  * The current language's flag. Decorative: the toggle around it names the

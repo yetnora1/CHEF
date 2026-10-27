@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
  *   positive – publish or mark done (saffron gold)
  *   danger   – a confirmed delete, archive or decline (berbere red)
  *   neutral  – utilities such as Apply or Search, and the default (black / white)
- * Secondary choices are `outline`; header controls (icon toggles, menus) are `soft`;
- * quiet ones (Clear, close) are `ghost`.
+ * Secondary choices are `outline`; header controls are `tint` with their own `hue-*`
+ * (each header button a different colour); quiet ones (Clear, close) are `ghost`.
  */
 const lift =
   "shadow-xs hover:shadow-md active:shadow-xs motion-safe:hover:-translate-y-px motion-safe:active:translate-y-0";
@@ -58,9 +58,10 @@ export const buttonVariants = cva(
           shine,
           lift,
         ),
-        // A lighter outline for header controls (icon toggles, menus): shaded face, soft border.
-        soft: cn(
-          "border border-border bg-surface from-control-top to-control-bottom text-foreground hover:border-border-strong active:from-control-bottom",
+        // Header controls, each in its own colour: pair with a `hue-*` utility (globals.css),
+        // which sets the face, border and text this variant reads. Hover deepens the face.
+        tint: cn(
+          "border border-(--tint-border) bg-(--tint-bottom) from-(--tint-top) to-(--tint-bottom) text-(--tint-text) hover:from-(--tint-bottom) active:from-(--tint-bottom)",
           shine,
           lift,
         ),

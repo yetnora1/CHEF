@@ -2,12 +2,23 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/brand/wordmark";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { siteNavigation } from "@/features/cms/navigation";
+import { siteNavigation, type SiteNavKey } from "@/features/cms/navigation";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { LocaleSwitcher } from "./locale-switcher";
 import { MobileNav, type NavItem } from "./mobile-nav";
 import { NavLink } from "./nav-link";
+
+// One colour per header link (the flag is teal and the theme toggle indigo, so the
+// links visible today never share a colour with them).
+const NAV_HUES: Record<string, string> = {
+  about: "hue-rose",
+  services: "hue-amber",
+  menu: "hue-sky",
+  gallery: "hue-teal",
+  journal: "hue-indigo",
+  contact: "hue-violet",
+} satisfies Record<SiteNavKey, string>;
 
 export async function SiteHeader() {
   const t = await getTranslations("Navigation");
@@ -19,7 +30,7 @@ export async function SiteHeader() {
   }));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 glass-wash">
+    <header className="sticky top-0 z-40 border-b glass-wash">
       <div className="page-container flex h-[4.5rem] items-center justify-between gap-4">
         <Link href="/" aria-label={tBrand("homeLink")} className="rounded-lg">
           <Wordmark tagline={tBrand("tagline")} />
@@ -27,15 +38,16 @@ export async function SiteHeader() {
 
         {/* Inline from lg: with every section published, five links do not fit beside the actions on tablets. */}
         <nav aria-label={t("primaryLabel")} className="hidden lg:block">
-          {/* A shaded segmented control: the current page is raised, the others rise on hover. */}
-          <ul className="flex items-center gap-1 rounded-xl border border-border/70 bg-surface/50 p-1 shadow-xs inset-shadow-2xs inset-shadow-shine/12">
+          {/* Each link is a tinted button in its own colour; the current page carries a ring. */}
+          <ul className="flex items-center gap-2">
             {links.map((link) => (
               <li key={link.key}>
                 <NavLink
                   href={link.href}
                   className={cn(
-                    buttonVariants({ variant: "ghost", size: "sm" }),
-                    "h-8 px-3.5 font-medium text-muted-foreground hover:text-foreground aria-[current]:from-control-top aria-[current]:to-control-bottom aria-[current]:text-foreground aria-[current]:shadow-xs aria-[current]:ring-1 aria-[current]:ring-border",
+                    buttonVariants({ variant: "tint", size: "sm" }),
+                    NAV_HUES[link.key] ?? "hue-sky",
+                    "aria-[current]:ring-2 aria-[current]:ring-(--tint-border) aria-[current]:ring-offset-2 aria-[current]:ring-offset-transparent",
                   )}
                 >
                   {link.label}

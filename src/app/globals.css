@@ -152,6 +152,39 @@
   --destructive-hover-top: light-dark(#d62828, #d62828);
   --destructive-hover-bottom: light-dark(#a91818, #a91818);
   --destructive-foreground: light-dark(#ffffff, #ffffff);
+
+  /* Header "watercolour": light blue glass in light, deep blue in dark. */
+  --header-water: light-dark(#e0f2fe, #0c2236);
+  --header-water-deep: light-dark(#bae6fd, #123b5c);
+  --header-water-light: light-dark(#f0f9ff, #0a1a2a);
+  --header-line: light-dark(#bae6fd, #1e4a6e);
+
+  /* Tinted header buttons: each control has its own hue (`hue-*` utilities below).
+   * Light: pastel face, deep text; dark: deep face, pastel text. */
+  --rose-top: light-dark(#ffe4e6, #4c0519);
+  --rose-bottom: light-dark(#fecdd3, #3b0414);
+  --rose-border: light-dark(#fda4af, #9f1239);
+  --rose-text: light-dark(#9f1239, #fecdd3);
+  --amber-top: light-dark(#fef3c7, #451a03);
+  --amber-bottom: light-dark(#fde68a, #3a1602);
+  --amber-border: light-dark(#fcd34d, #92400e);
+  --amber-text: light-dark(#92400e, #fde68a);
+  --violet-top: light-dark(#ede9fe, #2e1065);
+  --violet-bottom: light-dark(#ddd6fe, #240b52);
+  --violet-border: light-dark(#c4b5fd, #6d28d9);
+  --violet-text: light-dark(#5b21b6, #ddd6fe);
+  --indigo-top: light-dark(#e0e7ff, #1e1b4b);
+  --indigo-bottom: light-dark(#c7d2fe, #17153b);
+  --indigo-border: light-dark(#a5b4fc, #4338ca);
+  --indigo-text: light-dark(#3730a3, #c7d2fe);
+  --teal-top: light-dark(#ccfbf1, #042f2e);
+  --teal-bottom: light-dark(#99f6e4, #032624);
+  --teal-border: light-dark(#5eead4, #0f766e);
+  --teal-text: light-dark(#115e59, #99f6e4);
+  --sky-top: light-dark(#f0f9ff, #082f49);
+  --sky-bottom: light-dark(#bae6fd, #062538);
+  --sky-border: light-dark(#7dd3fc, #0369a1);
+  --sky-text: light-dark(#075985, #bae6fd);
 }
 
 :root[data-theme="dark"] {
@@ -372,26 +405,69 @@
 }
 
 /*
- * Translucent "watercolour" glass for sticky headers: the page shows through,
- * blurred, under soft washes of the button colours (orange, gold, blue). The
- * washes are faint, so header text keeps its contrast in both themes.
+ * Translucent light-blue "watercolour" glass for sticky headers (deep blue in
+ * dark): the page shows through, blurred, under soft blooms of lighter and
+ * deeper blue, like wet paint. Header text keeps its contrast in both themes.
  */
 @utility glass-wash {
-  background-color: color-mix(in oklab, var(--background) 70%, transparent);
+  background-color: color-mix(in oklab, var(--header-water) 80%, transparent);
   background-image:
-    radial-gradient(45% 160% at 8% 0%, color-mix(in oklab, var(--cta-top) 16%, transparent), transparent 70%),
     radial-gradient(
-      40% 160% at 55% 120%,
-      color-mix(in oklab, var(--positive-top) 14%, transparent),
-      transparent 70%
+      45% 170% at 8% 0%,
+      color-mix(in oklab, var(--header-water-deep) 70%, transparent),
+      transparent 72%
     ),
     radial-gradient(
-      45% 160% at 96% 0%,
-      color-mix(in oklab, var(--action-top) 14%, transparent),
-      transparent 70%
+      40% 170% at 55% 120%,
+      color-mix(in oklab, var(--header-water-light) 80%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      45% 170% at 96% 0%,
+      color-mix(in oklab, var(--header-water-deep) 60%, transparent),
+      transparent 72%
     );
+  border-color: var(--header-line);
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
   backdrop-filter: blur(16px) saturate(1.5);
+}
+
+/* Hues for `tint` buttons: each sets the face, border and text the variant reads. */
+@utility hue-rose {
+  --tint-top: var(--rose-top);
+  --tint-bottom: var(--rose-bottom);
+  --tint-border: var(--rose-border);
+  --tint-text: var(--rose-text);
+}
+@utility hue-amber {
+  --tint-top: var(--amber-top);
+  --tint-bottom: var(--amber-bottom);
+  --tint-border: var(--amber-border);
+  --tint-text: var(--amber-text);
+}
+@utility hue-violet {
+  --tint-top: var(--violet-top);
+  --tint-bottom: var(--violet-bottom);
+  --tint-border: var(--violet-border);
+  --tint-text: var(--violet-text);
+}
+@utility hue-indigo {
+  --tint-top: var(--indigo-top);
+  --tint-bottom: var(--indigo-bottom);
+  --tint-border: var(--indigo-border);
+  --tint-text: var(--indigo-text);
+}
+@utility hue-teal {
+  --tint-top: var(--teal-top);
+  --tint-bottom: var(--teal-bottom);
+  --tint-border: var(--teal-border);
+  --tint-text: var(--teal-text);
+}
+@utility hue-sky {
+  --tint-top: var(--sky-top);
+  --tint-bottom: var(--sky-bottom);
+  --tint-border: var(--sky-border);
+  --tint-text: var(--sky-text);
 }
 
 /* Fine dotted texture used by photography placeholders. */

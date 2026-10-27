@@ -47,9 +47,9 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   return (
     <Button
-      variant="soft"
+      variant="tint"
       size="icon"
-      className={cn("text-current", className)}
+      className={cn("hue-indigo", className)}
       aria-label={t("dark")}
       aria-pressed={theme ? theme === "dark" : undefined}
       onClick={() => setTheme(readTheme() === "dark" ? "light" : "dark")}

@@ -6,13 +6,18 @@ themes change in one place.
 
 ## Brand palette (proposed, adjustable)
 
-| Token                                           | Hex       | Role                                       |
-| ----------------------------------------------- | --------- | ------------------------------------------ |
-| Highland Forest `--color-highland-forest`       | `#173D32` | Primary actions (light), brand band        |
-| Ceremonial Gold `--color-ceremonial-gold`       | `#D3A45B` | Restrained accents; primary actions (dark) |
-| Berbere Terracotta `--color-berbere-terracotta` | `#9D4135` | Focus ring (light), status accents         |
-| Injera Ivory `--color-injera-ivory`             | `#F5F0E6` | Light background                           |
-| Coffee Charcoal `--color-coffee-charcoal`       | `#171D1A` | Dark background, text                      |
+| Token                                           | Hex       | Role                                |
+| ----------------------------------------------- | --------- | ----------------------------------- |
+| Highland Forest `--color-highland-forest`       | `#173D32` | Primary actions (light), brand band |
+| Ceremonial Gold `--color-ceremonial-gold`       | `#D3A45B` | Restrained accents (light)          |
+| Berbere Terracotta `--color-berbere-terracotta` | `#9D4135` | Focus ring (light), status accents  |
+| Injera Ivory `--color-injera-ivory`             | `#F5F0E6` | Light background                    |
+| Coffee Charcoal `--color-coffee-charcoal`       | `#171D1A` | Text (light)                        |
+
+The palette applies to the light theme. **Dark is neutral black and white** (owner's choice,
+2026-10-27): background `#0A0A0A`, surfaces `#141414`/`#1F1F1F`, white text and white primary
+buttons, grey accents; no green or warm tint. Only the feedback colours and terracotta status
+accents keep a hue. The logo keeps its brand colours in both themes.
 
 ## Semantic tokens and themes
 

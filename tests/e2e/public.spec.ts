@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const IVORY = "rgb(245, 240, 230)";
-const CHARCOAL = "rgb(23, 29, 26)";
+const BLACK = "rgb(10, 10, 10)";
 
 const bodyBackground = (page: Page) => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 
@@ -149,11 +149,11 @@ test.describe("theme", () => {
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
     // A direct switch: no menu of choices opens.
     await expect(page.getByRole("menu")).toHaveCount(0);
-    expect(await bodyBackground(page)).toBe(CHARCOAL);
+    expect(await bodyBackground(page)).toBe(BLACK);
 
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    expect(await bodyBackground(page)).toBe(CHARCOAL);
+    expect(await bodyBackground(page)).toBe(BLACK);
 
     await page.goto("/am");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");

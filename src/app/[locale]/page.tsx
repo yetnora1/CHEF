@@ -1,5 +1,6 @@
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { AboutSection } from "@/components/public/about-section";
+import { FoodReel } from "@/components/public/food-reel";
 import { Hero } from "@/components/public/hero";
 import { InquirySection } from "@/components/public/inquiry-section";
 import { ServicesSection, type ServiceCard } from "@/components/public/services-section";
@@ -7,6 +8,7 @@ import { getPublicNavigation, getPublicPage, getPublicServices } from "@/feature
 import { pageContent, serviceCards } from "@/features/cms/public-views";
 import { contactHrefFor } from "@/features/contact/service-subject";
 import { homeContent } from "@/features/content/home-content";
+import { sampleVideos } from "@/features/content/sample-videos";
 import { resolveLocalized, type Localized, type ResolvedText } from "@/lib/localization/translations";
 
 /*
@@ -16,10 +18,11 @@ import { resolveLocalized, type Localized, type ResolvedText } from "@/lib/local
  */
 export default async function HomePage() {
   const locale = await getLocale();
-  const [page, services, navigation] = await Promise.all([
+  const [page, services, navigation, tHome] = await Promise.all([
     getPublicPage("home").catch(() => null),
     getPublicServices().catch(() => null),
     getPublicNavigation().catch(() => null),
+    getTranslations("Home"),
   ]);
 
   // Placeholder content always has English, so the fallback never comes up empty.
@@ -73,6 +76,10 @@ export default async function HomePage() {
           photoSubject={placeholder(hero.photoSubject)}
         />
       )}
+      <FoodReel
+        clips={sampleVideos}
+        labels={{ region: tHome("videosLabel"), pause: tHome("videosPause"), play: tHome("videosPlay") }}
+      />
       {aboutTitle || aboutBody ? (
         <AboutSection
           title={aboutTitle ?? placeholder(about.title)}

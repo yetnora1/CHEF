@@ -178,6 +178,15 @@ the semantic tokens above.
   scroll; see [UI_REVIEW.md](UI_REVIEW.md)).
 - Links that open a new tab say so (an icon plus "opens in a new tab" for screen readers).
 
+## Videos
+
+Under the homepage hero, a row of three short, silent food loops (`public/components/food-reel`,
+data in `src/features/content/sample-videos.ts`, files in `public/videos`): Pexels clips of
+Ethiopian dishes and a coffee roasting, no identifiable faces, no captions, credited on `/credits`.
+Each is cut to a few seconds, cropped to 16:10, 960px wide, H.264 without sound, with its first frame
+as the poster. Nothing loads until the row is in view (`preload="none"`); clips play only while
+visible, stay paused for `prefers-reduced-motion`, and one button pauses or plays them all.
+
 ## Photography
 
 A published image from the media library always wins. Until one exists, a slot shows an openly

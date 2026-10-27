@@ -1,16 +1,14 @@
-import { ArrowRight, CalendarDays, Info, Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
+import { Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { Button } from "@/components/ui/button";
 import { getContactConfig } from "@/features/bookings/server/config";
 import { ContactForm } from "@/features/contact/components/contact-form";
 import { contactSubjectFor } from "@/features/contact/service-subject";
 import { contactDetails } from "@/features/content/contact-content";
 import { getClientMessages } from "@/i18n/client-messages";
-import { Link } from "@/i18n/navigation";
 import { resolveLocalized } from "@/lib/localization/translations";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,12 +24,12 @@ export async function generateMetadata(): Promise<Metadata> {
 type Detail = { key: string; icon: LucideIcon; label: string; value: string; href?: string; lang?: string };
 
 /**
- * Contact: the message form, beside a shortcut to the event inquiry form and
- * the phone, email and location shown only once confirmed in contact-content.ts.
+ * Contact: the message form, beside the phone, email and location shown only
+ * once confirmed in contact-content.ts.
  */
 export default async function ContactPage({ searchParams }: PageProps<"/[locale]/contact">) {
   const locale = await getLocale();
-  const [t, tHome] = await Promise.all([getTranslations("Contact"), getTranslations("Home")]);
+  const t = await getTranslations("Contact");
 
   const { phone, email, location } = contactDetails;
   const place = location ? resolveLocalized(location, locale) : null;
@@ -57,8 +55,8 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
 
   return (
     <section className="page-container py-14 md:py-20">
-      {/* Phones: intro, form, then the event shortcut. Desktop: intro and
-          shortcut on the left, the form beside them. */}
+      {/* Phones: intro, form, then any confirmed contact details. Desktop: intro and
+          details on the left, the form beside them. */}
       <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:gap-x-16">
         <header className="lg:col-start-1 lg:row-start-1">
           <h1 className="display-lg">{t("title")}</h1>
@@ -71,28 +69,8 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
           </Suspense>
         </div>
 
-        <div className="space-y-6 lg:col-start-1 lg:row-start-2 lg:self-start">
-          <div className="rounded-2xl border border-border bg-surface p-6">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <CalendarDays aria-hidden className="size-5" />
-              </span>
-              <h2 className="text-lg font-semibold">{t("inquiryTitle")}</h2>
-            </div>
-            <p className="mt-3 text-muted-foreground">{t("inquiryBody")}</p>
-            <Button asChild variant="outline" className="mt-5">
-              <Link href="/book">
-                {tHome("inquiryCta")}
-                <ArrowRight aria-hidden className="motion-safe:group-hover/button:translate-x-0.5" />
-              </Link>
-            </Button>
-            <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Info aria-hidden className="size-3.5 shrink-0" />
-              {tHome("inquiryNote")}
-            </p>
-          </div>
-
-          {details.length > 0 && (
+        {details.length > 0 && (
+          <div className="lg:col-start-1 lg:row-start-2 lg:self-start">
             <div className="rounded-2xl border border-border bg-surface p-6">
               <h2 className="text-lg font-semibold">{t("detailsTitle")}</h2>
               <dl className="mt-2 divide-y divide-border">
@@ -115,8 +93,8 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
                 ))}
               </dl>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );

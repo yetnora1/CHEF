@@ -8,6 +8,7 @@ describe("licenseUrl", () => {
     expect(licenseUrl("CC BY-SA 4.0")).toBe("https://creativecommons.org/licenses/by-sa/4.0/");
     expect(licenseUrl("CC BY 4.0")).toBe("https://creativecommons.org/licenses/by/4.0/");
     expect(licenseUrl("CC BY 3.0 PL")).toBe("https://creativecommons.org/licenses/by/3.0/pl/");
+    expect(licenseUrl("Pexels License")).toBe("https://www.pexels.com/license/");
   });
 
   it("returns null for anything it cannot map, rather than a wrong link", () => {

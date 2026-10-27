@@ -39,7 +39,7 @@
     "gallery": "Gallery",
     "journal": "Journal",
     "contact": "Contact",
-    "credits": "Photo credits"
+    "credits": "Credits"
   },
   "Language": {
     "label": "Language",
@@ -57,7 +57,10 @@
     "aboutPending": "Awaiting the chef's own biography",
     "inquiryCta": "Start your inquiry",
     "inquiryNote": "Sending an inquiry does not reserve a date.",
-    "aboutMore": "More about the chef"
+    "aboutMore": "More about the chef",
+    "videosLabel": "Short videos of Ethiopian food",
+    "videosPause": "Pause the videos",
+    "videosPlay": "Play the videos"
   },
   "Footer": {
     "navigationLabel": "Footer",
@@ -258,9 +261,7 @@
     "metaTitle": "Contact",
     "metaDescription": "Contact Chef Harena about weddings, corporate events and private occasions.",
     "title": "Contact",
-    "lede": "Have a question for Chef Harena? Send a message using the form. Planning an event? The inquiry form asks for the details needed to review it.",
-    "inquiryTitle": "Planning an event?",
-    "inquiryBody": "Share your date, guest count and occasion through the inquiry form.",
+    "lede": "Have a question for Chef Harena? Send a message using the form.",
     "detailsTitle": "Direct contact",
     "phone": "Phone",
     "email": "Email",
@@ -914,14 +915,16 @@
     }
   },
   "Credits": {
-    "metaTitle": "Photo credits",
-    "metaDescription": "Who took the openly licensed sample photographs on this website, and under which licence.",
+    "metaTitle": "Photo and video credits",
+    "metaDescription": "Who made the openly licensed sample photographs and videos on this website, and under which licence.",
     "eyebrow": "Credits",
-    "title": "Photo credits",
-    "intro": "The photographs on this website are openly licensed samples, shown until Chef Harena's own photography is ready. They are not Chef Harena's work.",
-    "changes": "Each photograph was resized for the web; nothing else was changed.",
+    "title": "Photo and video credits",
+    "intro": "The photographs and videos on this website are openly licensed samples, shown until Chef Harena's own are ready. They are not Chef Harena's work.",
+    "changes": "Photographs were resized for the web; videos were shortened, cropped, resized and silenced. Nothing else was changed.",
+    "photos": "Photographs",
+    "videos": "Videos",
     "by": "By {author}",
     "license": "Licence",
-    "source": "Original on Wikimedia Commons"
+    "source": "Original on {site}"
   }
 }

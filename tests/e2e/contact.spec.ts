@@ -51,10 +51,12 @@ async function signIn(page: Page, email: string) {
 }
 
 test.describe("public contact form", () => {
-  test("renders in English and Amharic beside the event inquiry shortcut", async ({ page }) => {
+  test("renders in English and Amharic, the message form only", async ({ page }) => {
     await openContactPage(page);
     await expect(page.getByRole("heading", { level: 2, name: "Send a message" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Planning an event?" })).toBeVisible();
+    // The event inquiry shortcut was removed from this page (owner's request).
+    await expect(page.getByRole("heading", { name: "Planning an event?" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Start your inquiry" })).toHaveCount(0);
     // No CAPTCHA: no security-check widget and no development-mode notice.
     const form = page.getByRole("form", { name: "Send a message" });
     await expect(form.getByText("Security check")).toHaveCount(0);

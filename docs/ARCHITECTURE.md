@@ -1,4 +1,4 @@
-| `/[locale]/credits` | Photo credits | ✅ Credits for the sample photos (photographer, licence, source); the images themselves carry no caption |
+| `/[locale]/credits` | Photo credits | ✅ Credits for the sample photos and videos (author, licence, source); the media themselves carry no caption |
 
 # Architecture
 

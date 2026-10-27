@@ -98,7 +98,7 @@ test.describe("locale routing", () => {
     ).toBeVisible();
   });
 
-  test("the contact page is linked everywhere and leads to the inquiry form", async ({ page }) => {
+  test("the contact page is linked everywhere and holds only the message form", async ({ page }) => {
     await page.goto("/en");
     await page.getByRole("contentinfo").getByRole("link", { name: "Contact" }).click();
     await expect(page).toHaveURL(/\/en\/contact$/);
@@ -110,8 +110,9 @@ test.describe("locale routing", () => {
       page.getByRole("status").filter({ hasText: "The contact form is not open yet" }),
     ).toBeVisible();
     await expect(page.locator("form input[name=fullName]")).toHaveCount(0);
-    await page.getByRole("main").getByRole("link", { name: "Start your inquiry" }).click();
-    await expect(page).toHaveURL(/\/en\/book$/);
+    // The event inquiry shortcut was removed from this page (owner's request);
+    // the inquiry form stays reachable from the header's "Plan an event".
+    await expect(page.getByRole("main").getByRole("link", { name: "Start your inquiry" })).toHaveCount(0);
 
     await page.goto("/am/contact");
     await expect(page.getByRole("heading", { level: 1, name: "ያግኙን" })).toBeVisible();
@@ -125,6 +126,40 @@ test.describe("locale routing", () => {
     const am = await page.goto("/am/this-page-does-not-exist");
     expect(am?.status()).toBe(404);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("ገጹን ማግኘት አልቻልንም");
+  });
+});
+
+test.describe("food videos", () => {
+  const reel = (page: Page) => page.getByRole("region", { name: "Short videos of Ethiopian food" });
+
+  test("three silent loops under the hero, with one button to pause and play them", async ({ page }) => {
+    await page.goto("/en");
+    const videos = reel(page).locator("video");
+    await expect(videos).toHaveCount(3);
+    for (const video of await videos.all()) {
+      expect(await video.evaluate((v: HTMLVideoElement) => v.muted && v.loop && !v.controls)).toBe(true);
+    }
+    await reel(page).getByRole("button", { name: "Pause the videos" }).click();
+    await expect(reel(page).getByRole("button", { name: "Play the videos" })).toBeVisible();
+    expect(await videos.evaluateAll((all: HTMLVideoElement[]) => all.every((v) => v.paused))).toBe(true);
+  });
+
+  test("stay paused for visitors who prefer reduced motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/en");
+    await expect(reel(page).getByRole("button", { name: "Play the videos" })).toBeVisible();
+    expect(
+      await reel(page)
+        .locator("video")
+        .evaluateAll((all: HTMLVideoElement[]) => all.every((v) => v.paused)),
+    ).toBe(true);
+  });
+
+  test("are credited, with the photos, on the credits page", async ({ page }) => {
+    await page.goto("/en/credits");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Photo and video credits");
+    await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(3);
+    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(6);
   });
 });
 

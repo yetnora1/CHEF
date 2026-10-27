@@ -159,7 +159,7 @@ test.describe("food videos", () => {
     await page.goto("/en/credits");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Photo and video credits");
     await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(3);
-    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(6);
+    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(9);
   });
 });
 

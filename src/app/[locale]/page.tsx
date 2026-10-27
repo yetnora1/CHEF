@@ -4,10 +4,13 @@ import { FoodReel } from "@/components/public/food-reel";
 import { Hero } from "@/components/public/hero";
 import { InquirySection } from "@/components/public/inquiry-section";
 import { ServicesSection, type ServiceCard } from "@/components/public/services-section";
+import { StorySection } from "@/components/public/story-section";
 import { getPublicNavigation, getPublicPage, getPublicServices } from "@/features/cms/public-data";
 import { pageContent, serviceCards } from "@/features/cms/public-views";
 import { contactHrefFor } from "@/features/contact/service-subject";
+import { foodStories } from "@/features/content/food-stories";
 import { homeContent } from "@/features/content/home-content";
+import { samplePhotos } from "@/features/content/sample-photos";
 import { sampleVideos } from "@/features/content/sample-videos";
 import { resolveLocalized, type Localized, type ResolvedText } from "@/lib/localization/translations";
 
@@ -99,6 +102,18 @@ export default async function HomePage() {
           moreHref={navigation?.[locale].about ? "/about" : null}
         />
       )}
+      {foodStories.map((story, index) => (
+        <StorySection
+          key={story.key}
+          id={`story-${story.key}`}
+          eyebrow={placeholder(story.eyebrow)}
+          title={placeholder(story.title)}
+          body={placeholder(story.body)}
+          photo={samplePhotos[story.photo]}
+          // "Meet Chef Harena" has its image on the left, so these start on the right.
+          imageRight={index % 2 === 0}
+        />
+      ))}
       <ServicesSection
         title={field("services", "heading") ?? placeholder(servicesCopy.title)}
         lede={field("services", "lede") ?? placeholder(servicesCopy.lede)}

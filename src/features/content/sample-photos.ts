@@ -6,6 +6,9 @@ import serviceCorporateEvents from "@/assets/samples/service-corporate-events.jp
 import serviceCulinaryExperiences from "@/assets/samples/service-culinary-experiences.jpg";
 import serviceSummits from "@/assets/samples/service-summits.jpg";
 import serviceWeddings from "@/assets/samples/service-weddings.jpg";
+import storyFasting from "@/assets/samples/story-fasting.jpg";
+import storyInjera from "@/assets/samples/story-injera.jpg";
+import storyWat from "@/assets/samples/story-wat.jpg";
 
 /*
  * SAMPLE PHOTOGRAPHY — not Chef Harena's work
@@ -88,6 +91,33 @@ export const samplePhotos = {
       author: "Radosław Botev",
       license: "CC BY 3.0 PL",
       source: "https://commons.wikimedia.org/wiki/File:Ethiopian_Coffee_Ceremony_(1).jpg",
+    },
+  },
+  injera: {
+    src: storyInjera,
+    alt: { en: "A freshly baked injera lifted from the griddle in a smoky kitchen." },
+    credit: {
+      author: "Natnael Tadele",
+      license: "CC BY-SA 4.0",
+      source: "https://commons.wikimedia.org/wiki/File:Fresh_Injera.JPG",
+    },
+  },
+  wat: {
+    src: storyWat,
+    alt: { en: "A bowl of deep red doro wat with a hard-boiled egg, beside injera." },
+    credit: {
+      author: "stu_spivack",
+      license: "CC BY-SA 2.0",
+      source: "https://commons.wikimedia.org/wiki/File:Ethiopian_wat.jpg",
+    },
+  },
+  fasting: {
+    src: storyFasting,
+    alt: { en: "A fasting platter of injera with lentils, split peas, greens, beetroot and potatoes." },
+    credit: {
+      author: "Rod Waddington",
+      license: "CC BY-SA 2.0",
+      source: "https://commons.wikimedia.org/wiki/File:Injera,_Fasting_Food,_Ethiopia_(11286899826).jpg",
     },
   },
 } satisfies Record<string, SamplePhoto>;

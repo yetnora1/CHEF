@@ -200,10 +200,31 @@ to customers.
 ## What the server secret key can do
 
 The secret key (`SUPABASE_SECRET_KEY`, the `service_role` role) has no table privileges on any
-inquiry table. Through its four functions it can create inquiries, consume rate-limit counters, and
-claim and complete queued notifications (which return the customer's address for acknowledgements).
-It cannot list, read, change or delete inquiries. It is still a Supabase secret key with full Auth
+inquiry or contact-message table. Through its five functions it can create inquiries and contact
+messages, consume rate-limit counters, and claim and complete queued notifications (which return the
+customer's address for acknowledgements). It cannot list, read, change or delete inquiries or
+messages. It is still a Supabase secret key with full Auth
 admin rights, so it must stay in the host's secret store; rotate it if it leaks.
+
+## Contact messages
+
+The form on `/[locale]/contact` is for questions that are not an event inquiry: name, email, optional
+phone and subject, a message (10–3,000 characters) and consent. It opens and closes with the inquiry
+form (same configuration) and runs the same pipeline with two differences:
+
+- its rate limits use their own `contact:` buckets (same limits), so sending one form never uses up
+  the other's budget; a solved CAPTCHA token is still accepted only once across both forms;
+- the Turnstile widget uses action `contact`, and the server refuses a token minted for `inquiry`
+  (and the other way round).
+
+`public.submit_contact_message` (service_role only) stores the message with a `CM-` reference and is
+idempotent per submission key, like inquiries. **No email is sent**: owners and admins
+(`messages.read`) see new messages in `/admin/messages` and in the Overview's "Needs attention", reply
+by email or phone, and mark each one handled (`messages.write`, audited). Other roles cannot see
+messages. There is no delete button yet; erase a message in the database if a sender asks.
+
+Before launch, the privacy notice (written for inquiries) should also describe contact messages; the
+form's consent links to it.
 
 ## Enabling the form in production
 

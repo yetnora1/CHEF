@@ -1,4 +1,5 @@
 import "server-only";
+import type { AppLocale } from "@/i18n/routing";
 import { isSubmissionKey, parseInquiry, readLocale, type InquiryFieldErrors } from "../inquiry-schema";
 import type { CaptchaResult } from "./captcha";
 import type { InquiryConfig } from "./config";
@@ -8,22 +9,25 @@ import {
   checkRateLimits,
   POST_CAPTCHA_LIMITS,
   PRE_CAPTCHA_LIMITS,
+  type ConsumeRateLimit,
+  type RateLimitNamespace,
   type RateLimitRule,
 } from "./rate-limit";
 import { InquiryKeyConflictError, type InquiryStore } from "./store";
 
 /*
- * The public inquiry pipeline, independent of Next.js so every branch is
- * unit-tested (tests/unit/inquiry-submission.test.ts):
+ * The public submission pipeline shared by the event inquiry and contact
+ * forms, independent of Next.js so every branch is unit-tested
+ * (tests/unit/inquiry-submission.test.ts, tests/unit/contact-submission.test.ts):
  *
  *   configuration → honeypot → validation → IP limits → CAPTCHA (single use) → mailbox/site limits → insert → email (async)
  *
  * Responses never contain database errors, internal ids or user input.
  */
 
-export type InquiryFormState =
+export type PublicFormState<FieldErrors> =
   | { status: "idle" }
-  | { status: "invalid"; fieldErrors: InquiryFieldErrors }
+  | { status: "invalid"; fieldErrors: FieldErrors }
   | { status: "success"; reference: string }
   | { status: "rate_limited"; retryAfterMinutes: number }
   | { status: "captcha_failed" }
@@ -31,26 +35,44 @@ export type InquiryFormState =
   | { status: "unavailable" }
   | { status: "error" };
 
-export type SubmissionDeps = {
+export type InquiryFormState = PublicFormState<InquiryFieldErrors>;
+
+export type PublicSubmissionDeps = {
   config: InquiryConfig;
-  store: Pick<InquiryStore, "consumeRateLimit" | "submitInquiry">;
+  consumeRateLimit: ConsumeRateLimit;
   verifyCaptcha: (
     token: string | undefined,
     remoteIp: string | null,
     idempotencyKey: string,
   ) => Promise<CaptchaResult>;
   clientIp: string | null;
-  /** Queues email delivery to run after the response (only called when email is enabled). */
-  scheduleDelivery: () => void;
   log?: (event: string, detail?: string) => void;
 };
 
-export async function processInquirySubmission(
+export type PublicForm<Data extends { email: string }, FieldErrors> = {
+  /** This form's own rate-limit buckets. */
+  namespace: RateLimitNamespace;
+  logPrefix: string;
+  parse: (
+    raw: Record<string, string>,
+  ) => { success: true; data: Data } | { success: false; fieldErrors: FieldErrors };
+  /** Stores a validated submission; throws InquiryKeyConflictError when the key was used for other content. */
+  save: (submission: {
+    submissionKey: string;
+    data: Data;
+    locale: AppLocale;
+  }) => Promise<{ reference: string; replay: boolean }>;
+};
+
+export async function processPublicSubmission<Data extends { email: string }, FieldErrors>(
   raw: Record<string, string>,
-  deps: SubmissionDeps,
-): Promise<InquiryFormState> {
+  deps: PublicSubmissionDeps,
+  form: PublicForm<Data, FieldErrors>,
+): Promise<PublicFormState<FieldErrors>> {
+  type State = PublicFormState<FieldErrors>;
   const log =
-    deps.log ?? ((event, detail) => console.info(`[inquiries] ${event}${detail ? `: ${detail}` : ""}`));
+    deps.log ??
+    ((event, detail) => console.info(`[${form.logPrefix}] ${event}${detail ? `: ${detail}` : ""}`));
   const { config } = deps;
 
   if (!config.available) {
@@ -66,14 +88,20 @@ export async function processInquirySubmission(
 
   if (!isSubmissionKey(raw.submissionKey)) return { status: "error" };
 
-  const parsed = parseInquiry(raw);
+  const parsed = form.parse(raw);
   if (!parsed.success) return { status: "invalid", fieldErrors: parsed.fieldErrors };
 
   const identity = { ip: deps.clientIp, email: parsed.data.email };
-  const limited = async (rules: readonly RateLimitRule[]): Promise<InquiryFormState | null> => {
+  const limited = async (rules: readonly RateLimitRule[]): Promise<State | null> => {
     let decision;
     try {
-      decision = await checkRateLimits(identity, config.secretKey, deps.store.consumeRateLimit, rules);
+      decision = await checkRateLimits(
+        identity,
+        config.secretKey,
+        deps.consumeRateLimit,
+        rules,
+        form.namespace,
+      );
     } catch {
       log("error", "rate limiter unavailable");
       return { status: "error" };
@@ -102,7 +130,7 @@ export async function processInquirySubmission(
     // requests a fresh token after every attempt.
     let firstUse;
     try {
-      firstUse = await deps.store.consumeRateLimit(
+      firstUse = await deps.consumeRateLimit(
         captchaTokenBucket(token ?? "", config.secretKey),
         CAPTCHA_TOKEN_RULE.limit,
         CAPTCHA_TOKEN_RULE.windowSeconds,
@@ -123,18 +151,43 @@ export async function processInquirySubmission(
   if (sharedBlocked) return sharedBlocked;
 
   try {
-    const result = await deps.store.submitInquiry({
+    const result = await form.save({
       submissionKey: raw.submissionKey,
-      inquiry: parsed.data,
+      data: parsed.data,
       locale: readLocale(raw.locale),
-      notify: config.email !== null,
     });
     log(result.replay ? "replayed" : "accepted", result.reference);
-    if (config.email !== null && !result.replay) deps.scheduleDelivery();
     return { status: "success", reference: result.reference };
   } catch (error) {
     if (error instanceof InquiryKeyConflictError) return { status: "conflict" };
     log("error", "insert failed");
     return { status: "error" };
   }
+}
+
+export type SubmissionDeps = Omit<PublicSubmissionDeps, "consumeRateLimit"> & {
+  store: Pick<InquiryStore, "consumeRateLimit" | "submitInquiry">;
+  /** Queues email delivery to run after the response (only called when email is enabled). */
+  scheduleDelivery: () => void;
+};
+
+export function processInquirySubmission(
+  raw: Record<string, string>,
+  deps: SubmissionDeps,
+): Promise<InquiryFormState> {
+  const notify = deps.config.available && deps.config.email !== null;
+  return processPublicSubmission(
+    raw,
+    { ...deps, consumeRateLimit: deps.store.consumeRateLimit },
+    {
+      namespace: "inquiry",
+      logPrefix: "inquiries",
+      parse: (values) => parseInquiry(values),
+      save: async ({ submissionKey, data, locale }) => {
+        const result = await deps.store.submitInquiry({ submissionKey, inquiry: data, locale, notify });
+        if (notify && !result.replay) deps.scheduleDelivery();
+        return result;
+      },
+    },
+  );
 }

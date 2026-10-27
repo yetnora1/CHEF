@@ -36,6 +36,8 @@ services ──1:n── service_translations        bookings (private)
 | `20261027090200_cms_content_types.sql`                | `dietary_tag` enum; `menu_categories`, `menu_items`, `gallery_items`, `journal_posts`, `pages` (seeded `home`, `about`), their translation tables, `page_images`; triggers, RLS, column grants for visitors                                                                                                                                                                                                            |
 | `20261027090300_cms_reads.sql`                        | Visibility helpers (`private.media_*`), staff reads (`cms_entries` view, `cms_list`, `cms_get`, `media_list`, `media_get`, `media_cleanup_candidates`), public reads (`public_page`, `public_services`, `public_service`, `public_menu`, `public_gallery`, `public_journal`, `public_journal_post`, `public_navigation`), EXECUTE grants                                                                               |
 | `20261027090400_cms_media_storage.sql`                | Private Storage bucket `media` (10 MB, JPEG/PNG/WebP) and four `storage.objects` policies ([MEDIA.md](MEDIA.md))                                                                                                                                                                                                                                                                                                       |
+| `20261027100000_contact_message_permissions.sql`      | Adds `messages.read` and `messages.write` to `app_permission` (own migration, like `contacted`)                                                                                                                                                                                                                                                                                                                        |
+| `20261027100100_contact_messages.sql`                 | `contact_message_status` enum, `contact_messages`, `submit_contact_message` (service_role only), `list_contact_messages`, `contact_message_counts`, `set_contact_message_status` (audited); grants both permissions to owner and admin                                                                                                                                                                                 |
 
 ## Stage 2 additions
 
@@ -52,8 +54,21 @@ private.rate_limits   (bucket, window_start) → hits; hashed identifiers; expir
   update or delete them otherwise. The audit log keeps only references and statuses, never personal
   data, and survives erasure.
 - `service_role` (the secret key) has **no** table privileges on any booking table; it can only
-  execute `submit_inquiry`, `consume_rate_limit`, `claim_notifications` and `complete_notification`.
+  execute `submit_inquiry`, `consume_rate_limit`, `claim_notifications` and `complete_notification`
+  (and, from Stage 3.7, `submit_contact_message`).
 - Status and assignment cannot be updated directly by any API role; see [INQUIRIES.md](INQUIRIES.md).
+
+## Stage 3.7 additions (contact messages)
+
+```
+contact_messages   reference (CM-…), status (new|handled), contact_*, subject, message, preferred_locale,
+                   consent_given_at, submission_key (unique, idempotency), handled_at, handled_by
+```
+
+- Written only by `submit_contact_message` (service_role); nobody can edit a submitted message.
+- Readable with `messages.read` (owner, admin); `set_contact_message_status` needs `messages.write`
+  and writes a `contact_message.status_changed` audit entry with the reference only.
+- No deletion path yet: erasing a message (privacy request or spam) is a database task for now.
 
 ## Stage 3 additions (content management)
 

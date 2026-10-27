@@ -8,6 +8,7 @@ import {
   ClipboardList,
   Inbox,
   Languages,
+  MessagesSquare,
   NotebookPen,
 } from "lucide-react";
 import { AccessDenied } from "@/components/admin/access-denied";
@@ -17,6 +18,7 @@ import { modulesFor } from "@/features/admin/modules";
 import { bookingReport, inboxCounts, READ_BOOKINGS } from "@/features/bookings/admin-data";
 import { OPEN_STATUSES } from "@/features/bookings/status";
 import { listEntries, type CmsListFilters } from "@/features/cms/admin-data";
+import { messageCounts } from "@/features/contact/admin-data";
 import { hasPermission, type SignedInStaffSession } from "@/lib/auth/access";
 import { authorizeAdmin } from "@/lib/auth/staff-session";
 
@@ -138,11 +140,13 @@ async function NeedsAttention({ session }: { session: SignedInStaffSession }) {
   const canReadBookings = hasPermission(session, READ_BOOKINGS);
   const canReadContent = hasPermission(session, "content.read");
   const canTranslate = hasPermission(session, "translations.write");
-  if (!canReadBookings && !canReadContent) return null;
+  const canReadMessages = hasPermission(session, "messages.read");
+  if (!canReadBookings && !canReadContent && !canReadMessages) return null;
 
   const t = await getTranslations("Admin.overview");
-  const [counts, inReview, amharic] = await Promise.all([
+  const [counts, messages, inReview, amharic] = await Promise.all([
     canReadBookings ? settle(inboxCounts) : null,
+    canReadMessages ? settle(messageCounts) : null,
     canReadContent
       ? settle(() =>
           listEntries(null, { ...LIST_DEFAULTS, status: "in_review", translation: "unpublished" }, 1),
@@ -154,7 +158,7 @@ async function NeedsAttention({ session }: { session: SignedInStaffSession }) {
   ]);
 
   type Item = {
-    key: "inquiries" | "assigned" | "review" | "amharic";
+    key: "inquiries" | "assigned" | "messages" | "review" | "amharic";
     Icon: typeof Inbox;
     count: number | null;
     text: string;
@@ -185,6 +189,16 @@ async function NeedsAttention({ session }: { session: SignedInStaffSession }) {
       count,
       text: t("attentionAssigned", { count: count ?? 0 }),
       href: "/admin/bookings",
+    });
+  }
+  if (canReadMessages) {
+    const count = messages ? messages.new : null;
+    items.push({
+      key: "messages",
+      Icon: MessagesSquare,
+      count,
+      text: t("attentionNewMessages", { count: count ?? 0 }),
+      href: "/admin/messages",
     });
   }
   if (canReadContent) {

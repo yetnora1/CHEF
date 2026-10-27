@@ -33,6 +33,8 @@ Reviewed specification: `src/lib/permissions/matrix.ts`. A database test fails i
 | `bookings.write_assigned`                     |   ✓   |       |                |       ✓       |         |
 | `bookings.assign`                             |   ✓   |   ✓   |                |               |         |
 | `bookings.delete` — privacy erasure           |   ✓   |       |                |               |         |
+| `messages.read` — contact-form inbox          |   ✓   |   ✓   |                |               |         |
+| `messages.write` — mark messages handled      |   ✓   |   ✓   |                |               |         |
 | `users.read` — staff list and roles           |   ✓   |   ✓   |                |               |         |
 | `users.manage` — non-privileged roles         |   ✓   |   ✓   |                |               |         |
 | `users.manage_privileged` — owner/admin roles |   ✓   |       |                |               |         |
@@ -80,6 +82,7 @@ grant roles outside these rules or forge/erase audit entries through the Data AP
 | `storage.objects`, bucket `media` (Stage 3)                                               | read only objects of images used by published content                                                                                                             | read with `content.read`/`media.write`; upload only to server-reserved names (`media.write`), never overwrite; remove only untracked objects ([MEDIA.md](MEDIA.md))                                                                 |
 | `bookings`                                                                                | **none**                                                                                                                                                          | all with `bookings.read_all`; only rows assigned to them with `bookings.read_assigned`; **no direct INSERT or UPDATE** (status, assignee and notes only via audited functions); delete with `bookings.delete` (audited)             |
 | `booking_status_history`, `booking_notes`                                                 | **none**                                                                                                                                                          | readable exactly when the parent inquiry is readable; **no direct writes** (history by trigger, notes via `add_booking_note`)                                                                                                       |
+| `contact_messages` (Stage 3.7)                                                            | **none**                                                                                                                                                          | read with `messages.read`; **no direct writes** (status only via `set_contact_message_status`, audited)                                                                                                                             |
 | `private.rate_limits`, `private.notification_outbox`                                      | **none**                                                                                                                                                          | **none** (only SECURITY DEFINER functions, executable by `service_role`)                                                                                                                                                            |
 
 ### Inquiry functions (Stage 2)
@@ -91,6 +94,9 @@ grant roles outside these rules or forge/erase audit entries through the Data AP
 | `change_booking_status`, `add_booking_note`                                            | `authenticated`     | `bookings.write_all`, or `bookings.write_assigned` on own assignments; missing and forbidden look identical |
 | `assign_booking`, `list_assignable_staff`                                              | `authenticated`     | `bookings.assign`; assignee must hold a booking write permission                                            |
 | `booking_report`                                                                       | `authenticated`     | `reports.read`; aggregates only                                                                             |
+| `submit_contact_message` (Stage 3.7)                                                   | `service_role` only | Server-side callers only; status and handling are not parameters                                            |
+| `list_contact_messages`, `contact_message_counts`                                      | `authenticated`     | SECURITY INVOKER: RLS (`messages.read`) decides; unauthorized callers get no rows                           |
+| `set_contact_message_status`                                                           | `authenticated`     | `messages.write`; audited                                                                                   |
 
 ### Content functions (Stage 3)
 
@@ -105,10 +111,11 @@ Visitors (`anon`) have USAGE on the `private` schema so that these policies and 
 the visibility helpers; EXECUTE is granted only on the helpers listed in
 `tests/integration/db/schema.test.ts`, and the Data API does not expose the `private` schema.
 
-The server secret key (`service_role`) has **no** direct privileges on any booking table. A leaked
-key or a server bug can create inquiries, consume rate-limit counters, and claim and complete queued
+The server secret key (`service_role`) has **no** direct privileges on any booking or
+contact-message table. A leaked key or a server bug can create inquiries and contact messages,
+consume rate-limit counters, and claim and complete queued
 notifications (an acknowledgement includes the customer's email address); it cannot list, alter or
-delete inquiries. It still carries Supabase Auth admin rights, so it must be treated as a full
+delete inquiries or messages. It still carries Supabase Auth admin rights, so it must be treated as a full
 secret and rotated if exposed. See [INQUIRIES.md](INQUIRIES.md) for abuse controls (rate limits, Turnstile,
 honeypot, body limit) and their verification status.
 

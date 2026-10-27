@@ -105,6 +105,11 @@ test.describe("locale routing", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Contact" })).toBeVisible();
     // No contact details are confirmed yet, so none are shown (never invented).
     await expect(page.getByRole("heading", { name: "Direct contact" })).toHaveCount(0);
+    // Without a backend the message form stays closed and says so.
+    await expect(
+      page.getByRole("status").filter({ hasText: "The contact form is not open yet" }),
+    ).toBeVisible();
+    await expect(page.locator("form input[name=fullName]")).toHaveCount(0);
     await page.getByRole("main").getByRole("link", { name: "Start your inquiry" }).click();
     await expect(page).toHaveURL(/\/en\/book$/);
 

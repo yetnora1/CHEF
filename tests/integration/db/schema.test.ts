@@ -47,7 +47,14 @@ describe("migrations", () => {
 });
 
 describe("table privileges for API roles", () => {
-  const privateTables = ["profiles", "user_roles", "role_permissions", "audit_logs", "bookings"];
+  const privateTables = [
+    "profiles",
+    "user_roles",
+    "role_permissions",
+    "audit_logs",
+    "bookings",
+    "contact_messages",
+  ];
 
   it.each(privateTables)("anon has no privileges on %s", async (table) => {
     const { rows } = await db.query<{ privileges: string[] }>(
@@ -128,10 +135,12 @@ describe("function privileges", () => {
       { fn: "public.cms_list", role: "authenticated" },
       { fn: "public.complete_notification", role: "service_role" },
       { fn: "public.consume_rate_limit", role: "service_role" },
+      { fn: "public.contact_message_counts", role: "authenticated" },
       { fn: "public.get_booking_detail", role: "authenticated" },
       { fn: "public.get_my_access", role: "authenticated" },
       { fn: "public.list_assignable_staff", role: "authenticated" },
       { fn: "public.list_bookings", role: "authenticated" },
+      { fn: "public.list_contact_messages", role: "authenticated" },
       { fn: "public.media_cleanup_candidates", role: "authenticated" },
       { fn: "public.media_get", role: "authenticated" },
       { fn: "public.media_list", role: "authenticated" },
@@ -144,6 +153,8 @@ describe("function privileges", () => {
       ...visitorAndStaff("public.public_service"),
       ...visitorAndStaff("public.public_services"),
       { fn: "public.revoke_role", role: "authenticated" },
+      { fn: "public.set_contact_message_status", role: "authenticated" },
+      { fn: "public.submit_contact_message", role: "service_role" },
       { fn: "public.submit_inquiry", role: "service_role" },
     ]);
   });
@@ -205,19 +216,20 @@ describe("function privileges", () => {
              has_function_privilege('service_role', p.oid, 'execute') as service
       from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public'
-        and p.proname in ('submit_inquiry', 'consume_rate_limit', 'claim_notifications', 'complete_notification')
+        and p.proname in ('submit_inquiry', 'submit_contact_message', 'consume_rate_limit',
+                          'claim_notifications', 'complete_notification')
       order by 1
     `);
-    expect(rows).toHaveLength(4);
+    expect(rows).toHaveLength(5);
     for (const row of rows)
       expect(row, row.fn).toMatchObject({ anon: false, authenticated: false, service: true });
   });
 
-  it("give the server secret key no direct access to booking data", async () => {
+  it("give the server secret key no direct access to booking or contact-message data", async () => {
     const { rows } = await db.query<{ t: string; any_privilege: boolean }>(`
       select t, has_table_privilege('service_role', t, 'select,insert,update,delete,truncate') as any_privilege
       from unnest(array['public.bookings', 'public.booking_status_history', 'public.booking_notes',
-                        'private.rate_limits', 'private.notification_outbox']) as t
+                        'public.contact_messages', 'private.rate_limits', 'private.notification_outbox']) as t
     `);
     for (const row of rows) expect(row.any_privilege, row.t).toBe(false);
   });

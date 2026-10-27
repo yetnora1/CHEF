@@ -34,7 +34,7 @@ export default defineConfig({
     },
     {
       name: "admin",
-      testMatch: /admin-auth\.spec\.ts|inquiries\.spec\.ts|cms\.spec\.ts/,
+      testMatch: /admin-auth\.spec\.ts|inquiries\.spec\.ts|contact\.spec\.ts|cms\.spec\.ts/,
       timeout: 90_000,
       use: { ...devices["Desktop Chrome"], baseURL: `http://localhost:${ADMIN_PORT}` },
     },

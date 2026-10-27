@@ -57,20 +57,20 @@ placeholder pages; unknown paths return a localized 404.
 
 ### Public (`/[locale]`, locale ∈ `en`, `am`)
 
-| Route                                    | Purpose                       | Status                                                                                                                             |
-| ---------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `/[locale]`                              | Homepage                      | ✅ published CMS sections and services; labelled placeholders otherwise                                                            |
-| `/[locale]/about`                        | Chef biography and philosophy | ✅ Stage 3 (404 until published)                                                                                                   |
-| `/[locale]/services`, `/services/[slug]` | Service overview and details  | ✅ Stage 3                                                                                                                         |
-| `/[locale]/menu`                         | Curated menu                  | ✅ Stage 3                                                                                                                         |
-| `/[locale]/gallery`                      | Culinary and event portfolio  | ✅ Stage 3                                                                                                                         |
-| `/[locale]/journal`, `/journal/[slug]`   | Articles                      | ✅ Stage 3                                                                                                                         |
-| `/[locale]/book`                         | Event inquiry form            | ✅ Stage 2 (fails closed until configured; see INQUIRIES.md)                                                                       |
-| `/[locale]/contact`                      | Contact page                  | ✅ Stage 3.6: the inquiry form first; phone, email and location appear once confirmed in `src/features/content/contact-content.ts` |
-| `/[locale]/privacy`                      | Privacy notice                | ✅ Stage 2 (draft for owner and legal review)                                                                                      |
-| `/[locale]/terms`                        | Terms                         | Later stage (needs business terms)                                                                                                 |
-| `/`                                      | Redirect to preferred locale  | ✅                                                                                                                                 |
-| `/media/assets/<id>/<file>`              | Images of published content   | ✅ Stage 3 ([MEDIA.md](MEDIA.md))                                                                                                  |
+| Route                                    | Purpose                       | Status                                                                                                                                                                                                                                       |
+| ---------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/[locale]`                              | Homepage                      | ✅ published CMS sections and services; labelled placeholders otherwise                                                                                                                                                                      |
+| `/[locale]/about`                        | Chef biography and philosophy | ✅ Stage 3 (404 until published)                                                                                                                                                                                                             |
+| `/[locale]/services`, `/services/[slug]` | Service overview and details  | ✅ Stage 3                                                                                                                                                                                                                                   |
+| `/[locale]/menu`                         | Curated menu                  | ✅ Stage 3                                                                                                                                                                                                                                   |
+| `/[locale]/gallery`                      | Culinary and event portfolio  | ✅ Stage 3                                                                                                                                                                                                                                   |
+| `/[locale]/journal`, `/journal/[slug]`   | Articles                      | ✅ Stage 3                                                                                                                                                                                                                                   |
+| `/[locale]/book`                         | Event inquiry form            | ✅ Stage 2 (fails closed until configured; see INQUIRIES.md)                                                                                                                                                                                 |
+| `/[locale]/contact`                      | Contact page                  | ✅ Stage 3.7: a message form (stored for the admin inbox; [INQUIRIES.md](INQUIRIES.md#contact-messages)) beside a shortcut to the inquiry form; phone, email and location appear once confirmed in `src/features/content/contact-content.ts` |
+| `/[locale]/privacy`                      | Privacy notice                | ✅ Stage 2 (draft for owner and legal review)                                                                                                                                                                                                |
+| `/[locale]/terms`                        | Terms                         | Later stage (needs business terms)                                                                                                                                                                                                           |
+| `/`                                      | Redirect to preferred locale  | ✅                                                                                                                                                                                                                                           |
+| `/media/assets/<id>/<file>`              | Images of published content   | ✅ Stage 3 ([MEDIA.md](MEDIA.md))                                                                                                                                                                                                            |
 
 Navigation only links to destinations that have something to show (`src/features/cms/navigation.ts`):
 About and Services link to their pages once published content exists, otherwise to the homepage
@@ -85,6 +85,7 @@ an empty state and are `noindex`.
 | `/admin/login`                                               | public                                                          | ✅                                               |
 | `/admin/overview`                                            | `admin.access`                                                  | ✅                                               |
 | `/admin/bookings`, `/admin/bookings/[reference]`             | `bookings.read_all` or `bookings.read_assigned`                 | ✅ Stage 2 (inquiries and bookings in one inbox) |
+| `/admin/messages`                                            | `messages.read` (mark handled: `messages.write`)                | ✅ Stage 3.7 (contact form messages)             |
 | `/admin/pages`, `/services`, `/menu`, `/gallery`, `/journal` | `content.read` (create: `content.write` + `translations.write`) | ✅ Stage 3 ([CMS.md](CMS.md))                    |
 | `/admin/preview/[type]/[id]`                                 | `content.read`                                                  | ✅ Stage 3 (drafts, never cached or indexed)     |
 | `/admin/media`, `/admin/media/[id]`                          | `media.write`                                                   | ✅ Stage 3                                       |
@@ -148,4 +149,6 @@ see [VERIFICATION.md](VERIFICATION.md).
 
 See [INQUIRIES.md](INQUIRIES.md): browser → server action (validation, rate limits, Turnstile) →
 `public.submit_inquiry` with the server secret key → optional email outbox delivered after the
-response. The secret key is used only in `src/features/bookings/server/store.ts`.
+response. The contact form runs the same pipeline (its own rate-limit buckets and Turnstile action)
+and calls `public.submit_contact_message`; it queues no email. The secret key is used only in
+`src/features/bookings/server/store.ts`.

@@ -6,6 +6,7 @@ import {
   Inbox,
   Languages,
   LayoutDashboard,
+  MessagesSquare,
   NotebookPen,
   ScrollText,
   Settings,
@@ -19,6 +20,7 @@ import type { AdminModuleKey } from "./modules";
 export const ADMIN_MODULE_ICONS: Record<AdminModuleKey, LucideIcon> = {
   overview: LayoutDashboard,
   bookings: Inbox,
+  messages: MessagesSquare,
   pages: FileText,
   services: ConciergeBell,
   menu: UtensilsCrossed,

@@ -60,10 +60,14 @@ export function normaliseEmailForLimit(email: string): string {
   return `${local.split("+")[0]}@${domain}`;
 }
 
+/** Each public form counts against its own buckets: an inquiry does not use up the contact form's budget. */
+export type RateLimitNamespace = "inquiry" | "contact";
+
 export function rateLimitBuckets(
   identity: { ip: string | null; email: string },
   secret: string,
   rules: readonly RateLimitRule[],
+  namespace: RateLimitNamespace = "inquiry",
 ) {
   return rules.map((rule) => {
     const subject =
@@ -73,7 +77,7 @@ export function rateLimitBuckets(
             rule.scope === "ip" ? (identity.ip ?? "unknown") : normaliseEmailForLimit(identity.email),
             secret,
           );
-    return { bucket: `inquiry:${rule.scope}:${rule.windowSeconds}:${subject}`, rule };
+    return { bucket: `${namespace}:${rule.scope}:${rule.windowSeconds}:${subject}`, rule };
   });
 }
 
@@ -82,9 +86,10 @@ export async function checkRateLimits(
   secret: string,
   consume: ConsumeRateLimit,
   rules: readonly RateLimitRule[],
+  namespace: RateLimitNamespace = "inquiry",
 ): Promise<RateLimitDecision> {
   const results = await Promise.all(
-    rateLimitBuckets(identity, secret, rules).map(({ bucket, rule }) =>
+    rateLimitBuckets(identity, secret, rules, namespace).map(({ bucket, rule }) =>
       consume(bucket, rule.limit, rule.windowSeconds),
     ),
   );

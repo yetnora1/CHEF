@@ -56,6 +56,24 @@ describe("verifyTurnstile", () => {
     });
   });
 
+  it("keeps each form's tokens to that form: a contact token cannot send an inquiry, and back", async () => {
+    expect(await verify(respond({ success: true, action: "contact" }), "token-123")).toEqual({
+      ok: false,
+      reason: "rejected",
+    });
+    const contact = (action: string) =>
+      verifyTurnstile({
+        token: "token-123",
+        secretKey: "secret",
+        remoteIp: null,
+        idempotencyKey: "key-1",
+        expectedAction: "contact",
+        fetchImpl: respond({ success: true, action }),
+      });
+    expect(await contact("contact")).toEqual({ ok: true });
+    expect(await contact("inquiry")).toEqual({ ok: false, reason: "rejected" });
+  });
+
   it("rejects a token solved on another hostname when one is expected", async () => {
     const check = (hostname: string | undefined) =>
       verifyTurnstile({

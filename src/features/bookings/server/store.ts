@@ -1,15 +1,17 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import type { ContactMessageInput } from "@/features/contact/message-schema";
 import type { AppLocale } from "@/i18n/routing";
 import type { InquiryInput } from "../inquiry-schema";
 import type { EventType } from "../status";
 
 /*
  * The ONLY module that uses the Supabase secret key (service_role). It exposes
- * four narrow operations, never the client itself. In the database,
+ * five narrow operations, never the client itself. In the database,
  * service_role can execute just these functions and has no direct privileges
- * on any booking table (migration 20261025090100).
+ * on any booking or contact-message table (migrations 20261025090100 and
+ * 20261027100100).
  */
 
 export class InquiryKeyConflictError extends Error {
@@ -45,6 +47,10 @@ export type InquiryStore = ReturnType<typeof createInquiryStore>;
 
 const submitRowSchema = z.object({
   inquiry_reference: z.string().regex(/^CH-[0-9A-F]{10}$/),
+  is_replay: z.boolean(),
+});
+const contactRowSchema = z.object({
+  message_reference: z.string().regex(/^CM-[0-9A-F]{10}$/),
   is_replay: z.boolean(),
 });
 const rateRowSchema = z.object({ allowed: z.boolean(), retry_after_seconds: z.number().int().nonnegative() });
@@ -107,6 +113,32 @@ export function createInquiryStore({ url, secretKey }: { url: string; secretKey:
       }
       const row = submitRowSchema.parse(data);
       return { reference: row.inquiry_reference, replay: row.is_replay };
+    },
+
+    async submitContactMessage(input: {
+      submissionKey: string;
+      message: ContactMessageInput;
+      locale: AppLocale;
+    }): Promise<{ reference: string; replay: boolean }> {
+      const { message } = input;
+      const { data, error } = await db
+        .rpc("submit_contact_message", {
+          p_submission_key: input.submissionKey,
+          p_contact_name: message.fullName,
+          p_contact_email: message.email,
+          p_contact_phone: message.phone,
+          p_subject: message.subject,
+          p_message: message.message,
+          p_preferred_locale: input.locale,
+          p_consent: true,
+        })
+        .single();
+      if (error) {
+        if (error.code === "23505") throw new InquiryKeyConflictError();
+        throw new InquiryStoreError("submit_contact_message", error);
+      }
+      const row = contactRowSchema.parse(data);
+      return { reference: row.message_reference, replay: row.is_replay };
     },
 
     async claimNotifications(limit: number): Promise<ClaimedNotification[]> {

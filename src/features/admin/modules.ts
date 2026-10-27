@@ -8,6 +8,7 @@ import type { AppPermission } from "@/lib/permissions/matrix";
 export type AdminModuleKey =
   | "overview"
   | "bookings"
+  | "messages"
   | "pages"
   | "services"
   | "menu"
@@ -32,6 +33,7 @@ const READ_BOOKINGS = ["bookings.read_all", "bookings.read_assigned"] as const;
 export const ADMIN_MODULES: readonly AdminModule[] = [
   { key: "overview", href: "/admin/overview", permissions: ["admin.access"], status: "available" },
   { key: "bookings", href: "/admin/bookings", permissions: READ_BOOKINGS, status: "available" },
+  { key: "messages", href: "/admin/messages", permissions: ["messages.read"], status: "available" },
   { key: "pages", href: "/admin/pages", permissions: ["content.read"], status: "available" },
   { key: "services", href: "/admin/services", permissions: ["content.read"], status: "available" },
   { key: "menu", href: "/admin/menu", permissions: ["content.read"], status: "available" },

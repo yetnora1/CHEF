@@ -6,7 +6,15 @@ const keysFor = (role: AppRole) => modulesFor(ROLE_PERMISSIONS[role]).map((m) =>
 
 describe("admin module visibility", () => {
   it("shows the owner every module", () => {
-    expect(keysFor("owner")).toHaveLength(12);
+    expect(keysFor("owner")).toHaveLength(13);
+  });
+
+  it("lists contact messages only for owners and admins", () => {
+    expect(keysFor("owner")).toContain("messages");
+    expect(keysFor("admin")).toContain("messages");
+    for (const role of ["content_editor", "event_manager", "analyst"] as const) {
+      expect(keysFor(role)).not.toContain("messages");
+    }
   });
 
   const CMS_MODULES = ["pages", "services", "menu", "gallery", "journal", "media", "translations"];

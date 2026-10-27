@@ -18,7 +18,6 @@ export type ServiceCard = {
   title: ResolvedText;
   summary: ResolvedText;
   photoSubject: ResolvedText;
-  confirmed: boolean;
   /** The contact form, opened with this service as the subject. */
   contactHref: string;
   /** Published services also link to their page and may have an image. */
@@ -98,12 +97,6 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
               <p className="mt-3 text-sm text-muted-foreground" lang={service.summary.lang}>
                 {service.summary.text}
               </p>
-              {!service.confirmed && (
-                <p className="mt-4 inline-flex w-fit items-center gap-2 rounded-full bg-surface-muted px-3 py-1 text-xs font-semibold text-terracotta">
-                  <span aria-hidden className="size-1.5 rounded-full bg-terracotta" />
-                  {t("serviceToBeConfirmed")}
-                </p>
-              )}
               <Link
                 href={service.contactHref}
                 className={cn(

@@ -21,7 +21,6 @@ export type ServicePreview = {
   summary: Localized;
   photoSubject: Localized;
   /** False until Chef Harena confirms the offering exists. */
-  confirmed: boolean;
 };
 
 export const homeContent = {
@@ -76,7 +75,6 @@ export const homeContent = {
           am: "ለሠርግ በዓላትና ለትላልቅ የቤተሰብ ስብሰባዎች የሚዘጋጅ የኢትዮጵያ ምግብ።",
         },
         photoSubject: { en: "a wedding feast", am: "የሠርግ ግብዣ" },
-        confirmed: true,
       },
       {
         slug: "corporate-events",
@@ -86,7 +84,6 @@ export const homeContent = {
           am: "ለድርጅት ዝግጅቶች፣ ለእንግዳ መቀበያዎችና ለሠራተኞች በዓላት የምግብ አገልግሎት።",
         },
         photoSubject: { en: "a corporate reception", am: "የድርጅት የእንግዳ መቀበያ" },
-        confirmed: true,
       },
       {
         slug: "summits-and-conferences",
@@ -96,7 +93,6 @@ export const homeContent = {
           am: "ለጉባኤዎች፣ ለኮንፈረንሶችና ለሙያዊ ስብሰባዎች የኢትዮጵያ መስተንግዶ።",
         },
         photoSubject: { en: "a conference buffet", am: "የኮንፈረንስ የምግብ ገበታ" },
-        confirmed: true,
       },
       {
         slug: "culinary-experiences",
@@ -106,18 +102,7 @@ export const homeContent = {
           am: "ኢትዮጵያን ለሚጎበኙ እንግዶች የኢትዮጵያ ምግብ ልምዶች።",
         },
         photoSubject: { en: "visitors sharing an Ethiopian meal", am: "የኢትዮጵያ ምግብ የሚጋሩ እንግዶች" },
-        confirmed: false,
       },
     ] satisfies ServicePreview[],
-  },
-  inquiry: {
-    title: {
-      en: "Planning a celebration or event?",
-      am: "በዓል ወይም ዝግጅት እያቀዱ ነው?",
-    },
-    body: {
-      en: "Share your date, guest count and occasion through the inquiry form, and Chef Harena will review your request.",
-      am: "በጥያቄ ቅጹ የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት ያጋሩ፤ Chef Harena ጥያቄዎን ይገመግማሉ።",
-    },
   },
 } as const;

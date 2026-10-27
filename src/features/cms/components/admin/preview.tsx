@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AboutSection } from "@/components/public/about-section";
 import { Hero } from "@/components/public/hero";
-import { InquirySection } from "@/components/public/inquiry-section";
 import type { AppLocale } from "@/i18n/routing";
 import { resolveLocalized, resolveTranslation } from "@/lib/localization/translations";
 import { getEntry } from "../../admin-data";
@@ -157,10 +156,6 @@ export async function PreviewScreen({
                 />
               </section>
             )}
-            <InquirySection
-              title={field("inquiry", "heading") ?? { text: "" }}
-              body={field("inquiry", "body") ?? { text: "" }}
-            />
           </>
         ) : (
           <section className="page-container py-12">

@@ -41,8 +41,9 @@ test.describe("locale routing", () => {
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     // The site-wide preview banner was removed at the owner's request (Stage 3.6).
     await expect(page.getByText("Preview: placeholder copy")).toHaveCount(0);
-    // The inquiry band describes the form that exists (Stage 2), not one still to come.
-    await expect(page.getByText("through the inquiry form")).toBeVisible();
+    // The inquiry band and the "to be confirmed" service badge were removed (owner's request).
+    await expect(page.getByText("Planning a celebration or event?")).toHaveCount(0);
+    await expect(page.getByText("Offering to be confirmed")).toHaveCount(0);
     // Demo mode is off in every normal build.
     await expect(page.getByText("Demo mode.")).toHaveCount(0);
     expect(errors).toEqual([]);

@@ -2,7 +2,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { AboutSection } from "@/components/public/about-section";
 import { FoodReel } from "@/components/public/food-reel";
 import { Hero } from "@/components/public/hero";
-import { InquirySection } from "@/components/public/inquiry-section";
 import { ServicesSection, type ServiceCard } from "@/components/public/services-section";
 import { StorySection } from "@/components/public/story-section";
 import { getPublicNavigation, getPublicPage, getPublicServices } from "@/features/cms/public-data";
@@ -35,7 +34,7 @@ export default async function HomePage() {
     const value = content?.sections[section]?.[name];
     return value ? { text: value, lang: content.lang } : null;
   };
-  const { hero, about, services: servicesCopy, inquiry } = homeContent;
+  const { hero, about, services: servicesCopy } = homeContent;
 
   const heroHeadline = field("hero", "headline");
   const aboutBody = field("about", "body");
@@ -47,7 +46,6 @@ export default async function HomePage() {
         title: card.title,
         summary: card.summary ?? { text: "" },
         photoSubject: card.title,
-        confirmed: true,
         contactHref: contactHrefFor(card.key),
         href: card.href,
         image: card.image,
@@ -57,7 +55,6 @@ export default async function HomePage() {
         title: placeholder(item.title),
         summary: placeholder(item.summary),
         photoSubject: placeholder(item.photoSubject),
-        confirmed: item.confirmed,
         contactHref: contactHrefFor(item.slug),
       }));
 
@@ -118,10 +115,6 @@ export default async function HomePage() {
         title={field("services", "heading") ?? placeholder(servicesCopy.title)}
         lede={field("services", "lede") ?? placeholder(servicesCopy.lede)}
         services={cards}
-      />
-      <InquirySection
-        title={field("inquiry", "heading") ?? placeholder(inquiry.title)}
-        body={field("inquiry", "body") ?? placeholder(inquiry.body)}
       />
     </>
   );

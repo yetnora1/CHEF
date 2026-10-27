@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useTransition } from "react";
-import { LanguageFlags, languageToggleClassName } from "@/components/brand/language-flags";
+import { LanguageFlag, languageToggleClassName } from "@/components/brand/language-flags";
 import { setAdminLocale } from "@/features/localization/actions";
 import { LOCALE_NATIVE_NAMES, routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,7 @@ export function AdminLocaleSwitcher({ className }: { className?: string }) {
         title={LOCALE_NATIVE_NAMES[target]}
         className={cn(languageToggleClassName, "disabled:cursor-wait")}
       >
-        <LanguageFlags active={locale} />
+        <LanguageFlag locale={locale} />
         <span className="sr-only" lang={target}>
           {LOCALE_NATIVE_NAMES[target]}
         </span>

@@ -1,6 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
-import { routing, type AppLocale } from "@/i18n/routing";
-import { cn } from "@/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 
 type FlagProps = SVGProps<SVGSVGElement>;
 
@@ -49,33 +48,15 @@ function EthiopiaFlag(props: FlagProps) {
 
 const LOCALE_FLAGS: Record<AppLocale, ComponentType<FlagProps>> = { en: UsFlag, am: EthiopiaFlag };
 
-/** The language toggle's frame: a small switch track that reacts to hover. */
+/** The language toggle: an icon-sized button around one flag, like the theme toggle beside it. */
 export const languageToggleClassName =
-  "group/lang inline-flex h-10 items-center gap-0.5 rounded-lg border border-border-strong/60 bg-surface-muted/70 p-1 transition-colors hover:border-foreground/50 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+  "inline-flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-surface-muted active:bg-border/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 /**
- * Both flags side by side, the current language's raised like a switch knob.
- * Decorative: the toggle around it names the language it switches to.
+ * The current language's flag. Decorative: the toggle around it names the
+ * language it switches to.
  */
-export function LanguageFlags({ active }: { active: string }) {
-  return (
-    <span aria-hidden className="flex items-center gap-0.5">
-      {routing.locales.map((locale) => {
-        const Flag = LOCALE_FLAGS[locale];
-        return (
-          <span
-            key={locale}
-            className={cn(
-              "rounded-md px-1.5 py-1 transition-[opacity,filter,background-color] duration-200",
-              locale === active
-                ? "bg-background shadow-xs"
-                : "opacity-60 grayscale-[55%] group-hover/lang:opacity-100 group-hover/lang:grayscale-0",
-            )}
-          >
-            <Flag className="block h-4 w-6 rounded-[2px]" />
-          </span>
-        );
-      })}
-    </span>
-  );
+export function LanguageFlag({ locale }: { locale: AppLocale }) {
+  const Flag = LOCALE_FLAGS[locale];
+  return <Flag aria-hidden className="block h-4 w-6 rounded-[2px]" />;
 }

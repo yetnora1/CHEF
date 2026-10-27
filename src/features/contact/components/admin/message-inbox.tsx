@@ -50,10 +50,8 @@ export async function MessageTabs({
                 href={messagesHref({ ...filters, status: tab.key, page: 1 })}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-colors",
-                  active
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-surface hover:border-border-strong",
+                  buttonVariants({ variant: active ? "primary" : "outline", size: "sm" }),
+                  "px-3.5",
                 )}
               >
                 {tab.label}

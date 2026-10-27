@@ -65,7 +65,7 @@ export function AdminNav({ label, sections, plannedLabel, onNavigate }: AdminNav
                         base,
                         "font-medium transition-colors",
                         active
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-primary bg-linear-to-b from-primary-top to-primary-bottom text-primary-foreground shadow-xs inset-shadow-2xs inset-shadow-shine/12"
                           : "text-foreground hover:bg-surface-muted",
                       )}
                     >

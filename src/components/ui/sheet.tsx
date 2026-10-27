@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import type { ComponentProps } from "react";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const Sheet = DialogPrimitive.Root;
@@ -39,7 +40,10 @@ export function SheetContent({
       >
         {children}
         <DialogPrimitive.Close
-          className="absolute top-5 right-5 inline-flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface-muted hover:text-foreground"
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "icon" }),
+            "absolute top-5 right-5 text-muted-foreground hover:text-foreground",
+          )}
           aria-label={closeLabel}
         >
           <X aria-hidden className="size-5" />

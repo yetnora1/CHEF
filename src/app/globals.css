@@ -37,6 +37,9 @@
   --color-logo-band-bottom: #b0b0b0;
   --color-logo-shadow: #000000;
 
+  /* Light catching the top edge of a button (an inset hairline), both themes. */
+  --color-shine: #ffffff;
+
   /* Flag artwork for the language toggle: fixed national colours, not theme
    * roles, so they are the same in light and dark. */
   --color-flag-us-red: #b22234;
@@ -115,6 +118,16 @@
   --success: light-dark(#2b6649, #7cc4a0);
   --warning: light-dark(#7f4f00, #e8b866);
   --danger: light-dark(#a3262a, #f2938a);
+
+  /* Button shading (src/components/ui/button.tsx): soft top-to-bottom gradients.
+   * Primary is lit from above; hover lightens it in light and dims it in dark.
+   * Control is the face of outline buttons, and of ghost buttons on hover. */
+  --primary-top: light-dark(#333333, #ffffff);
+  --primary-bottom: light-dark(#0a0a0a, #dedede);
+  --primary-hover-top: light-dark(#4a4a4a, #f0f0f0);
+  --primary-hover-bottom: light-dark(#1f1f1f, #cccccc);
+  --control-top: light-dark(#ffffff, #262626);
+  --control-bottom: light-dark(#f0f0f0, #171717);
 }
 
 :root[data-theme="dark"] {
@@ -144,6 +157,12 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-primary-top: var(--primary-top);
+  --color-primary-bottom: var(--primary-bottom);
+  --color-primary-hover-top: var(--primary-hover-top);
+  --color-primary-hover-bottom: var(--primary-hover-bottom);
+  --color-control-top: var(--control-top);
+  --color-control-bottom: var(--control-bottom);
 
   /* The device's own UI font for Latin (Segoe UI, San Francisco, Roboto…); the
    * browser falls through to Noto Sans Ethiopic for each Ethiopic glyph.

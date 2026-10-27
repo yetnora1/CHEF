@@ -88,8 +88,7 @@ async function Pagination({
   const t = await getTranslations("AdminCms.list");
   const pages = Math.max(1, Math.ceil(total / CMS_PAGE_SIZE));
   if (pages <= 1) return null;
-  const link =
-    "inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:border-border-strong";
+  const link = buttonVariants({ variant: "outline", size: "sm" });
   return (
     <nav aria-label={t("pagination")} className="flex items-center justify-between gap-3">
       {filters.page > 1 ? (
@@ -353,10 +352,8 @@ async function MenuTabs({ active }: { active: ContentType }) {
           href={tab.href}
           aria-current={tab.type === active ? "page" : undefined}
           className={cn(
-            "rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-colors",
-            tab.type === active
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border bg-surface hover:border-border-strong",
+            buttonVariants({ variant: tab.type === active ? "primary" : "outline", size: "sm" }),
+            "px-3.5",
           )}
         >
           {t(`types.${tab.type}.plural`)}

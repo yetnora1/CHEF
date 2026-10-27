@@ -257,7 +257,7 @@
     "metaTitle": "ያግኙን",
     "metaDescription": "ስለ ሠርግ፣ የድርጅት ዝግጅቶችና የግል ግብዣዎች Chef Harenaን ያግኙ።",
     "title": "ያግኙን",
-    "lede": "ለChef Harena ጥያቄ አለዎት? ከታች ባለው ቅጽ መልእክት ይላኩ። ዝግጅት እያቀዱ ነው? የጥያቄ ቅጹ ለግምገማ የሚያስፈልጉትን ዝርዝሮች ይጠይቃል።",
+    "lede": "ለChef Harena ጥያቄ አለዎት? በቅጹ መልእክት ይላኩ። ዝግጅት እያቀዱ ነው? የጥያቄ ቅጹ ለግምገማ የሚያስፈልጉትን ዝርዝሮች ይጠይቃል።",
     "inquiryTitle": "ዝግጅት እያቀዱ ነው?",
     "inquiryBody": "በጥያቄ ቅጹ የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት ያጋሩ።",
     "detailsTitle": "ቀጥታ ግንኙነት",
@@ -268,7 +268,6 @@
   "ContactForm": {
     "title": "መልእክት ይላኩ",
     "intro": "ስለ አንድ የተወሰነ ዝግጅት ላልሆኑ ጥያቄዎች። Chef Harena በሰጡት የመገናኛ ዝርዝር ምላሽ ይሰጣሉ።",
-    "requiredHint": "* ምልክት ያላቸው መስኮች የግድ መሞላት አለባቸው።",
     "fullName": "ሙሉ ስም",
     "email": "ኢሜይል",
     "phone": "ስልክ ቁጥር",
@@ -281,7 +280,6 @@
     "localBypassNotice": "የማበልጸጊያ ሁነታ፦ የደኅንነት ማረጋገጫው (CAPTCHA) ለአካባቢ ሙከራ ጠፍቷል።",
     "submit": "መልእክቱን ይላኩ",
     "submitting": "በመላክ ላይ…",
-    "errorSummaryTitle": "እባክዎ {count, plural, one {# መስክ} other {# መስኮችን}} ያረጋግጡ",
     "errors": {
       "required": "ይህ መስክ የግድ ነው።",
       "tooShort": "እባክዎ ትንሽ ተጨማሪ ይጻፉ።",

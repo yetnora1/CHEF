@@ -33,6 +33,13 @@ type ClientState = ContactFormState | { status: "network_error" };
 
 const IDLE: ClientState = { status: "idle" };
 const subscribeNever = () => () => {};
+const ids = (field: ContactField) => `contact-${field}`;
+
+/** Focuses the first field with a problem, in form order. */
+function focusFirstError(errors: ContactFieldErrors) {
+  const first = CONTACT_FIELDS.find((field) => errors[field]);
+  if (first) document.getElementById(ids(first))?.focus();
+}
 
 /** The contact form; "Send another message" remounts it with a fresh state and key. */
 export function ContactForm(props: { locale: AppLocale; captcha: ContactCaptcha }) {
@@ -66,7 +73,6 @@ function MessageForm({
     () => false,
   );
   const formRef = useRef<HTMLFormElement>(null);
-  const summaryRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const [state, dispatch, pending] = useActionState(async (previous: ClientState, formData: FormData) => {
@@ -83,16 +89,16 @@ function MessageForm({
     return next;
   }, IDLE);
 
-  // Move focus to the outcome so keyboard and screen-reader users hear it.
+  // Move focus to the first problem or to the outcome, so keyboard and
+  // screen-reader users hear it.
   useEffect(() => {
     if (state.status === "idle") return;
-    if (state.status === "invalid") summaryRef.current?.focus();
+    if (state.status === "invalid") focusFirstError(state.fieldErrors);
     else resultRef.current?.focus();
   }, [state]);
 
   const fieldErrors: ContactFieldErrors =
     clientErrors ?? (state.status === "invalid" ? state.fieldErrors : {});
-  const errorList = CONTACT_FIELDS.filter((field) => fieldErrors[field]);
 
   function readForm(): Record<string, string> {
     const data = new FormData(formRef.current!);
@@ -108,7 +114,8 @@ function MessageForm({
     const parsed = parseContactMessage(readForm());
     if (!parsed.success) {
       setClientErrors(parsed.fieldErrors);
-      requestAnimationFrame(() => summaryRef.current?.focus());
+      // After the render that attaches the error text to the field.
+      requestAnimationFrame(() => focusFirstError(parsed.fieldErrors));
       return;
     }
     setClientErrors(null);
@@ -141,39 +148,32 @@ function MessageForm({
         ref={resultRef}
         tabIndex={-1}
         role="status"
-        className="scroll-mt-28 space-y-5 rounded-2xl border border-border bg-surface p-6 outline-none sm:p-8"
+        className="scroll-mt-28 rounded-2xl border border-border bg-surface p-6 outline-none sm:p-8"
       >
         <span className="inline-flex size-12 items-center justify-center rounded-full bg-success/12 text-success">
           <CheckCircle2 aria-hidden className="size-6" />
         </span>
-        <h2 className="display-md">{t("successTitle")}</h2>
-        <p className="text-muted-foreground">{t("successBody")}</p>
-        <p className="text-sm text-muted-foreground">
-          {t("referenceLabel")}:{" "}
-          <span
-            className="font-mono font-semibold tracking-wider text-foreground"
-            data-testid="contact-reference"
-          >
-            {state.reference}
-          </span>
-        </p>
-        <Button variant="outline" onClick={onReset}>
-          {t("newMessage")}
-        </Button>
+        <h2 className="mt-5 display-md">{t("successTitle")}</h2>
+        <p className="mt-2 text-muted-foreground">{t("successBody")}</p>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-5">
+          <p className="text-sm text-muted-foreground">
+            {t("referenceLabel")}:{" "}
+            <span
+              className="font-mono font-semibold tracking-wider text-foreground"
+              data-testid="contact-reference"
+            >
+              {state.reference}
+            </span>
+          </p>
+          <Button variant="outline" size="sm" onClick={onReset}>
+            {t("newMessage")}
+          </Button>
+        </div>
       </div>
     );
   }
 
   const error = (field: ContactField) => (fieldErrors[field] ? t(`errors.${fieldErrors[field]}`) : undefined);
-  const ids = (field: ContactField) => `contact-${field}`;
-  const labels: Record<ContactField, string> = {
-    fullName: t("fullName"),
-    email: t("email"),
-    phone: t("phone"),
-    subject: t("subject"),
-    message: t("message"),
-    consent: t("errors.consentRequired"),
-  };
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
@@ -196,35 +196,11 @@ function MessageForm({
           </p>
         )}
 
-        {errorList.length > 0 && (
-          <div
-            ref={summaryRef}
-            tabIndex={-1}
-            role="alert"
-            className="scroll-mt-28 rounded-xl border border-danger/40 bg-danger/8 p-4 outline-none"
-          >
-            <p className="flex items-center gap-2 font-semibold text-danger">
-              <AlertCircle aria-hidden className="size-4" />
-              {t("errorSummaryTitle", { count: errorList.length })}
-            </p>
-            <ul className="mt-2 list-disc space-y-1 pl-6 text-sm">
-              {errorList.map((field) => (
-                <li key={field}>
-                  <a href={`#${ids(field)}`} className="underline underline-offset-2 hover:text-danger">
-                    {labels[field]}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         <ServerMessage state={state} resultRef={resultRef} />
 
-        <p className="text-sm text-muted-foreground">{t("requiredHint")}</p>
-
+        {/* Every field is required unless its label says "optional". */}
         <div className="grid gap-6 sm:grid-cols-2">
-          <Field id={ids("fullName")} label={t("fullName")} required error={error("fullName")}>
+          <Field id={ids("fullName")} label={t("fullName")} error={error("fullName")}>
             <Input
               {...fieldAria(ids("fullName"), { error: error("fullName") })}
               name="fullName"
@@ -233,7 +209,7 @@ function MessageForm({
               required
             />
           </Field>
-          <Field id={ids("email")} label={t("email")} required error={error("email")}>
+          <Field id={ids("email")} label={t("email")} error={error("email")}>
             <Input
               {...fieldAria(ids("email"), { error: error("email") })}
               name="email"
@@ -269,12 +245,12 @@ function MessageForm({
           </Field>
         </div>
 
-        <Field id={ids("message")} label={t("message")} required error={error("message")}>
+        <Field id={ids("message")} label={t("message")} error={error("message")}>
           <div className="relative">
             <Textarea
               {...fieldAria(ids("message"), { error: error("message") })}
               name="message"
-              rows={6}
+              rows={5}
               maxLength={CONTACT_LIMITS.messageMax}
               required
               onInput={(event) => setMessageLength(event.currentTarget.value.length)}
@@ -320,9 +296,6 @@ function MessageForm({
                   </Link>
                 ),
               })}
-              <span aria-hidden className="ml-0.5 text-terracotta">
-                *
-              </span>
             </span>
           </label>
           {error("consent") && (

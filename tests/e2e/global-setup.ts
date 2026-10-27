@@ -7,7 +7,7 @@ export default async function globalSetup() {
 
   // Compile the dev server's routes once, sequentially, before parallel tests
   // request them (concurrent first compiles of one route can race in dev).
-  for (const path of ["/en/book", "/am/book", "/admin/login", "/en"]) {
+  for (const path of ["/en/book", "/am/book", "/en/contact", "/am/contact", "/admin/login", "/en"]) {
     await fetch(`${ADMIN_ORIGIN}${path}`).catch(() => undefined);
   }
 

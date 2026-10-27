@@ -56,13 +56,21 @@ export default async function ContactPage() {
 
   return (
     <section className="page-container py-14 md:py-20">
-      <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        <div className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-          <header>
-            <h1 className="display-lg">{t("title")}</h1>
-            <p className="mt-4 text-lg text-muted-foreground">{t("lede")}</p>
-          </header>
+      {/* Phones: intro, form, then the event shortcut. Desktop: intro and
+          shortcut on the left, the form beside them. */}
+      <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:grid-rows-[auto_1fr] lg:gap-x-16">
+        <header className="lg:col-start-1 lg:row-start-1">
+          <h1 className="display-lg">{t("title")}</h1>
+          <p className="mt-4 text-lg text-muted-foreground">{t("lede")}</p>
+        </header>
 
+        <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+          <Suspense fallback={<FormPlaceholder />}>
+            <ContactFormSection />
+          </Suspense>
+        </div>
+
+        <div className="space-y-6 lg:col-start-1 lg:row-start-2 lg:self-start">
           <div className="rounded-2xl border border-border bg-surface p-6">
             <div className="flex items-center gap-3">
               <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -108,10 +116,6 @@ export default async function ContactPage() {
             </div>
           )}
         </div>
-
-        <Suspense fallback={<FormPlaceholder />}>
-          <ContactFormSection />
-        </Suspense>
       </div>
     </section>
   );

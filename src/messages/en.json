@@ -257,7 +257,7 @@
     "metaTitle": "Contact",
     "metaDescription": "Contact Chef Harena about weddings, corporate events and private occasions.",
     "title": "Contact",
-    "lede": "Have a question for Chef Harena? Send a message with the form below. Planning an event? The inquiry form asks for the details needed to review it.",
+    "lede": "Have a question for Chef Harena? Send a message using the form. Planning an event? The inquiry form asks for the details needed to review it.",
     "inquiryTitle": "Planning an event?",
     "inquiryBody": "Share your date, guest count and occasion through the inquiry form.",
     "detailsTitle": "Direct contact",
@@ -268,7 +268,6 @@
   "ContactForm": {
     "title": "Send a message",
     "intro": "For questions that are not about a specific event. Chef Harena will reply using the contact details you give.",
-    "requiredHint": "Fields marked * are required.",
     "fullName": "Full name",
     "email": "Email",
     "phone": "Phone number",
@@ -281,7 +280,6 @@
     "localBypassNotice": "Development mode: the security check (CAPTCHA) is switched off for local testing.",
     "submit": "Send message",
     "submitting": "Sending…",
-    "errorSummaryTitle": "Please check {count, plural, one {# field} other {# fields}}",
     "errors": {
       "required": "This field is required.",
       "tooShort": "Please enter a little more.",

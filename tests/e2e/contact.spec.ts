@@ -61,14 +61,23 @@ test.describe("public contact form", () => {
     await expect(page.getByLabel("ሙሉ ስም")).toBeVisible();
   });
 
-  test("checks the fields before sending and points to each problem", async ({ page }) => {
+  test("checks the fields before sending and moves focus to the first problem", async ({ page }) => {
     await openContactPage(page);
     const form = page.getByRole("form", { name: "Send a message" });
     await form.getByRole("button", { name: "Send message" }).click();
-    const summary = page.getByRole("alert").filter({ hasText: "Please check 4 fields" });
-    await expect(summary).toBeVisible();
-    await expect(form.getByLabel("Full name")).toHaveAttribute("aria-invalid", "true");
+    const fullName = form.getByLabel("Full name");
+    await expect(fullName).toBeFocused();
+    await expect(fullName).toHaveAttribute("aria-invalid", "true");
+    await expect(fullName).toHaveAccessibleDescription("This field is required.");
+    await expect(form.getByText("This field is required.")).toHaveCount(3);
+    await expect(form.getByText("Please accept to send your message.")).toBeVisible();
+    // Optional fields are never flagged when left empty.
+    await expect(form.getByLabel("Subject")).not.toHaveAttribute("aria-invalid");
     await expect(page.getByTestId("contact-reference")).toHaveCount(0);
+
+    // Errors clear as the visitor fixes them.
+    await fullName.fill("Selam Tesfaye");
+    await expect(fullName).not.toHaveAttribute("aria-invalid");
   });
 
   test("sends a message and offers to write another", async ({ page }) => {
@@ -104,12 +113,13 @@ test.describe("admin message inbox", () => {
       ),
     );
 
+    // A server action plus a re-render on the dev server: allow for a slow first compile.
     await card.getByRole("button", { name: "Mark as handled" }).click();
-    await expect(page.getByRole("article", { name: subject })).toHaveCount(0);
+    await expect(page.getByRole("article", { name: subject })).toHaveCount(0, { timeout: 15_000 });
 
     await page.getByRole("link", { name: /^Handled/ }).click();
     const handled = page.getByRole("article", { name: subject });
-    await expect(handled.getByText(/^Handled by Owner Test on /)).toBeVisible();
+    await expect(handled.getByText(/^Handled by Owner Test on /)).toBeVisible({ timeout: 15_000 });
     await expect(handled.getByRole("button", { name: "Move back to new" })).toBeVisible();
   });
 

@@ -67,37 +67,38 @@
 }
 
 /*
- * Dark is a clean, neutral black-and-white theme (the owner's choice): no
- * green or warm tint in surfaces, white primary actions. Only the feedback
- * colours (and terracotta status accents) keep a hue, because they carry meaning.
+ * Both themes are clean, neutral black and white (the owner's choice): no
+ * green, ivory or gold tint in surfaces; black primary actions in light, white
+ * in dark. Only the feedback colours (and terracotta status accents) keep a
+ * hue, because they carry meaning. The brand palette above is the logo's.
  */
 :root {
   color-scheme: light;
 
   /* Surfaces */
-  --background: light-dark(#f5f0e6, #0a0a0a);
-  --foreground: light-dark(#171d1a, #f5f5f5);
-  --surface: light-dark(#fbf8f1, #141414);
-  --surface-foreground: light-dark(#171d1a, #f5f5f5);
-  --surface-muted: light-dark(#ece4d4, #1f1f1f);
-  --muted-foreground: light-dark(#5a5950, #a3a3a3);
-  --border: light-dark(#ddd3c0, #262626);
-  --border-strong: light-dark(#8c7f69, #737373);
+  --background: light-dark(#ffffff, #0a0a0a);
+  --foreground: light-dark(#0a0a0a, #f5f5f5);
+  --surface: light-dark(#fafafa, #141414);
+  --surface-foreground: light-dark(#0a0a0a, #f5f5f5);
+  --surface-muted: light-dark(#f2f2f2, #1f1f1f);
+  --muted-foreground: light-dark(#525252, #a3a3a3);
+  --border: light-dark(#e5e5e5, #262626);
+  --border-strong: light-dark(#8a8a8a, #737373);
 
   /* Actions and accents */
-  --primary: light-dark(#173d32, #f5f5f5);
-  --primary-hover: light-dark(#0f2c24, #d4d4d4);
-  --primary-foreground: light-dark(#f5f0e6, #0a0a0a);
-  --accent: light-dark(#d3a45b, #d4d4d4);
-  --accent-ink: light-dark(#7e5a1c, #d4d4d4);
+  --primary: light-dark(#0a0a0a, #f5f5f5);
+  --primary-hover: light-dark(#333333, #d4d4d4);
+  --primary-foreground: light-dark(#fafafa, #0a0a0a);
+  --accent: light-dark(#737373, #d4d4d4);
+  --accent-ink: light-dark(#404040, #d4d4d4);
   --terracotta: light-dark(#9d4135, #e3907f);
-  --ring: light-dark(#9d4135, #f5f5f5);
+  --ring: light-dark(#0a0a0a, #f5f5f5);
 
-  /* Deep brand band (hero accents, inquiry call to action) */
-  --band: light-dark(#173d32, #171717);
-  --band-foreground: light-dark(#f5f0e6, #f5f5f5);
-  --band-muted: light-dark(#c9d2c9, #a3a3a3);
-  --band-accent: light-dark(#d3a45b, #e5e5e5);
+  /* Dark band (hero pattern strip, inquiry call to action), the same in both themes */
+  --band: light-dark(#171717, #171717);
+  --band-foreground: light-dark(#f5f5f5, #f5f5f5);
+  --band-muted: light-dark(#a3a3a3, #a3a3a3);
+  --band-accent: light-dark(#e5e5e5, #e5e5e5);
 
   /* Feedback */
   --success: light-dark(#2b6649, #7cc4a0);

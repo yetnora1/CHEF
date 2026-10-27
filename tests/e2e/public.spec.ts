@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const IVORY = "rgb(245, 240, 230)";
+const WHITE = "rgb(255, 255, 255)";
 const BLACK = "rgb(10, 10, 10)";
 
 const bodyBackground = (page: Page) => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
@@ -135,7 +135,7 @@ test.describe("theme", () => {
   test("opens in light whatever the device prefers", async ({ page }) => {
     await page.goto("/en");
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
-    expect(await bodyBackground(page)).toBe(IVORY);
+    expect(await bodyBackground(page)).toBe(WHITE);
   });
 
   test("one button switches between light and dark and remembers the choice", async ({ page }) => {
@@ -164,7 +164,7 @@ test.describe("theme", () => {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await expect(amToggle).toHaveAttribute("aria-pressed", "false");
     expect(await page.evaluate(() => localStorage.getItem("chef-harena:theme"))).toBe("light");
-    expect(await bodyBackground(page)).toBe(IVORY);
+    expect(await bodyBackground(page)).toBe(WHITE);
   });
 
   test("applies a stored theme before first paint", async ({ page, request }) => {

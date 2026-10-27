@@ -4,20 +4,29 @@ All tokens live in `src/app/globals.css`. Components use **semantic** utilities
 (`bg-background`, `text-muted-foreground`, `border-border`…), never raw colours, so the palette and
 themes change in one place.
 
-## Brand palette (proposed, adjustable)
+## Colour
 
-| Token                                           | Hex       | Role                                |
-| ----------------------------------------------- | --------- | ----------------------------------- |
-| Highland Forest `--color-highland-forest`       | `#173D32` | Primary actions (light), brand band |
-| Ceremonial Gold `--color-ceremonial-gold`       | `#D3A45B` | Restrained accents (light)          |
-| Berbere Terracotta `--color-berbere-terracotta` | `#9D4135` | Focus ring (light), status accents  |
-| Injera Ivory `--color-injera-ivory`             | `#F5F0E6` | Light background                    |
-| Coffee Charcoal `--color-coffee-charcoal`       | `#171D1A` | Text (light)                        |
+**Both themes are neutral black and white** (owner's choice, 2026-10-27); no green, ivory or gold
+tint in the interface:
 
-The palette applies to the light theme. **Dark is neutral black and white** (owner's choice,
-2026-10-27): background `#0A0A0A`, surfaces `#141414`/`#1F1F1F`, white text and white primary
-buttons, grey accents; no green or warm tint. Only the feedback colours and terracotta status
-accents keep a hue. The logo keeps its brand colours in both themes.
+|                 | Light                                   | Dark                                    |
+| --------------- | --------------------------------------- | --------------------------------------- |
+| Background      | `#FFFFFF`                               | `#0A0A0A`                               |
+| Surfaces        | `#FAFAFA`, `#F2F2F2`                    | `#141414`, `#1F1F1F`                    |
+| Text            | `#0A0A0A`; secondary `#525252`          | `#F5F5F5`; secondary `#A3A3A3`          |
+| Primary buttons | black, white text                       | white, black text                       |
+| Band            | `#171717` (hero strip, inquiry band)    | the same                                |
+| Kept hues       | feedback colours, terracotta status dot | feedback colours, terracotta status dot |
+
+The brand palette survives in the logo only (`@theme` in `globals.css`):
+
+| Token                                           | Hex       | Used in                           |
+| ----------------------------------------------- | --------- | --------------------------------- |
+| Highland Forest `--color-highland-forest`       | `#173D32` | Logo tile                         |
+| Ceremonial Gold `--color-ceremonial-gold`       | `#D3A45B` | Logo lozenge                      |
+| Berbere Terracotta `--color-berbere-terracotta` | `#9D4135` | Status accents (light)            |
+| Injera Ivory `--color-injera-ivory`             | `#F5F0E6` | Logo strokes                      |
+| Coffee Charcoal `--color-coffee-charcoal`       | `#171D1A` | Text on the band button, overlays |
 
 ## Semantic tokens and themes
 
@@ -33,12 +42,11 @@ There is no "match device" mode: the owner chose a plain light/dark switch (Stag
 
 Tokens: `background`, `foreground`, `surface`, `surface-foreground`, `surface-muted`,
 `muted-foreground`, `border`, `border-strong`, `primary`, `primary-hover`, `primary-foreground`,
-`accent`, `accent-ink` (gold dark enough for text on light), `terracotta`, `ring`, `band`,
+`accent`, `accent-ink` (small labels, such as section eyebrows), `terracotta`, `ring`, `band`,
 `band-foreground`, `band-muted`, `band-accent`, `success`, `warning`, `danger`.
 
 `tests/unit/design-tokens.test.ts` parses this file and enforces WCAG 2.2 contrast in **both**
-themes: 4.5:1 for text pairs, 3:1 for focus rings and input borders. Gold is never used as body
-text on ivory (2:1); `accent-ink` (#7E5A1C, 5.5:1) is used instead.
+themes: 4.5:1 for text pairs, 3:1 for focus rings and input borders.
 
 Tailwind's `dark:` variant is redefined to match this model (`data-theme="dark"` only), but
 semantic tokens make it rarely necessary.

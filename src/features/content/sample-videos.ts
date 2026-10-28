@@ -32,37 +32,6 @@ export type SampleVideo = {
   credit: { author: string; license: string; source: string };
 };
 
-export type KitchenVideo = {
-  key: string;
-  /** 3:1, 1920x640, from the `sm` breakpoint up. */
-  wide: { src: string; poster: string };
-  /** 4:3, 960x720, for phones. */
-  narrow: { src: string; poster: string };
-  description: Localized;
-  credit: { author: string; license: string; source: string };
-};
-
-/**
- * The homepage's kitchen loop, under the header: a cook chopping red onions,
- * from the same author on Pexels. Six seconds of steady work (7.5-14.25s of the
- * original), its last 0.75s cross-faded into its start so the loop has no jump,
- * lightly brightened, without sound. Both crops start below the shoulders, so
- * no face is shown. Each poster (WebP) is the loop's first frame.
- */
-export const kitchenVideo: KitchenVideo = {
-  key: "kitchen",
-  wide: { src: "/videos/kitchen-wide.mp4", poster: "/videos/kitchen-wide.webp" },
-  narrow: { src: "/videos/kitchen-narrow.mp4", poster: "/videos/kitchen-narrow.webp" },
-  description: {
-    en: "A cook chopping red onions beside diced meat on a wooden board, in a kitchen, framed below the shoulders.",
-  },
-  credit: {
-    author: "kelly",
-    license: "Pexels License",
-    source: "https://www.pexels.com/video/a-woman-chopping-ingredients-using-kitchen-knife-3967269/",
-  },
-};
-
 export const sampleVideos: SampleVideo[] = [
   {
     key: "platter",

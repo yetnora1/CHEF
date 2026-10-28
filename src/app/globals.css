@@ -84,6 +84,179 @@
       transform: translateY(-4px) scale(0.98);
     }
   }
+
+  /* Homepage kitchen illustration: slow loops that only move and fade, paused
+   * by its button or off screen, still under prefers-reduced-motion. */
+  --animate-kitchen-stir: kitchen-stir 1.6s ease-in-out infinite alternate;
+  --animate-kitchen-nod: kitchen-nod 1.6s ease-in-out infinite alternate;
+  --animate-kitchen-breathe: kitchen-breathe 3.2s ease-in-out infinite alternate;
+  --animate-kitchen-steam: kitchen-steam 4.5s ease-out infinite;
+  --animate-kitchen-flame: kitchen-flame 0.45s ease-in-out infinite alternate;
+  --animate-kitchen-glow: kitchen-glow 1.3s ease-in-out infinite alternate;
+  --animate-kitchen-ripple: kitchen-ripple 1.6s ease-out infinite;
+  --animate-kitchen-bubble: kitchen-bubble 2.2s ease-out infinite;
+  --animate-kitchen-eye: kitchen-eye 7s ease-out infinite;
+
+  @keyframes kitchen-stir {
+    from {
+      transform: rotate(-5deg);
+    }
+    to {
+      transform: rotate(5deg);
+    }
+  }
+  @keyframes kitchen-nod {
+    from {
+      transform: rotate(-1.5deg);
+    }
+    to {
+      transform: rotate(1.5deg);
+    }
+  }
+  @keyframes kitchen-breathe {
+    to {
+      transform: translateY(1.5px);
+    }
+  }
+  @keyframes kitchen-steam {
+    0% {
+      transform: translate(0, 10px) scale(0.7);
+      opacity: 0;
+    }
+    25% {
+      opacity: 0.85;
+    }
+    100% {
+      transform: translate(-10px, -70px) scale(1.6);
+      opacity: 0;
+    }
+  }
+  @keyframes kitchen-flame {
+    from {
+      transform: scale(1.05, 0.82);
+    }
+    to {
+      transform: scale(0.95, 1.08);
+    }
+  }
+  @keyframes kitchen-glow {
+    from {
+      opacity: 0.55;
+    }
+    to {
+      opacity: 0.95;
+    }
+  }
+  @keyframes kitchen-ripple {
+    0% {
+      transform: scale(0.4);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1.9);
+      opacity: 0;
+    }
+  }
+  @keyframes kitchen-bubble {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    20% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    45% {
+      transform: scale(1.25);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(0);
+      opacity: 0;
+    }
+  }
+  /* Injera's "eyes": the little holes that open across it as it cooks. */
+  @keyframes kitchen-eye {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    8%,
+    88% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+}
+
+/* Homepage kitchen illustration (src/components/public/kitchen-scene.tsx): a
+ * painted scene lit from the window on the right. Fixed, like the logo: the
+ * same picture in light and dark. `static`, because the scene reads these by
+ * name in SVG attributes, where Tailwind cannot see them to emit them. */
+@theme static {
+  --color-kitchen-wall-top: #f4e4cf;
+  --color-kitchen-wall-bottom: #e8cdae;
+  --color-kitchen-tile: #efdcc4;
+  --color-kitchen-tile-line: #fffaf2;
+  --color-kitchen-light: #fff7e8;
+  --color-kitchen-sky-top: #cfe8f7;
+  --color-kitchen-sky-bottom: #f7fbfd;
+  --color-kitchen-shadow: #2b1a10;
+  --color-kitchen-wood-light: #d9ae7c;
+  --color-kitchen-wood: #b98552;
+  --color-kitchen-wood-dark: #7d532f;
+  --color-kitchen-wood-deep: #5a3820;
+  --color-kitchen-skin-light: #9a6240;
+  --color-kitchen-skin: #774427;
+  --color-kitchen-skin-dark: #4f2b17;
+  --color-kitchen-hair: #1b120c;
+  --color-kitchen-coat-light: #ffffff;
+  --color-kitchen-coat: #eeeae3;
+  --color-kitchen-coat-shade: #cdc5b9;
+  --color-kitchen-scarf: #b42318;
+  --color-kitchen-scarf-dark: #7f1810;
+  --color-kitchen-steel-dark: #4b5563;
+  --color-kitchen-steel: #9aa3ae;
+  --color-kitchen-steel-light: #dfe3e8;
+  --color-kitchen-steel-shine: #fbfcfd;
+  --color-kitchen-pot-inside: #2a2f35;
+  --color-kitchen-iron: #1f2329;
+  --color-kitchen-stew-light: #c2501f;
+  --color-kitchen-stew: #8f2d12;
+  --color-kitchen-stew-dark: #5e1c0a;
+  --color-kitchen-oil: #f0a04b;
+  --color-kitchen-flame-blue: #2f6fe8;
+  --color-kitchen-flame-sky: #a7c9ff;
+  --color-kitchen-flame-orange: #f59e0b;
+  --color-kitchen-glow: #ff8a3d;
+  --color-kitchen-steam: #ffffff;
+  --color-kitchen-injera-light: #f0dfbd;
+  --color-kitchen-injera: #dcc193;
+  --color-kitchen-injera-eye: #b0905f;
+  --color-kitchen-clay: #4a3a31;
+  --color-kitchen-clay-dark: #2a201b;
+  --color-kitchen-onion-light: #c25a8c;
+  --color-kitchen-onion: #8e2c5c;
+  --color-kitchen-onion-dark: #5e1638;
+  --color-kitchen-onion-flesh: #f7e9f0;
+  --color-kitchen-chili-light: #74bd3d;
+  --color-kitchen-chili: #2f7a1f;
+  --color-kitchen-garlic: #f3ece0;
+  --color-kitchen-berbere: #b3261e;
+  --color-kitchen-berbere-dark: #7a1712;
+  --color-kitchen-turmeric: #e3a51a;
+  --color-kitchen-lentil: #d9772b;
+  --color-kitchen-teff: #8a5a3c;
+  --color-kitchen-jebena-light: #5a524d;
+  --color-kitchen-jebena: #1d1917;
+  --color-kitchen-straw: #d7b46a;
+  --color-kitchen-porcelain: #fbfbfb;
+  --color-kitchen-coffee: #3b2416;
+  --color-kitchen-cup-band: #1f6f8b;
 }
 
 /*

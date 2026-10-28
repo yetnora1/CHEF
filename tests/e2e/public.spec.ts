@@ -113,8 +113,8 @@ test.describe("locale routing", () => {
       page.getByRole("status").filter({ hasText: "The contact form is not open yet" }),
     ).toBeVisible();
     await expect(page.locator("form input[name=fullName]")).toHaveCount(0);
-    // The event inquiry shortcut was removed from this page (owner's request);
-    // the inquiry form stays reachable from the header's "Plan an event".
+    // The event inquiry shortcut was removed from this page (owner's request); the inquiry
+    // form stays reachable from the homepage call to action, the phone menu and the footer.
     await expect(page.getByRole("main").getByRole("link", { name: "Start your inquiry" })).toHaveCount(0);
 
     await page.goto("/am/contact");
@@ -282,11 +282,11 @@ test.describe("accessibility basics", () => {
   });
 
   test("the header marks the current page", async ({ page }) => {
-    const planEvent = page.getByRole("banner").getByRole("link", { name: "Plan an event" });
-    await page.goto("/en/book");
-    await expect(planEvent).toHaveAttribute("aria-current", "page");
+    const contact = page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Contact" });
+    await page.goto("/en/contact");
+    await expect(contact).toHaveAttribute("aria-current", "page");
     await page.goto("/en/privacy");
-    await expect(planEvent).not.toHaveAttribute("aria-current");
+    await expect(contact).not.toHaveAttribute("aria-current");
   });
 
   test("tablets get the menu button; the inline navigation starts at desktop width", async ({ page }) => {
@@ -296,7 +296,8 @@ test.describe("accessibility basics", () => {
       await page.goto("/en");
       await expect(page.getByRole("navigation", { name: "Primary" }), `${width}`).toBeHidden();
       await expect(page.getByRole("button", { name: "Open menu" }), `${width}`).toBeVisible();
-      await expect(page.getByRole("banner").getByRole("link", { name: "Plan an event" })).toBeVisible();
+      // No "Plan an event" button in the header bar (owner's request).
+      await expect(page.getByRole("banner").getByRole("link", { name: "Plan an event" })).toHaveCount(0);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, `${width}`).toBeLessThanOrEqual(0);
     }

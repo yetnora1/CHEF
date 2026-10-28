@@ -28,7 +28,7 @@ test.describe("inquiry page without server configuration", () => {
 
   test("is reached from the homepage call to action", async ({ page }) => {
     await page.goto("/en");
-    await page.getByRole("link", { name: "Plan an event" }).first().click();
+    await page.getByRole("main").getByRole("link", { name: "Plan an event" }).first().click();
     await expect(page).toHaveURL(/\/en\/book$/);
   });
 });

@@ -84,7 +84,7 @@ every page `h1` and `display-md` for section headings, so operational screens st
 | ---------- | ------- | ------------------------------------------------------------------------------------------ |
 | base       | 320px + | One column; header: wordmark, theme, menu button                                           |
 | `xs`       | 26rem   | Custom, for small two-up arrangements                                                      |
-| `sm`       | 40rem   | Header language switcher and "Plan an event" button appear; admin filters always shown     |
+| `sm`       | 40rem   | Header language switcher appears; admin filters always shown                               |
 | `md`       | 48rem   | Two-column editorial sections (about, services intro)                                      |
 | `lg`       | 64rem   | **Inline public navigation** (below it, the menu sheet); admin sidebar; multi-column grids |
 
@@ -154,8 +154,10 @@ Owner's request (2026-10-28), after a "glassy sidebar" reference: the whole site
 The public header and the admin top bar are sticky, floating `glass-thick` bars. Each header button
 is a `tint` button with its own `hue-*` colour: the navigation links (The chef, Services, Contact,
 and menu, gallery, journal once published) light green in both themes, language flag teal, theme
-toggle indigo, phone menu amber, admin account menu violet; Plan an event stays the orange
-`primary`. The current page carries a ring in its hue.
+toggle indigo, phone menu amber, admin account menu violet. The current page carries a ring in its
+hue. There is no "Plan an event" button in the header bar (removed at the owner's request,
+2026-10-28); the event form is reached from the homepage call to action, the phone menu and the
+footer.
 
 ## Admin sidebar
 

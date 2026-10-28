@@ -1,7 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/brand/wordmark";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { siteNavigation, type SiteNavKey } from "@/features/cms/navigation";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -61,9 +61,8 @@ export async function SiteHeader() {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <LocaleSwitcher className="hidden sm:inline-flex" />
             <ThemeToggle />
-            <Button asChild size="sm" variant="primary" className="ml-1 hidden sm:inline-flex">
-              <NavLink href="/book">{t("planEvent")}</NavLink>
-            </Button>
+            {/* No "Plan an event" button here (owner's request, 2026-10-28): the event form is
+                reached from the homepage's call to action, this phone menu and the footer. */}
             <MobileNav
               links={[...links, { key: "book", href: "/book", label: t("planEvent") }]}
               labels={{ open: t("openMenu"), close: t("closeMenu"), title: t("menuTitle") }}

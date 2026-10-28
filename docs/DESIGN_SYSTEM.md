@@ -241,18 +241,19 @@ the semantic tokens above.
 ## Kitchen illustration
 
 Directly under the header on the homepage, a rounded card holds an animated, painted kitchen
-(`components/public/kitchen-scene`): a chef in a white coat and toque, seen in profile looking down,
-stirs a steel pot of stew over gas flames; injera cooks on a clay mitad as its holes open; red
-onions, chillies, garlic and a knife lie on a wooden board beside a bowl of berbere; a jebena of
-coffee and small cups sit on a tray; behind them, a tiled wall, a spice shelf and a window whose
-light comes from the right. The owner asked for an animation that looks as real as possible
-(2026-10-28), so it is shaded rather than outlined: gradients, highlights and soft contact shadows
-in its own fixed `--color-kitchen-*` palette (an `@theme static` block in `globals.css`, the same
-picture in light and dark, like the logo). It replaced a flat line drawing and, briefly, a stock
-video.
+(`components/public/kitchen-scene`): a chef in a white coat, slate apron and toque, seen in profile
+looking down, stirs a steel pot of stew over gas flames; injera cooks on a clay mitad as its holes
+open; a jebena keeps coffee warm; a red onion, a cut half and a knife wait on a wooden board beside
+a white bowl of berbere; behind them, quiet tiles, a spice shelf and a window whose light comes from
+the right. The owner asked for an animation that looks real, then for it to be cleaner and more
+professional (2026-10-28), so it is drawn as an editorial illustration: few, smooth shapes, flat
+colours with crisp shadow shapes and a few soft gradients (the steel, the stew, the light), no
+outlines and no small clutter, in its own fixed `--color-kitchen-*` palette (an `@theme static`
+block in `globals.css`, the same picture in light and dark, like the logo). It replaced a flat line
+drawing and, briefly, a stock video.
 
 - Motion is CSS only (`animate-kitchen-*` keyframes): the stirring arm and spoon, a slight nod and
-  breathing, rising steam (soft radial puffs, no blur filters), flickering flames and their glow,
+  breathing, rising steam (soft gradient wisps, no blur filters), flickering flames and their glow,
   ripples and bubbles in the stew, and the injera's holes. Staggered parts use negative delays, so
   a paused frame still shows steam.
 - The SVG covers the card (`preserveAspectRatio="xMidYMid slice"`, 220/260/300px tall); on narrow

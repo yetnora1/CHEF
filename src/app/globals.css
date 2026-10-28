@@ -120,14 +120,14 @@
   }
   @keyframes kitchen-steam {
     0% {
-      transform: translate(0, 10px) scale(0.7);
+      transform: translate(0, 8px) scale(0.9, 0.85);
       opacity: 0;
     }
-    25% {
-      opacity: 0.85;
+    30% {
+      opacity: 0.9;
     }
     100% {
-      transform: translate(-10px, -70px) scale(1.6);
+      transform: translate(-8px, -46px) scale(1.1, 1.15);
       opacity: 0;
     }
   }
@@ -219,6 +219,8 @@
   --color-kitchen-coat-shade: #cdc5b9;
   --color-kitchen-scarf: #b42318;
   --color-kitchen-scarf-dark: #7f1810;
+  --color-kitchen-apron: #3d4850;
+  --color-kitchen-apron-light: #56626b;
   --color-kitchen-steel-dark: #4b5563;
   --color-kitchen-steel: #9aa3ae;
   --color-kitchen-steel-light: #dfe3e8;
@@ -243,9 +245,6 @@
   --color-kitchen-onion: #8e2c5c;
   --color-kitchen-onion-dark: #5e1638;
   --color-kitchen-onion-flesh: #f7e9f0;
-  --color-kitchen-chili-light: #74bd3d;
-  --color-kitchen-chili: #2f7a1f;
-  --color-kitchen-garlic: #f3ece0;
   --color-kitchen-berbere: #b3261e;
   --color-kitchen-berbere-dark: #7a1712;
   --color-kitchen-turmeric: #e3a51a;
@@ -254,9 +253,6 @@
   --color-kitchen-jebena-light: #5a524d;
   --color-kitchen-jebena: #1d1917;
   --color-kitchen-straw: #d7b46a;
-  --color-kitchen-porcelain: #fbfbfb;
-  --color-kitchen-coffee: #3b2416;
-  --color-kitchen-cup-band: #1f6f8b;
 }
 
 /*

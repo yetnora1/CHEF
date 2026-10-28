@@ -222,12 +222,16 @@ the semantic tokens above.
 
 ## Videos
 
-Under the homepage hero, a row of three short, silent food loops (`public/components/food-reel`,
-data in `src/features/content/sample-videos.ts`, files in `public/videos`): Pexels clips of
-Ethiopian dishes and a coffee roasting, no identifiable faces, no captions, credited on `/credits`.
-Each is cut to a few seconds, cropped to 16:10, 960px wide, H.264 without sound, with its first frame
-as the poster. Nothing loads until the row is in view (`preload="none"`); clips play only while
-visible, stay paused for `prefers-reduced-motion`, and one button pauses or plays them all.
+Under the homepage hero, six short, silent loops (`components/public/food-reel`, data in
+`src/features/content/sample-videos.ts`, files in `public/videos`), two rows of three (three rows of
+two on phones): injera platters, a stew served onto injera, and the coffee ceremony (roasting, the
+beans shown above the cups, popcorn among petals). All are Pexels clips from one Addis Ababa shoot
+by @kelly, with no identifiable faces and no captions, credited on `/credits`. Free Ethiopian food
+footage is scarce: other "Ethiopian" search results were other cuisines or showed faces. Each clip
+is cut to 4-7 s, cropped to 16:10 to keep bystanders out, 960x600 H.264 without sound (about
+0.5-0.7 MB), with its first frame as the poster. Nothing loads until the reel is in view
+(`preload="none"`); clips play only while visible, stay paused for `prefers-reduced-motion`, and
+one button pauses or plays them all.
 
 ## Photography
 

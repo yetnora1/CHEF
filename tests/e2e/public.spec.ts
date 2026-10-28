@@ -138,7 +138,7 @@ test.describe("food videos", () => {
   test("three silent loops under the hero, with one button to pause and play them", async ({ page }) => {
     await page.goto("/en");
     const videos = reel(page).locator("video");
-    await expect(videos).toHaveCount(3);
+    await expect(videos).toHaveCount(6);
     for (const video of await videos.all()) {
       expect(await video.evaluate((v: HTMLVideoElement) => v.muted && v.loop && !v.controls)).toBe(true);
     }
@@ -161,7 +161,7 @@ test.describe("food videos", () => {
   test("are credited, with the photos, on the credits page", async ({ page }) => {
     await page.goto("/en/credits");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Photo and video credits");
-    await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(3);
+    await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(6);
     await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(9);
   });
 });

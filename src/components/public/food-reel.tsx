@@ -60,7 +60,8 @@ export function FoodReel({ clips, labels }: FoodReelProps) {
 
   return (
     <section aria-label={labels.region} className="page-container pb-14 md:pb-20">
-      <div className="grid gap-4 sm:grid-cols-3">
+      {/* Two columns on phones (a long single column of loops would dwarf the page), three from sm. */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
         {clips.map((clip, index) => (
           <div key={clip.key} className="aspect-[16/10] overflow-hidden rounded-2xl bg-surface-muted">
             <video

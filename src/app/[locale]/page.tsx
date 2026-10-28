@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { AboutSection } from "@/components/public/about-section";
+import { DishesSection } from "@/components/public/dishes-section";
 import { FoodReel } from "@/components/public/food-reel";
 import { Hero } from "@/components/public/hero";
 import { KitchenScene } from "@/components/public/kitchen-scene";
@@ -133,6 +134,7 @@ export default async function HomePage() {
           imageRight={index % 2 === 0}
         />
       ))}
+      <DishesSection />
       <ServicesSection
         title={field("services", "heading") ?? placeholder(servicesCopy.title)}
         lede={field("services", "lede") ?? placeholder(servicesCopy.lede)}

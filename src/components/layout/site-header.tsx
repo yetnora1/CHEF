@@ -59,7 +59,8 @@ export async function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <LocaleSwitcher className="hidden sm:inline-flex" />
+            {/* Shown on every screen size, phones included (owner's request, 2026-10-28). */}
+            <LocaleSwitcher />
             <ThemeToggle />
             {/* No "Plan an event" button here (owner's request, 2026-10-28): the event form is
                 reached from the homepage's call to action, this phone menu and the footer. */}

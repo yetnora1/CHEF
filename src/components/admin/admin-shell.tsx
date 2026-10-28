@@ -83,7 +83,7 @@ export async function AdminShell({
             />
             <div className="lg:hidden">{brand()}</div>
             <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-              <AdminLocaleSwitcher className="hidden sm:inline-flex" />
+              <AdminLocaleSwitcher />
               <ThemeToggle />
               <UserMenu
                 email={session.user.email}

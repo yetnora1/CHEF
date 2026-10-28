@@ -82,6 +82,22 @@ test.describe("locale routing", () => {
     await expect(page).toHaveURL(/\/am$/);
   });
 
+  test("phones have the language switch in the header bar, beside the menu", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await page.goto("/en");
+    const header = page.getByRole("banner");
+    const toggle = header
+      .getByRole("group", { name: "Language" })
+      .first()
+      .getByRole("link", { name: "አማርኛ" });
+    await expect(toggle).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+    ).toBeLessThanOrEqual(0);
+    await toggle.click();
+    await expect(page).toHaveURL(/\/am$/);
+  });
+
   test("the flag toggle switches language without jumping to the top", async ({ page }) => {
     await page.goto("/en");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
@@ -169,6 +185,33 @@ test.describe("kitchen animation", () => {
   });
 });
 
+test.describe("fasting and non-fasting dishes", () => {
+  test("lists both kinds and filters them", async ({ page }) => {
+    await page.goto("/en");
+    const section = page.getByRole("region", { name: "Fasting and non-fasting dishes" });
+    const cards = section.getByRole("listitem");
+    await expect(cards).toHaveCount(8);
+    const filter = section.getByRole("group", { name: "Show dishes" });
+
+    await filter.getByRole("button", { name: "Fasting", exact: true }).click();
+    await expect(filter.getByRole("button", { name: "Fasting", exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(cards).toHaveCount(4);
+    await expect(section.getByRole("heading", { name: /^Shiro/ })).toBeVisible();
+    await expect(section.getByRole("heading", { name: /^Doro wat/ })).toHaveCount(0);
+    await expect(section.getByRole("status")).toHaveText("4 dishes shown");
+
+    await filter.getByRole("button", { name: "Non-fasting" }).click();
+    await expect(cards).toHaveCount(4);
+    await expect(section.getByRole("heading", { name: /^Kitfo/ })).toBeVisible();
+
+    await filter.getByRole("button", { name: "All" }).click();
+    await expect(cards).toHaveCount(8);
+  });
+});
+
 test.describe("food videos", () => {
   const reel = (page: Page) => page.getByRole("region", { name: "Short videos of Ethiopian food" });
 
@@ -232,7 +275,8 @@ test.describe("food videos", () => {
     await page.goto("/en/credits");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Photo and video credits");
     await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(6);
-    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(9);
+    // Nine page and story photos and eight dish photos.
+    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(17);
   });
 });
 

@@ -66,7 +66,15 @@
     "videosPrevious": "ቀዳሚው ቪዲዮ",
     "videosNext": "ቀጣዩ ቪዲዮ",
     "videoPause": "ቪዲዮውን ያቁሙ",
-    "videoPlay": "ቪዲዮውን ያጫውቱ"
+    "videoPlay": "ቪዲዮውን ያጫውቱ",
+    "dishesEyebrow": "ከኢትዮጵያ ማዕድ",
+    "dishesTitle": "የጾምና የፍስክ ምግቦች",
+    "dishesLede": "የኢትዮጵያ ምግብ ሁለት ገጽታዎች አሉት። የጾም ምግቦች ያለ ሥጋ፣ ያለ ወተት ተዋጽኦና ያለ እንቁላል ይዘጋጃሉ፤ በኦርቶዶክስ ቀን መቁጠሪያ በብዙ የጾም ቀናት ማዕዱን ይሞላሉ። የፍስክ ምግቦች ደግሞ ቅቤን፣ አይብንና ሥጋን ይዘው ይቀርባሉ።",
+    "dishesFilter": "ምግቦችን አሳይ",
+    "dishesAll": "ሁሉም",
+    "dishesFasting": "የጾም",
+    "dishesNonFasting": "የፍስክ",
+    "dishesShowing": "{count, plural, one {# ምግብ ይታያል} other {# ምግቦች ይታያሉ}}"
   },
   "Footer": {
     "navigationLabel": "የግርጌ ማውጫ",

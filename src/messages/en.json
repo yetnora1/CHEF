@@ -66,7 +66,15 @@
     "videosPrevious": "Previous video",
     "videosNext": "Next video",
     "videoPause": "Pause the video",
-    "videoPlay": "Play the video"
+    "videoPlay": "Play the video",
+    "dishesEyebrow": "From the Ethiopian table",
+    "dishesTitle": "Fasting and non-fasting dishes",
+    "dishesLede": "Ethiopian cooking has two sides. Fasting dishes are made without meat, dairy or eggs and fill the table on the many fasting days of the Orthodox calendar; non-fasting dishes bring out the butter, cheese and meat.",
+    "dishesFilter": "Show dishes",
+    "dishesAll": "All",
+    "dishesFasting": "Fasting",
+    "dishesNonFasting": "Non-fasting",
+    "dishesShowing": "{count, plural, one {# dish shown} other {# dishes shown}}"
   },
   "Footer": {
     "navigationLabel": "Footer",

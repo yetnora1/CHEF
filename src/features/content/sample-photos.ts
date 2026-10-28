@@ -1,6 +1,14 @@
 import type { StaticImageData } from "next/image";
 import type { Localized } from "@/lib/localization/translations";
 import aboutCoffeeCeremony from "@/assets/samples/about-coffee-ceremony.jpg";
+import dishAyibGomen from "@/assets/samples/dish-ayib-gomen.jpg";
+import dishBeyaynetu from "@/assets/samples/dish-beyaynetu.jpg";
+import dishDoroWat from "@/assets/samples/dish-doro-wat.jpg";
+import dishGomen from "@/assets/samples/dish-gomen.jpg";
+import dishKikAlicha from "@/assets/samples/dish-kik-alicha.jpg";
+import dishKitfo from "@/assets/samples/dish-kitfo.jpg";
+import dishShiro from "@/assets/samples/dish-shiro.jpg";
+import dishTibs from "@/assets/samples/dish-tibs.jpg";
 import heroFeast from "@/assets/samples/hero-feast.jpg";
 import serviceCorporateEvents from "@/assets/samples/service-corporate-events.jpg";
 import serviceCulinaryExperiences from "@/assets/samples/service-culinary-experiences.jpg";
@@ -20,7 +28,8 @@ import storyWat from "@/assets/samples/story-wat.jpg";
  * photographer, licence and source, and says plainly that these are samples, not
  * the chef's food or events. None shows an identifiable face.
  *
- * Files in src/assets/samples are resized to 1600px on the long edge; the
+ * Files in src/assets/samples are resized to 1600px on the long edge (the
+ * dish-* photos, shown smaller, to 1200x900 4:3 crops); the
  * licences (CC BY / CC BY-SA) allow this with attribution, and the resized
  * copies keep the original licence. Descriptions are English only until a
  * fluent speaker writes the Amharic ones (docs/DESIGN_SYSTEM.md → Images).
@@ -118,6 +127,80 @@ export const samplePhotos = {
       author: "Rod Waddington",
       license: "CC BY-SA 2.0",
       source: "https://commons.wikimedia.org/wiki/File:Injera,_Fasting_Food,_Ethiopia_(11286899826).jpg",
+    },
+  },
+  "dish-shiro": {
+    src: dishShiro,
+    alt: { en: "Shiro being spooned onto injera from a small black clay pot." },
+    credit: {
+      author: "David Stanley",
+      license: "CC BY 2.0",
+      source: "https://commons.wikimedia.org/wiki/File:Ethiopian_Shiro_(11354785095).jpg",
+    },
+  },
+  "dish-kik-alicha": {
+    src: dishKikAlicha,
+    alt: { en: "A golden mound of kik alicha, yellow split peas, on injera beside gomen." },
+    credit: {
+      author: "stu_spivack",
+      license: "CC BY-SA 2.0",
+      source: "https://commons.wikimedia.org/wiki/File:KIK_ALICHA,_MISIR,_GOMEN_and_TIKIL_GOMEN.jpg",
+    },
+  },
+  "dish-gomen": {
+    src: dishGomen,
+    alt: { en: "Dark, silky gomen, cooked collard greens, on injera between lentils and split peas." },
+    credit: {
+      author: "stu_spivack",
+      license: "CC BY-SA 2.0",
+      source: "https://commons.wikimedia.org/wiki/File:KIK_ALICHA,_MISIR,_GOMEN_and_TIKIL_GOMEN.jpg",
+    },
+  },
+  "dish-beyaynetu": {
+    src: dishBeyaynetu,
+    alt: {
+      en: "A tray of fasting beyaynetu: many small vegetable stews and salads on injera, with a green chilli.",
+    },
+    credit: {
+      author: "Yonatan Solomon",
+      license: "CC BY-SA 4.0",
+      source: "https://commons.wikimedia.org/wiki/File:Beyaynetu_ethiopian_food.jpg",
+    },
+  },
+  "dish-doro-wat": {
+    src: dishDoroWat,
+    alt: { en: "A piece of doro wat chicken and a hard-boiled egg in berbere sauce on injera." },
+    credit: {
+      author: "Edsel Little",
+      license: "CC BY-SA 2.0",
+      source: "https://commons.wikimedia.org/wiki/File:Injera_and_doro_wat.jpg",
+    },
+  },
+  "dish-kitfo": {
+    src: dishKitfo,
+    alt: { en: "A platter of kitfo with ayib cheese, gomen, mitmita and rolled kocho bread on a leaf." },
+    credit: {
+      author: "Milo.G",
+      license: "CC BY-SA 4.0",
+      source: "https://commons.wikimedia.org/wiki/File:Kitfo_with_Ayibe..JPG",
+    },
+  },
+  "dish-tibs": {
+    src: dishTibs,
+    alt: { en: "Tibs topped with green chilli in a clay pot over embers, with rolls of injera on a tray." },
+    credit: {
+      author: "Jean Rebiffé",
+      license: "CC BY-SA 4.0",
+      source: "https://commons.wikimedia.org/wiki/File:Tibs_in_Yod_Abyssinia.jpg",
+    },
+  },
+  "dish-ayib-gomen": {
+    src: dishAyibGomen,
+    alt: { en: "Fresh white ayib cheese beside gomen on injera, with a bowl of red stew." },
+    credit: {
+      author: "stu_spivack",
+      license: "CC BY-SA 2.0",
+      source: "https://commons.wikimedia.org/wiki/File:Ayib_and_gomen.jpg",
     },
   },
 } satisfies Record<string, SamplePhoto>;

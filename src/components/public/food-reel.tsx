@@ -51,10 +51,10 @@ export function FoodReel({ clips, labels }: FoodReelProps) {
       (entries) => {
         for (const entry of entries) {
           const video = entry.target as HTMLVideoElement;
-          if (!entry.isIntersecting || video.preload === "auto") continue;
+          if (!entry.isIntersecting) continue;
+          // Raising preload starts the download. Not load(): it would refetch the clip and
+          // cancel a play() already under way.
           video.preload = "auto";
-          // Start fetching now; a media element left at preload="none" may wait for play().
-          if (video.readyState === HTMLMediaElement.HAVE_NOTHING) video.load();
           nearby.unobserve(video);
         }
       },

@@ -250,7 +250,7 @@ export function TranslationForm({
       {errorCount > 0 && (
         <p
           role="alert"
-          className="rounded-xl border border-danger/50 bg-surface p-3 text-sm font-medium text-danger"
+          className="rounded-xl border border-danger/50 glass p-3 text-sm font-medium text-danger"
         >
           {t("errorSummary", { count: errorCount })}
         </p>
@@ -293,7 +293,7 @@ export function TranslationForm({
         ))}
 
         {locale === "am" && (
-          <div className="rounded-xl border border-accent/50 bg-surface p-4">
+          <div className="rounded-xl border border-accent/50 glass p-4">
             <label className="flex items-start gap-3 text-sm">
               <input
                 type="checkbox"

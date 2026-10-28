@@ -64,7 +64,7 @@ export function LanguageTabs({
               className={cn(
                 "-mb-px inline-flex items-center gap-2 rounded-t-lg border border-b-0 px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                 selected
-                  ? "border-border bg-surface text-foreground"
+                  ? "border-border bg-glass text-foreground"
                   : "border-transparent text-muted-foreground hover:bg-surface-muted hover:text-foreground",
               )}
             >
@@ -81,7 +81,7 @@ export function LanguageTabs({
           aria-labelledby={`tab-${tab.key}`}
           hidden={tab.key !== active}
           tabIndex={0}
-          className="rounded-b-2xl border border-t-0 border-border bg-surface p-4 focus-visible:outline-2 focus-visible:outline-ring sm:p-6"
+          className="rounded-b-2xl border border-t-0 border-border glass p-4 inset-shadow-none focus-visible:outline-2 focus-visible:outline-ring sm:p-6"
         >
           {tab.panel}
         </div>

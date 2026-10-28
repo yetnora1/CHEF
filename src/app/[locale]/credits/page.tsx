@@ -79,7 +79,7 @@ async function CreditList({
   return (
     <section className="mt-10">
       <h2 className="text-lg font-semibold">{heading}</h2>
-      <ul className="mt-4 divide-y divide-border rounded-2xl border border-border bg-surface">
+      <ul className="mt-4 divide-y divide-border rounded-2xl border border-border glass">
         {entries.map((entry) => {
           const description = resolveLocalized(entry.description, locale);
           const deed = licenseUrl(entry.credit.license);

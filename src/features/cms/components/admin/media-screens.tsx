@@ -62,7 +62,7 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
 
         <section
           aria-labelledby="upload-heading"
-          className="space-y-3 rounded-2xl border border-border bg-surface p-4 sm:p-6"
+          className="space-y-3 rounded-2xl border border-border glass p-4 sm:p-6"
         >
           <h2 id="upload-heading" className="text-lg font-semibold">
             {t("upload.heading")}
@@ -72,7 +72,7 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
         </section>
 
         {cleanup.length > 0 && (
-          <section className="space-y-2 rounded-2xl border border-warning/60 bg-surface p-4">
+          <section className="space-y-2 rounded-2xl border border-warning/60 glass p-4">
             <p className="text-sm">{t("media.cleanupIntro")}</p>
             <CleanupButton count={cleanup.length} />
           </section>
@@ -83,7 +83,7 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
           action="/admin/media"
           role="search"
           aria-label={t("list.filters")}
-          className="grid gap-4 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-[2fr_1fr_auto] sm:items-end"
+          className="grid gap-4 rounded-2xl border border-border glass p-4 sm:grid-cols-[2fr_1fr_auto] sm:items-end"
         >
           <label className="space-y-1.5">
             <span className="text-xs font-semibold">{t("list.search")}</span>
@@ -129,7 +129,7 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {list.rows.map((row) => (
-              <li key={row.id} className="overflow-hidden rounded-2xl border border-border bg-surface">
+              <li key={row.id} className="overflow-hidden rounded-2xl border border-border glass">
                 <Link
                   href={`/admin/media/${row.id}`}
                   className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
@@ -247,7 +247,7 @@ export async function MediaDetailScreen({ id }: { id: string }) {
                 {t("media.incompleteExplained")}
               </p>
             )}
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-2xl border border-border bg-surface p-4 text-sm">
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-2xl border border-border glass p-4 text-sm">
               <dt className="text-muted-foreground">{t("media.type")}</dt>
               <dd>{asset.mime_type ?? "—"}</dd>
               <dt className="text-muted-foreground">{t("media.dimensions")}</dt>
@@ -260,7 +260,7 @@ export async function MediaDetailScreen({ id }: { id: string }) {
           </div>
 
           <div className="space-y-6">
-            <section className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-6">
+            <section className="space-y-4 rounded-2xl border border-border glass p-4 sm:p-6">
               <h2 className="text-lg font-semibold">{t("media.details")}</h2>
               <MediaDetailsForm
                 id={asset.id}
@@ -269,7 +269,7 @@ export async function MediaDetailScreen({ id }: { id: string }) {
                 credit={asset.credit}
               />
             </section>
-            <section className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-6">
+            <section className="space-y-4 rounded-2xl border border-border glass p-4 sm:p-6">
               <h2 className="text-lg font-semibold">{t("media.descriptions")}</h2>
               <p className="text-sm text-muted-foreground">{t("media.descriptionsIntro")}</p>
               {(["en", "am"] as const).map((language) => (
@@ -287,7 +287,7 @@ export async function MediaDetailScreen({ id }: { id: string }) {
           </div>
         </div>
 
-        <section className="space-y-3 rounded-2xl border border-border bg-surface p-4 sm:p-6">
+        <section className="space-y-3 rounded-2xl border border-border glass p-4 sm:p-6">
           <h2 className="text-lg font-semibold">{t("media.usages", { count: usages.length })}</h2>
           {usages.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t("media.unused")}</p>
@@ -320,11 +320,11 @@ export async function MediaDetailScreen({ id }: { id: string }) {
         </section>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <section className="space-y-3 rounded-2xl border border-border bg-surface p-4 sm:p-6">
+          <section className="space-y-3 rounded-2xl border border-border glass p-4 sm:p-6">
             <h2 className="text-lg font-semibold">{t("upload.replaceFile")}</h2>
             <ReplaceFileForm id={asset.id} version={asset.version} />
           </section>
-          <section className="space-y-3 rounded-2xl border border-border bg-surface p-4 sm:p-6">
+          <section className="space-y-3 rounded-2xl border border-border glass p-4 sm:p-6">
             <h2 className="text-lg font-semibold">{t("danger.title")}</h2>
             <DeleteMediaButton id={asset.id} inUse={usages.length > 0} />
           </section>

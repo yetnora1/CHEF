@@ -185,7 +185,7 @@ export async function PreviewScreen({
     <div className="max-w-6xl space-y-6">
       <div
         role="note"
-        className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-warning/60 bg-surface p-4"
+        className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-warning/60 glass p-4"
       >
         <div className="space-y-1">
           <p className="inline-flex items-center gap-2 font-semibold">
@@ -210,7 +210,7 @@ export async function PreviewScreen({
           {t("previewBanner.back")}
         </Link>
       </div>
-      <div lang={locale} className="overflow-hidden rounded-3xl border border-border bg-background">
+      <div lang={locale} className="overflow-hidden rounded-3xl border border-border glass">
         {body}
       </div>
     </div>

@@ -143,7 +143,7 @@ function Field({
         {...input}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
-        className="block h-12 w-full rounded-xl border border-border-strong bg-surface px-4 text-base text-foreground transition-colors placeholder:text-muted-foreground hover:border-foreground/60 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring aria-invalid:border-danger"
+        className="block h-12 w-full rounded-xl border border-border-strong bg-field px-4 text-base text-foreground transition-colors placeholder:text-muted-foreground hover:border-foreground/60 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring aria-invalid:border-danger"
       />
       {error && (
         <p id={errorId} className="text-sm text-danger">

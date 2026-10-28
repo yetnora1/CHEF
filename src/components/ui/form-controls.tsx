@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
  */
 
 const controlBase =
-  "block w-full rounded-xl border border-border-strong bg-surface px-4 text-base text-foreground transition-colors placeholder:text-muted-foreground hover:border-foreground/60 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-danger";
+  "block w-full rounded-xl border border-border-strong bg-field px-4 text-base text-foreground transition-colors placeholder:text-muted-foreground hover:border-foreground/60 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-danger";
 
 export function Input({ className, ...props }: ComponentProps<"input">) {
   return <input className={cn(controlBase, "h-12", className)} {...props} />;

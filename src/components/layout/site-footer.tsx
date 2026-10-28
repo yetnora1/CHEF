@@ -11,7 +11,7 @@ async function currentYear() {
   return new Date().getFullYear();
 }
 
-/** A compact footer: brand and links on one row, the copyright on another. */
+/** A compact floating glass footer: brand and links on one row, the copyright on another. */
 export async function SiteFooter() {
   const [t, tNav, tBrand, year] = await Promise.all([
     getTranslations("Footer"),
@@ -28,26 +28,28 @@ export async function SiteFooter() {
   ];
 
   return (
-    <footer className="border-t border-border bg-surface">
-      <div className="page-container flex flex-col gap-4 py-6 md:flex-row md:items-center md:justify-between">
-        <Wordmark tagline={tBrand("tagline")} />
-        <nav aria-label={t("navigationLabel")}>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-            {links.map((link) => (
-              <li key={link.key}>
-                <Link
-                  href={link.href}
-                  className="text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-      <div className="border-t border-border">
-        <p className="page-container py-4 text-xs text-muted-foreground">{t("copyright", { year })}</p>
+    <footer className="page-container pb-3">
+      <div className="rounded-2xl border border-border glass">
+        <div className="flex flex-col gap-4 px-5 py-5 md:flex-row md:items-center md:justify-between">
+          <Wordmark tagline={tBrand("tagline")} />
+          <nav aria-label={t("navigationLabel")}>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {links.map((link) => (
+                <li key={link.key}>
+                  <Link
+                    href={link.href}
+                    className="text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+        <p className="border-t border-border px-5 py-3 text-xs text-muted-foreground">
+          {t("copyright", { year })}
+        </p>
       </div>
     </footer>
   );

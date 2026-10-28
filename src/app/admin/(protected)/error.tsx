@@ -15,7 +15,7 @@ export default function AdminError({ error, retry }: { error: unknown; retry: ()
   const digest = error instanceof Error && "digest" in error ? String(error.digest) : null;
 
   return (
-    <div role="alert" className="mx-auto max-w-xl space-y-4 rounded-2xl border border-border bg-surface p-7">
+    <div role="alert" className="mx-auto max-w-xl space-y-4 rounded-2xl border border-border glass p-7">
       <span className="inline-flex size-11 items-center justify-center rounded-full bg-surface-muted text-danger">
         <TriangleAlert aria-hidden className="size-5" />
       </span>

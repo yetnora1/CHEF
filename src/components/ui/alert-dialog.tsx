@@ -30,10 +30,10 @@ export function AlertDialogContent({
 }: ContentProps) {
   return (
     <AlertDialogPrimitive.Portal>
-      <AlertDialogPrimitive.Overlay className="fixed inset-0 z-50 bg-coffee-charcoal/55 data-[state=open]:animate-fade-in" />
+      <AlertDialogPrimitive.Overlay className="fixed inset-0 z-50 bg-coffee-charcoal/40 backdrop-blur-sm data-[state=open]:animate-fade-in" />
       <AlertDialogPrimitive.Content
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 space-y-4 rounded-2xl border border-border bg-surface p-6 text-surface-foreground shadow-2xl data-[state=open]:animate-fade-in",
+          "fixed top-1/2 left-1/2 z-50 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 space-y-4 rounded-2xl border border-border glass-thick p-6 text-surface-foreground shadow-2xl data-[state=open]:animate-fade-in",
           className,
         )}
         {...props}

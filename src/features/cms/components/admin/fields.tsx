@@ -141,7 +141,7 @@ function MarkupControl({ field, name, id, label, hint, error, value, lang }: Con
         onChange={(event) => setText(event.target.value)}
       />
       {preview && (
-        <div className="min-h-28 rounded-xl border border-border bg-background p-4" aria-live="polite">
+        <div className="min-h-28 rounded-xl border border-border bg-field p-4" aria-live="polite">
           {text.trim() ? (
             <Markup text={text} lang={lang} />
           ) : (
@@ -251,7 +251,7 @@ export function MediaPicker({
                     <button
                       type="button"
                       onClick={() => onSelect({ id: item.id, title: item.title, version: item.version })}
-                      className="group w-full overflow-hidden rounded-xl border border-border bg-surface text-left shadow-xs transition-[border-color,box-shadow] hover:border-foreground hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      className="group w-full overflow-hidden rounded-xl border border-border glass text-left shadow-xs transition-[border-color,box-shadow] hover:border-foreground hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element -- authenticated admin file route */}
                       <img

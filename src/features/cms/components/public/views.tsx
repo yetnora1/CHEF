@@ -45,7 +45,7 @@ export async function FallbackNote({ lang }: { lang?: AppLocale }) {
   if (!lang) return null;
   const t = await getTranslations("PublicContent");
   return (
-    <p className="mt-4 inline-flex rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-muted-foreground">
+    <p className="mt-4 inline-flex rounded-full border border-border bg-glass-raised px-3 py-1 text-xs font-semibold text-muted-foreground">
       {t("englishOnly")}
     </p>
   );
@@ -54,7 +54,7 @@ export async function FallbackNote({ lang }: { lang?: AppLocale }) {
 export async function EmptyState({ title, body }: { title: string; body: string }) {
   const t = await getTranslations("PublicContent");
   return (
-    <div className="mt-12 rounded-2xl border border-dashed border-border-strong bg-surface p-8 text-center sm:p-12">
+    <div className="mt-12 rounded-2xl border border-dashed border-border-strong glass p-8 text-center sm:p-12">
       <p className="display-md">{title}</p>
       <p className="mx-auto mt-3 max-w-xl text-muted-foreground">{body}</p>
       <Button asChild variant="primary" className="mt-6">

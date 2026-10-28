@@ -46,7 +46,7 @@ export default async function AdminBookingDetailPage({ params }: PageProps<"/adm
   // Same response for "does not exist" and "not yours": no existence oracle.
   if (!detail) {
     return (
-      <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-border bg-surface p-7">
+      <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-border glass p-7">
         <h1 className="display-md">{t("detail.notFoundTitle")}</h1>
         <p className="text-sm text-muted-foreground">{t("detail.notFoundBody")}</p>
         <BackLink label={t("detail.back")} />
@@ -280,7 +280,7 @@ function BackLink({ label }: { label: string }) {
 
 function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+    <section className="rounded-2xl border border-border glass p-5 sm:p-6">
       <h2 className="mb-4 text-base font-semibold">{title}</h2>
       {children}
     </section>

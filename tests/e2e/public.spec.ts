@@ -3,7 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 const WHITE = "rgb(255, 255, 255)";
 const BLACK = "rgb(10, 10, 10)";
 
-const bodyBackground = (page: Page) => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+// The page colour is on <html> (it paints the canvas); <body> stays transparent so the glass backdrop shows.
+const pageBackground = (page: Page) =>
+  page.evaluate(() => getComputedStyle(document.documentElement).backgroundColor);
 
 function collectConsoleErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -171,7 +173,7 @@ test.describe("theme", () => {
   test("opens in light whatever the device prefers", async ({ page }) => {
     await page.goto("/en");
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
-    expect(await bodyBackground(page)).toBe(WHITE);
+    expect(await pageBackground(page)).toBe(WHITE);
   });
 
   test("one button switches between light and dark and remembers the choice", async ({ page }) => {
@@ -185,11 +187,11 @@ test.describe("theme", () => {
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
     // A direct switch: no menu of choices opens.
     await expect(page.getByRole("menu")).toHaveCount(0);
-    expect(await bodyBackground(page)).toBe(BLACK);
+    expect(await pageBackground(page)).toBe(BLACK);
 
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    expect(await bodyBackground(page)).toBe(BLACK);
+    expect(await pageBackground(page)).toBe(BLACK);
 
     await page.goto("/am");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
@@ -200,7 +202,7 @@ test.describe("theme", () => {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await expect(amToggle).toHaveAttribute("aria-pressed", "false");
     expect(await page.evaluate(() => localStorage.getItem("chef-harena:theme"))).toBe("light");
-    expect(await bodyBackground(page)).toBe(WHITE);
+    expect(await pageBackground(page)).toBe(WHITE);
   });
 
   test("applies a stored theme before first paint", async ({ page, request }) => {

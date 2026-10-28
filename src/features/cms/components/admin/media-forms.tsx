@@ -114,7 +114,7 @@ export function MediaUploadForm() {
           name="file"
           accept={ACCEPT}
           required
-          className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border-strong file:bg-surface file:bg-linear-to-b file:from-control-top file:to-control-bottom file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground file:shadow-xs file:inset-shadow-2xs file:inset-shadow-shine/12 file:transition-[border-color,box-shadow] hover:file:border-foreground hover:file:shadow-md"
+          className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border file:bg-glass-raised file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground file:shadow-xs file:inset-shadow-sheen file:transition-[border-color,background-color,box-shadow] hover:file:border-border-strong hover:file:bg-glass-raised-hover hover:file:shadow-md"
           onChange={(event) => setFileName(event.target.files?.[0]?.name ?? null)}
         />
       </Field>
@@ -166,7 +166,7 @@ export function ReplaceFileForm({ id, version }: { id: string; version: number }
           name="file"
           accept={ACCEPT}
           required
-          className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border-strong file:bg-surface file:bg-linear-to-b file:from-control-top file:to-control-bottom file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground file:shadow-xs file:inset-shadow-2xs file:inset-shadow-shine/12 file:transition-[border-color,box-shadow] hover:file:border-foreground hover:file:shadow-md"
+          className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border file:bg-glass-raised file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground file:shadow-xs file:inset-shadow-sheen file:transition-[border-color,background-color,box-shadow] hover:file:border-border-strong hover:file:bg-glass-raised-hover hover:file:shadow-md"
         />
       </Field>
       <div className="flex flex-wrap items-center gap-3">

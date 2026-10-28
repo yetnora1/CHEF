@@ -149,7 +149,7 @@ async function EntryRows({
   ]);
   const head = "hidden text-xs font-semibold text-muted-foreground md:block";
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+    <div className="overflow-hidden rounded-2xl border border-border glass">
       <div className="hidden grid-cols-[minmax(0,2.2fr)_1fr_1.2fr_1.2fr_1fr] gap-4 border-b border-border px-5 py-3 md:grid">
         <span className={head}>{t("list.title")}</span>
         <span className={head}>{t("list.status")}</span>
@@ -243,7 +243,7 @@ async function ListFilters({
         action={basePath}
         role="search"
         aria-label={t("list.filters")}
-        className="space-y-4 rounded-2xl border border-border bg-surface p-4"
+        className="space-y-4 rounded-2xl border border-border glass p-4"
       >
         <label className="block space-y-1.5">
           <span className="text-xs font-semibold">{t("list.search")}</span>
@@ -461,7 +461,7 @@ export async function ContentCreateScreen({ type }: { type: ContentType }) {
             </Link>
           </p>
         ) : (
-          <div className="rounded-2xl border border-border bg-surface p-4 sm:p-6">
+          <div className="rounded-2xl border border-border glass p-4 sm:p-6">
             <CreateEntryForm type={type} categories={categories} />
           </div>
         )}
@@ -480,7 +480,7 @@ function Card({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-6">
+    <section className="space-y-4 rounded-2xl border border-border glass p-4 sm:p-6">
       <div>
         <h2 className="text-lg font-semibold">{title}</h2>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}

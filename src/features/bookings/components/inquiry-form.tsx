@@ -144,7 +144,7 @@ export function InquiryForm({ locale, captcha }: { locale: AppLocale; captcha: I
         ref={resultRef}
         tabIndex={-1}
         role="status"
-        className="scroll-mt-28 space-y-5 rounded-3xl border border-border bg-surface p-7 outline-none sm:p-10"
+        className="scroll-mt-28 space-y-5 rounded-3xl border border-border glass p-7 outline-none sm:p-10"
       >
         <CheckCircle2 aria-hidden className="size-8 text-success" />
         <h2 className="display-md">{t("successTitle")}</h2>

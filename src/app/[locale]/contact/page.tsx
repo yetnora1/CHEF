@@ -71,7 +71,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
 
         {details.length > 0 && (
           <div className="lg:col-start-1 lg:row-start-2 lg:self-start">
-            <div className="rounded-2xl border border-border bg-surface p-6">
+            <div className="rounded-2xl border border-border glass p-6">
               <h2 className="text-lg font-semibold">{t("detailsTitle")}</h2>
               <dl className="mt-2 divide-y divide-border">
                 {details.map(({ key, icon: Icon, label, value, href, lang }) => (
@@ -113,7 +113,7 @@ async function ContactFormSection({ searchParams }: Pick<PageProps<"/[locale]/co
   if (!config.available) {
     const t = await getTranslations("ContactForm");
     return (
-      <div role="status" className="self-start rounded-2xl border border-border bg-surface p-6 sm:p-8">
+      <div role="status" className="self-start rounded-2xl border border-border glass p-6 sm:p-8">
         <h2 className="display-md">{t("unavailableTitle")}</h2>
         <p className="mt-3 text-muted-foreground">{t("unavailableBody")}</p>
       </div>
@@ -134,10 +134,7 @@ async function ContactFormSection({ searchParams }: Pick<PageProps<"/[locale]/co
 
 function FormPlaceholder() {
   return (
-    <div
-      aria-hidden
-      className="animate-pulse space-y-6 rounded-2xl border border-border bg-surface p-6 sm:p-8"
-    >
+    <div aria-hidden className="animate-pulse space-y-6 rounded-2xl border border-border glass p-6 sm:p-8">
       <div className="h-7 w-48 rounded bg-surface-muted" />
       <div className="grid gap-6 sm:grid-cols-2">
         {Array.from({ length: 4 }, (_, i) => (

@@ -45,11 +45,7 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
   ]);
 
   return (
-    <section
-      id={HOME_SECTIONS.services}
-      aria-labelledby="services-heading"
-      className="border-y border-border bg-surface py-14 md:py-20"
-    >
+    <section id={HOME_SECTIONS.services} aria-labelledby="services-heading" className="py-14 md:py-20">
       <div className="page-container">
         <div className="grid gap-6 md:grid-cols-[1fr_1fr] md:items-end">
           <div>
@@ -66,11 +62,14 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
         {/* Every card asks about its service on the contact form (subject prefilled). Without
             a page of its own, that link covers the whole card; a published service's title
             covers the card and links to its page instead, with the contact link above it. */}
-        <ul className={cn("mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2", desktopColumns(services.length))}>
+        <ul className={cn("mt-10 grid gap-5 sm:grid-cols-2", desktopColumns(services.length))}>
           {services.map((service) => (
-            <li key={service.slug} className="group/card relative flex flex-col">
+            <li
+              key={service.slug}
+              className="group/card relative flex flex-col rounded-2xl border border-border glass p-3 pb-5"
+            >
               {service.image ? (
-                <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-muted">
+                <div className="aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-muted">
                   <CmsImage image={service.image} sizes={SERVICE_IMAGE_SIZES} className={CARD_IMAGE_HOVER} />
                 </div>
               ) : (
@@ -78,11 +77,11 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
                   subject={service.photoSubject}
                   sample={samplePhotoFor(service.slug)}
                   sizes={SERVICE_IMAGE_SIZES}
-                  className="aspect-[4/3] w-full"
+                  className="aspect-[4/3] w-full rounded-xl"
                   imageClassName={CARD_IMAGE_HOVER}
                 />
               )}
-              <h3 className="mt-5 display-md" lang={service.title.lang}>
+              <h3 className="mt-5 px-2 display-md" lang={service.title.lang}>
                 {service.href ? (
                   <Link
                     href={service.href}
@@ -94,13 +93,13 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
                   service.title.text
                 )}
               </h3>
-              <p className="mt-3 text-sm text-muted-foreground" lang={service.summary.lang}>
+              <p className="mt-3 px-2 text-sm text-muted-foreground" lang={service.summary.lang}>
                 {service.summary.text}
               </p>
               <Link
                 href={service.contactHref}
                 className={cn(
-                  "mt-auto inline-flex w-fit items-center gap-1.5 pt-5 text-sm font-semibold underline-offset-4",
+                  "mt-auto inline-flex w-fit items-center gap-1.5 px-2 pt-5 text-sm font-semibold underline-offset-4",
                   service.href
                     ? "relative z-10 hover:underline"
                     : "group-hover/card:underline after:absolute after:inset-0",

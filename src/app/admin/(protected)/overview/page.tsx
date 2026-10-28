@@ -55,7 +55,7 @@ export default async function AdminOverviewPage() {
             {session.roles.map((role) => (
               <li
                 key={role}
-                className="rounded-full border border-border-strong/60 bg-surface px-3 py-1 text-sm font-medium"
+                className="rounded-full border border-border bg-glass-raised px-3 py-1 text-sm font-medium"
               >
                 {tRoles(role)}
               </li>
@@ -83,7 +83,7 @@ export default async function AdminOverviewPage() {
               return (
                 <li
                   key={module.key}
-                  className="relative flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 transition-colors has-[a:hover]:border-border-strong"
+                  className="relative flex flex-col gap-3 rounded-2xl border border-border glass p-5 transition-colors has-[a:hover]:border-border-strong"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="inline-flex size-10 items-center justify-center rounded-xl bg-surface-muted text-accent-ink">
@@ -228,12 +228,12 @@ async function NeedsAttention({ session }: { session: SignedInStaffSession }) {
         {t("attentionTitle")}
       </h2>
       {waiting.length === 0 ? (
-        <p className="mt-4 flex items-center gap-2.5 rounded-2xl border border-border bg-surface p-5 text-sm text-muted-foreground">
+        <p className="mt-4 flex items-center gap-2.5 rounded-2xl border border-border glass p-5 text-sm text-muted-foreground">
           <CircleCheck aria-hidden className="size-5 shrink-0 text-success" />
           {t("attentionNone")}
         </p>
       ) : (
-        <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+        <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border glass">
           {waiting.map(({ key, Icon, count, text, href }) => (
             <li
               key={key}
@@ -312,7 +312,7 @@ async function InquirySummary({ session }: { session: SignedInStaffSession }) {
       </div>
       <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-border bg-surface p-5">
+          <div key={stat.label} className="rounded-2xl border border-border glass p-5">
             <dt className="text-sm text-muted-foreground">{stat.label}</dt>
             <dd className="mt-2 font-display text-3xl font-bold tabular-nums">{stat.value}</dd>
           </div>

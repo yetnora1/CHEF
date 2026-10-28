@@ -111,7 +111,7 @@ export async function InboxFilters({
         action={BASE}
         role="search"
         aria-label={t("label")}
-        className="grid gap-4 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-4"
+        className="grid gap-4 rounded-2xl border border-border glass p-4 sm:grid-cols-2 lg:grid-cols-4"
       >
         <label className="space-y-1.5 sm:col-span-2">
           <span className="text-xs font-semibold">{t("search")}</span>
@@ -247,7 +247,7 @@ export async function InboxList({
   return (
     <>
       {/* Desktop and tablet: table */}
-      <div className="hidden overflow-x-auto rounded-2xl border border-border bg-surface md:block">
+      <div className="hidden overflow-x-auto rounded-2xl border border-border glass md:block">
         <table className="w-full text-left text-sm">
           <caption className="sr-only">{t("table.caption")}</caption>
           <thead className="border-b border-border text-xs font-semibold text-muted-foreground">
@@ -313,7 +313,7 @@ export async function InboxList({
           <li key={row.id}>
             <Link
               href={detailHref(row.reference)}
-              className="block space-y-2 rounded-2xl border border-border bg-surface p-4 transition-colors hover:border-border-strong"
+              className="block space-y-2 rounded-2xl border border-border glass p-4 transition-colors hover:border-border-strong"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="font-mono text-xs font-semibold">{row.reference}</span>

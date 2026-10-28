@@ -141,7 +141,7 @@ function MessageForm({
         ref={resultRef}
         tabIndex={-1}
         role="status"
-        className="scroll-mt-28 rounded-2xl border border-border bg-surface p-6 outline-none sm:p-8"
+        className="scroll-mt-28 rounded-2xl border border-border glass p-6 outline-none sm:p-8"
       >
         <span className="inline-flex size-12 items-center justify-center rounded-full bg-success/12 text-success">
           <CheckCircle2 aria-hidden className="size-6" />
@@ -169,7 +169,7 @@ function MessageForm({
   const error = (field: ContactField) => (fieldErrors[field] ? t(`errors.${fieldErrors[field]}`) : undefined);
 
   return (
-    <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+    <div className="rounded-2xl border border-border glass p-6 sm:p-8">
       <h2 className="display-md">{t("title")}</h2>
       <p className="mt-2 text-muted-foreground">{t("intro")}</p>
 

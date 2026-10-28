@@ -146,7 +146,7 @@ export async function MessageList({
             <li key={row.id}>
               <article
                 aria-labelledby={`message-${row.id}`}
-                className="rounded-2xl border border-border bg-surface p-5 sm:p-6"
+                className="rounded-2xl border border-border glass p-5 sm:p-6"
               >
                 <header className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
                   <div className="min-w-0">

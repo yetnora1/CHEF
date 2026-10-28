@@ -28,44 +28,47 @@ export async function SiteHeader() {
     label: t(link.key),
   }));
 
+  // A floating glass bar, aligned with the page content below it.
   return (
-    <header className="sticky top-0 z-40 border-b glass-wash">
-      <div className="page-container flex h-[4.5rem] items-center justify-between gap-4">
-        <Link href="/" aria-label={tBrand("homeLink")} className="rounded-lg">
-          <Wordmark tagline={tBrand("tagline")} />
-        </Link>
+    <header className="sticky top-0 z-40 pt-3">
+      <div className="page-container">
+        <div className="flex h-16 items-center justify-between gap-4 rounded-2xl border border-border glass-thick pr-2 pl-3 sm:pr-3 sm:pl-4">
+          <Link href="/" aria-label={tBrand("homeLink")} className="rounded-lg">
+            <Wordmark tagline={tBrand("tagline")} />
+          </Link>
 
-        {/* Inline from lg: with every section published, five links do not fit beside the actions on tablets. */}
-        <nav aria-label={t("primaryLabel")} className="hidden lg:block">
-          {/* Each link is a tinted button in its own colour; the current page carries a ring. */}
-          <ul className="flex items-center gap-2">
-            {links.map((link) => (
-              <li key={link.key}>
-                <NavLink
-                  href={link.href}
-                  className={cn(
-                    buttonVariants({ variant: "tint", size: "sm" }),
-                    NAV_HUES[link.key] ?? "hue-sky",
-                    "aria-[current]:ring-2 aria-[current]:ring-(--tint-border) aria-[current]:ring-offset-2 aria-[current]:ring-offset-transparent",
-                  )}
-                >
-                  {link.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
+          {/* Inline from lg: with every section published, five links do not fit beside the actions on tablets. */}
+          <nav aria-label={t("primaryLabel")} className="hidden lg:block">
+            {/* Each link is a tinted button in its own colour; the current page carries a ring. */}
+            <ul className="flex items-center gap-2">
+              {links.map((link) => (
+                <li key={link.key}>
+                  <NavLink
+                    href={link.href}
+                    className={cn(
+                      buttonVariants({ variant: "tint", size: "sm" }),
+                      NAV_HUES[link.key] ?? "hue-sky",
+                      "aria-[current]:ring-2 aria-[current]:ring-(--tint-border) aria-[current]:ring-offset-2 aria-[current]:ring-offset-transparent",
+                    )}
+                  >
+                    {link.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <LocaleSwitcher className="hidden sm:inline-flex" />
-          <ThemeToggle />
-          <Button asChild size="sm" variant="primary" className="ml-1 hidden sm:inline-flex">
-            <NavLink href="/book">{t("planEvent")}</NavLink>
-          </Button>
-          <MobileNav
-            links={[...links, { key: "book", href: "/book", label: t("planEvent") }]}
-            labels={{ open: t("openMenu"), close: t("closeMenu"), title: t("menuTitle") }}
-          />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <LocaleSwitcher className="hidden sm:inline-flex" />
+            <ThemeToggle />
+            <Button asChild size="sm" variant="primary" className="ml-1 hidden sm:inline-flex">
+              <NavLink href="/book">{t("planEvent")}</NavLink>
+            </Button>
+            <MobileNav
+              links={[...links, { key: "book", href: "/book", label: t("planEvent") }]}
+              labels={{ open: t("openMenu"), close: t("closeMenu"), title: t("menuTitle") }}
+            />
+          </div>
         </div>
       </div>
     </header>

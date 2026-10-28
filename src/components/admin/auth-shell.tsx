@@ -28,9 +28,7 @@ export async function AuthShell({ children }: { children: ReactNode }) {
         tabIndex={-1}
         className="flex flex-1 items-start justify-center px-4 pt-8 pb-16 outline-none sm:items-center sm:pt-0"
       >
-        <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-7 shadow-sm sm:p-9">
-          {children}
-        </div>
+        <div className="w-full max-w-md rounded-3xl border border-border glass p-7 sm:p-9">{children}</div>
       </main>
     </div>
   );

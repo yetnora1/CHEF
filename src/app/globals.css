@@ -18,6 +18,10 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* The admin sidebar folded to an icon rail (data-sidebar on <html>, set before
+ * paint by SidebarScript and toggled by SidebarToggle). */
+@custom-variant sidebar-collapsed (&:where([data-sidebar="collapsed"] *));
+
 @theme {
   /* Brand palette */
   --color-highland-forest: #173d32;
@@ -37,8 +41,9 @@
   --color-logo-band-bottom: #b0b0b0;
   --color-logo-shadow: #000000;
 
-  /* Light catching the top edge of a button (an inset hairline), both themes. */
-  --color-shine: #ffffff;
+  /* Glass sheen on buttons: a line of light along the top edge and a soft glow
+   * below it, so solid colours read as tinted glass. The same in both themes. */
+  --inset-shadow-sheen: inset 0 1px 0 #ffffff59, inset 0 12px 16px -10px #ffffff2e;
 
   /* Flag artwork for the language toggle: fixed national colours, not theme
    * roles, so they are the same in light and dark. */
@@ -62,14 +67,15 @@
       opacity: 0;
     }
   }
+  /* Sheets float 0.75rem in from the edge, so they start a little further out. */
   @keyframes slide-in-right {
     from {
-      transform: translateX(100%);
+      transform: translateX(calc(100% + 1rem));
     }
   }
   @keyframes slide-in-left {
     from {
-      transform: translateX(-100%);
+      transform: translateX(calc(-100% - 1rem));
     }
   }
   @keyframes menu-in {
@@ -81,10 +87,14 @@
 }
 
 /*
- * Both themes are clean, neutral black and white (the owner's choice): no
- * green, ivory or gold tint in surfaces; black primary actions in light, white
- * in dark. Only the feedback colours (and terracotta status accents) keep a
- * hue, because they carry meaning. The brand palette above is the logo's.
+ * Neutral text and actions (black in light, white in dark) on frosted glass:
+ * cards, bars and the admin sidebar are translucent panels over a soft violet
+ * and blue page backdrop. Only the feedback colours (and terracotta status
+ * accents) keep a hue of their own, because they carry meaning. The brand
+ * palette above is the logo's.
+ *
+ * Translucent tokens carry their alpha in the colour (#rrggbbaa); the token
+ * test composites them over the backdrop before checking contrast.
  */
 :root {
   color-scheme: light;
@@ -94,10 +104,28 @@
   --foreground: light-dark(#0a0a0a, #f5f5f5);
   --surface: light-dark(#fafafa, #141414);
   --surface-foreground: light-dark(#0a0a0a, #f5f5f5);
-  --surface-muted: light-dark(#f2f2f2, #1f1f1f);
+  /* A faint well inside glass (hover fills, image frames, skeletons, quiet badges). */
+  --surface-muted: light-dark(#0f172a0d, #ffffff0f);
   --muted-foreground: light-dark(#525252, #a3a3a3);
-  --border: light-dark(#e5e5e5, #262626);
+  /* Hairlines: translucent, so a rim on glass and a divider on the page look alike. */
+  --border: light-dark(#0f172a17, #ffffff1f);
   --border-strong: light-dark(#8a8a8a, #737373);
+
+  /* Page backdrop (body::before): violet light from the top left and a broad blue
+   * arc from the bottom right. Text sits directly on it too. */
+  --backdrop-violet: light-dark(#ebe5ff, #1e0c44);
+  --backdrop-blue: light-dark(#dbe7ff, #0c1a40);
+
+  /* Glass (`glass` and `glass-thick` utilities below). */
+  --glass: light-dark(#ffffff8c, #ffffff0d);
+  --glass-thick: light-dark(#ffffffd9, #101016d9);
+  --glass-shine: light-dark(#ffffffcc, #ffffff1f);
+  --glass-shadow: light-dark(#1e1b4b1a, #00000073);
+  /* Raised glass: outline buttons and the selected sidebar item. */
+  --glass-raised: light-dark(#ffffffcc, #ffffff14);
+  --glass-raised-hover: light-dark(#fffffff2, #ffffff1f);
+  /* Form inputs: lighter than the card in light, darker in dark. */
+  --field: light-dark(#ffffffb3, #00000033);
 
   /* Actions and accents */
   --primary: light-dark(#0a0a0a, #f5f5f5);
@@ -121,13 +149,11 @@
 
   /* Button shading (src/components/ui/button.tsx): soft top-to-bottom gradients.
    * Primary is lit from above; hover lightens it in light and dims it in dark.
-   * Control is the face of outline buttons, and of ghost buttons on hover. */
+   * Outline and ghost buttons are raised glass instead. */
   --primary-top: light-dark(#333333, #ffffff);
   --primary-bottom: light-dark(#0a0a0a, #dedede);
   --primary-hover-top: light-dark(#4a4a4a, #f0f0f0);
   --primary-hover-bottom: light-dark(#1f1f1f, #cccccc);
-  --control-top: light-dark(#ffffff, #262626);
-  --control-bottom: light-dark(#f0f0f0, #171717);
 
   /* Button colours by role, the same in both themes (each passes 4.5:1 with its text):
    * cta = book or contact (spice orange), action = save or create (royal blue),
@@ -152,12 +178,6 @@
   --destructive-hover-top: light-dark(#d62828, #d62828);
   --destructive-hover-bottom: light-dark(#a91818, #a91818);
   --destructive-foreground: light-dark(#ffffff, #ffffff);
-
-  /* Header "watercolour": light blue glass in light, deep blue in dark. */
-  --header-water: light-dark(#e0f2fe, #0c2236);
-  --header-water-deep: light-dark(#bae6fd, #123b5c);
-  --header-water-light: light-dark(#f0f9ff, #0a1a2a);
-  --header-line: light-dark(#bae6fd, #1e4a6e);
 
   /* Tinted header buttons: each control has its own hue (`hue-*` utilities below).
    * Light: pastel face, deep text; dark: deep face, pastel text. */
@@ -196,6 +216,14 @@
   color-scheme: dark;
 }
 
+/* Visitors who ask for less transparency get solid panels. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass: var(--surface);
+    --glass-thick: var(--surface);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -223,8 +251,11 @@
   --color-primary-bottom: var(--primary-bottom);
   --color-primary-hover-top: var(--primary-hover-top);
   --color-primary-hover-bottom: var(--primary-hover-bottom);
-  --color-control-top: var(--control-top);
-  --color-control-bottom: var(--control-bottom);
+  --color-glass: var(--glass);
+  --color-glass-thick: var(--glass-thick);
+  --color-glass-raised: var(--glass-raised);
+  --color-glass-raised-hover: var(--glass-raised-hover);
+  --color-field: var(--field);
   --color-cta-top: var(--cta-top);
   --color-cta-bottom: var(--cta-bottom);
   --color-cta-hover-top: var(--cta-hover-top);
@@ -246,6 +277,10 @@
   --color-destructive-hover-bottom: var(--destructive-hover-bottom);
   --color-destructive-foreground: var(--destructive-foreground);
 
+  /* Glass panels: light along the top edge and a soft shadow underneath. */
+  --shadow-glass: 0 1px 2px var(--glass-shadow), 0 12px 32px -12px var(--glass-shadow);
+  --inset-shadow-glass: inset 0 1px 0 var(--glass-shine);
+
   /* The device's own UI font for Latin (Segoe UI, San Francisco, Roboto…); the
    * browser falls through to Noto Sans Ethiopic for each Ethiopic glyph.
    * Headings use the same stack as body text, only bolder. */
@@ -265,13 +300,26 @@
     scroll-padding-top: 6rem;
   }
 
+  /* No background of its own: the backdrop below shows through. */
   body {
     min-height: 100dvh;
-    background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* The page backdrop, fixed to the viewport so glass frosts it as it scrolls past.
+   * It sits above the html background and below all content. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(circle 90vmax at 105% 112%, var(--backdrop-blue) 0 58%, transparent 62%),
+      radial-gradient(95% 80% at 0% 0%, var(--backdrop-violet) 10%, transparent 75%);
   }
 
   /* Ethiopic script needs more vertical room than Latin. */
@@ -410,31 +458,18 @@
 }
 
 /*
- * Translucent light-blue "watercolour" glass for sticky headers (deep blue in
- * dark): the page shows through, blurred, under soft blooms of lighter and
- * deeper blue, like wet paint. Header text keeps its contrast in both themes.
+ * Frosted glass: a translucent panel that blurs whatever is behind it, with light
+ * along its top edge and a soft shadow. Pair it with `border border-border` for
+ * the hairline rim; an explicit `shadow-*` replaces the outer shadow only.
+ *   glass       – cards and the admin sidebar, over the page backdrop
+ *   glass-thick – sticky bars, menus, dialogs and sheets, which content moves behind
  */
-@utility glass-wash {
-  background-color: color-mix(in oklab, var(--header-water) 80%, transparent);
-  background-image:
-    radial-gradient(
-      45% 170% at 8% 0%,
-      color-mix(in oklab, var(--header-water-deep) 70%, transparent),
-      transparent 72%
-    ),
-    radial-gradient(
-      40% 170% at 55% 120%,
-      color-mix(in oklab, var(--header-water-light) 80%, transparent),
-      transparent 72%
-    ),
-    radial-gradient(
-      45% 170% at 96% 0%,
-      color-mix(in oklab, var(--header-water-deep) 60%, transparent),
-      transparent 72%
-    );
-  border-color: var(--header-line);
-  -webkit-backdrop-filter: blur(16px) saturate(1.5);
-  backdrop-filter: blur(16px) saturate(1.5);
+@utility glass {
+  @apply bg-glass shadow-glass inset-shadow-glass backdrop-blur-xl backdrop-saturate-150;
+}
+
+@utility glass-thick {
+  @apply bg-glass-thick shadow-glass inset-shadow-glass backdrop-blur-2xl backdrop-saturate-150;
 }
 
 /* Hues for `tint` buttons: each sets the face, border and text the variant reads. */

@@ -35,7 +35,7 @@ export default async function BookPage() {
             {t("title")}
           </h1>
           <p className="mt-5 text-lg text-muted-foreground">{t("intro")}</p>
-          <div className="mt-8 rounded-2xl border border-border bg-surface p-5 sm:p-6">
+          <div className="mt-8 rounded-2xl border border-border glass p-5 sm:p-6">
             <h2 className="text-sm font-semibold">{t("processTitle")}</h2>
             <ol className="mt-4 space-y-3 text-sm leading-relaxed">
               {PROCESS_STEPS.map((step, index) => (
@@ -80,7 +80,7 @@ async function InquiryFormSection() {
     ]);
     const services = navigation.find((link) => link.key === "services")?.href ?? "/";
     return (
-      <div role="status" className="self-start rounded-3xl border border-border bg-surface p-7 sm:p-10">
+      <div role="status" className="self-start rounded-3xl border border-border glass p-7 sm:p-10">
         <h2 className="display-md">{t("unavailableTitle")}</h2>
         <p className="mt-4 text-muted-foreground">{t("unavailableBody")}</p>
         <div className="mt-8 flex flex-wrap gap-3">

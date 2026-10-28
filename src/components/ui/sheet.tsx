@@ -17,7 +17,7 @@ type SheetContentProps = ComponentProps<typeof DialogPrimitive.Content> & {
   closeLabel: string;
 };
 
-/** A modal side panel built on Radix Dialog (focus trap, Escape, scroll lock). */
+/** A modal glass side panel floating in from an edge, built on Radix Dialog (focus trap, Escape, scroll lock). */
 export function SheetContent({
   className,
   children,
@@ -27,13 +27,13 @@ export function SheetContent({
 }: SheetContentProps) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-coffee-charcoal/55 data-[state=open]:animate-fade-in" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-coffee-charcoal/40 backdrop-blur-sm data-[state=open]:animate-fade-in" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed inset-y-0 z-50 flex w-[min(22rem,88vw)] flex-col gap-6 overflow-y-auto bg-background p-6 text-foreground shadow-2xl outline-none",
+          "fixed inset-y-3 z-50 flex w-[min(22rem,calc(100vw-1.5rem))] flex-col gap-6 overflow-y-auto rounded-2xl border border-border glass-thick p-6 text-foreground shadow-2xl outline-none",
           side === "right"
-            ? "right-0 border-l border-border data-[state=open]:animate-slide-in-right"
-            : "left-0 border-r border-border data-[state=open]:animate-slide-in-left",
+            ? "right-3 data-[state=open]:animate-slide-in-right"
+            : "left-3 data-[state=open]:animate-slide-in-left",
           className,
         )}
         {...props}

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
+import { BeforePaintScript } from "@/components/layout/before-paint-script";
 import { DemoBanner } from "@/components/layout/demo-banner";
 import { SkipLink } from "@/components/layout/skip-link";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { getClientMessages } from "@/i18n/client-messages";
 import { fontVariables } from "@/lib/fonts";
+import { SIDEBAR_INIT_SCRIPT } from "@/lib/sidebar";
 import "../globals.css";
 
 /*
@@ -35,6 +37,7 @@ export default async function AdminRootLayout({ children }: LayoutProps<"/admin"
     <html lang={locale} className={fontVariables} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <ThemeScript />
+        <BeforePaintScript code={SIDEBAR_INIT_SCRIPT} />
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>

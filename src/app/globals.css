@@ -530,6 +530,14 @@
   --tint-text: var(--green-text);
 }
 
+/* Small tinted surfaces in a `hue-*` colour (role badges, avatars, icon tiles):
+ * the same face, rim and text as a `tint` button, without its shading. */
+@utility tint-chip {
+  border: 1px solid var(--tint-border);
+  background-image: linear-gradient(to bottom, var(--tint-top), var(--tint-bottom));
+  color: var(--tint-text);
+}
+
 /* Fine dotted texture used by photography placeholders. */
 @utility dot-texture {
   background-image: radial-gradient(

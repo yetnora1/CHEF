@@ -48,10 +48,19 @@ test.describe("staff and roles", () => {
       "No role",
     );
 
-    // The guide comes from the reviewed permission matrix.
-    const guide = page.getByRole("list", { name: "What Event manager can do" });
-    await expect(guide).toContainText("See and update the inquiries assigned to them");
-    await expect(guide).not.toContainText("Read the audit log");
+    // The guide comes from the reviewed permission matrix (Owner, Administrator, Content editor,
+    // Event manager, Analyst); seeing all inquiries includes the assigned ones.
+    const guide = page.getByRole("table", { name: "What each role can do" });
+    await expect(
+      guide.getByRole("row", { name: /^See and update the inquiries assigned to them/ }).getByRole("cell"),
+    ).toHaveText(["Yes", "Yes", "No", "Yes", "No"]);
+    await expect(guide.getByRole("row", { name: /^Read the audit log/ }).getByRole("cell")).toHaveText([
+      "Yes",
+      "Yes",
+      "No",
+      "No",
+      "No",
+    ]);
   });
 
   test("an owner gives and removes roles, confirming owner-level access", async ({ page }) => {

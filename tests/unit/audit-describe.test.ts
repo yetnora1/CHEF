@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { auditDay, describeAuditEntry, type AuditEntry } from "@/features/audit/describe";
+import { auditDay, describeAuditEntry, recentDays, type AuditEntry } from "@/features/audit/describe";
 
 const USER = "11111111-1111-4111-8111-111111111111";
 const OTHER = "22222222-2222-4222-8222-222222222222";
@@ -166,6 +166,14 @@ describe("audit entries in plain language", () => {
 });
 
 describe("grouping by day", () => {
+  it("names today and yesterday in the business time zone", () => {
+    // 22:30 UTC on 24 October is already 25 October in Addis Ababa.
+    expect(recentDays("Africa/Addis_Ababa", new Date("2026-10-24T22:30:00Z"))).toEqual({
+      today: "2026-10-25",
+      yesterday: "2026-10-24",
+    });
+  });
+
   it("uses the business time zone", () => {
     // 21:30 UTC is already the next day in Addis Ababa (UTC+3).
     expect(auditDay("2026-10-24T21:30:00Z", "Africa/Addis_Ababa")).toBe("2026-10-25");

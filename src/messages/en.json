@@ -510,6 +510,9 @@
     },
     "guideHeading": "What each role can do",
     "guideIntro": "Roles are fixed: their permissions are set in the database and checked again on every page and every change.",
+    "guideAbility": "Ability",
+    "guideYes": "Yes",
+    "guideNo": "No",
     "canDo": "What {role} can do",
     "roleDescriptions": {
       "owner": "Full control of the website, including other owners and administrators, and erasing inquiries.",
@@ -576,6 +579,8 @@
     },
     "inquiriesOpenHint": "On: visitors can send event inquiries.",
     "inquiriesPausedHint": "Off: the form says that new inquiries are paused, and nothing can be sent. Existing inquiries are not affected.",
+    "statusOpen": "Open",
+    "statusPaused": "Paused",
     "review": {
       "label": "Reviewed by a fluent Amharic speaker",
       "help": "Tick only when someone fluent in Amharic has read this exact text. Your name and the time are recorded.",
@@ -636,6 +641,8 @@
     "newest": "Back to the newest",
     "older": "Older entries",
     "pagesLabel": "Audit log pages",
+    "today": "Today",
+    "yesterday": "Yesterday",
     "by": "by {name}",
     "formerStaff": "a former staff member",
     "system": "the system",

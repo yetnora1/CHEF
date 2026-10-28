@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import {
   ArrowRight,
+  ArrowUpRight,
   FileText,
   Image as ImageIcon,
   Inbox,
@@ -22,6 +23,7 @@ import {
   AUDIT_CATEGORIES,
   auditDay,
   describeAuditEntry,
+  recentDays,
   type AuditCategory,
   type AuditDescription,
   type AuditEntry,
@@ -38,6 +40,16 @@ const CATEGORY_ICONS: Record<AuditCategory, LucideIcon> = {
   content: FileText,
   media: ImageIcon,
   settings: Settings,
+};
+
+/** Each area's colour (a `hue-*` utility in globals.css), so entries can be told apart at a glance. */
+const CATEGORY_HUES: Record<AuditCategory, string> = {
+  role: "hue-violet",
+  booking: "hue-amber",
+  contact_message: "hue-sky",
+  content: "hue-teal",
+  media: "hue-rose",
+  settings: "hue-indigo",
 };
 
 function query(filters: AuditFilters, before?: number) {
@@ -142,6 +154,7 @@ export async function AuditList({
     timeStyle: "short",
     timeZone: BUSINESS_TIME_ZONE,
   });
+  const { today, yesterday } = recentDays(BUSINESS_TIME_ZONE);
   const days: { day: string; entries: AuditEntry[] }[] = [];
   for (const entry of entries) {
     const day = auditDay(entry.occurredAt, BUSINESS_TIME_ZONE);
@@ -154,8 +167,15 @@ export async function AuditList({
     <div className="space-y-8">
       {days.map(({ day, entries: dayEntries }) => (
         <section key={day} aria-labelledby={`audit-day-${day}`}>
-          <h2 id={`audit-day-${day}`} className="text-sm font-semibold text-muted-foreground">
-            {formatCalendarDate(locale, day)}
+          <h2 id={`audit-day-${day}`} className="flex flex-wrap items-baseline gap-x-2 text-sm font-semibold">
+            {day === today || day === yesterday ? (
+              <>
+                {day === today ? t("today") : t("yesterday")}
+                <span className="font-normal text-muted-foreground">{formatCalendarDate(locale, day)}</span>
+              </>
+            ) : (
+              formatCalendarDate(locale, day)
+            )}
           </h2>
           <ol className="mt-3 divide-y divide-border overflow-hidden rounded-2xl border border-border glass">
             {dayEntries.map((entry) => (
@@ -214,6 +234,7 @@ async function EntryRow({
   const described = describeAuditEntry(entry);
   const category = entry.action.split(".")[0] as AuditCategory;
   const Icon = CATEGORY_ICONS[category] ?? FileText;
+  const hue = CATEGORY_HUES[category];
 
   const statusLabel = (status: AuditStatus | null) => {
     if (!status) return t("unknownValue");
@@ -245,12 +266,17 @@ async function EntryRow({
   ].filter((detail) => detail !== null);
 
   return (
-    <li className="grid gap-x-4 gap-y-1 p-4 sm:grid-cols-[4.5rem_1fr_auto] sm:items-start">
-      <p className="text-sm text-muted-foreground tabular-nums sm:pt-0.5">
+    <li className="grid gap-x-4 gap-y-2 px-4 py-3.5 transition-colors hover:bg-glass-raised sm:grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:items-center">
+      <p className="text-xs font-medium text-muted-foreground tabular-nums">
         <time dateTime={entry.occurredAt}>{time}</time>
       </p>
-      <div className="flex min-w-0 gap-3">
-        <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-accent-ink">
+      <div className="flex min-w-0 items-center gap-3">
+        <span
+          className={cn(
+            "inline-flex size-8 shrink-0 items-center justify-center rounded-lg",
+            hue ? cn("tint-chip", hue) : "bg-surface-muted text-accent-ink",
+          )}
+        >
           <Icon aria-hidden className="size-4" />
         </span>
         <div className="min-w-0">
@@ -332,16 +358,22 @@ async function TargetLink({ target, t }: { target: AuditTarget; t: AuditTranslat
       label = [target.type, target.id].filter(Boolean).join(" ") || t("unknownValue");
       break;
   }
+  const pill =
+    "inline-flex max-w-full min-w-0 items-center gap-1 justify-self-start rounded-md border px-2 py-1 text-xs font-medium max-sm:ml-11 sm:max-w-56 sm:justify-self-end";
   return href ? (
     <Link
       href={href}
-      className="justify-self-start text-sm font-medium break-all text-accent-ink underline-offset-4 hover:underline max-sm:pl-10 sm:max-w-56 sm:justify-self-end sm:text-right"
+      className={cn(
+        pill,
+        "border-border bg-glass-raised transition-colors hover:border-border-strong hover:bg-glass-raised-hover",
+      )}
     >
-      {label}
+      <span className="truncate">{label}</span>
+      <ArrowUpRight aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
     </Link>
   ) : (
-    <span className="justify-self-start text-sm break-all text-muted-foreground max-sm:pl-10 sm:max-w-56 sm:justify-self-end sm:text-right">
-      {label}
+    <span className={cn(pill, "border-dashed border-border text-muted-foreground")}>
+      <span className="truncate">{label}</span>
     </span>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, LoaderCircle, ShieldCheck } from "lucide-react";
+import { AlertCircle, CheckCircle2, LoaderCircle, Lock, UserCog } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   startTransition,
@@ -16,7 +16,9 @@ import { Button } from "@/components/ui/button";
 import { APP_ROLES, type AppRole } from "@/lib/permissions/matrix";
 import { cn } from "@/lib/utils";
 import { setUserRolesAction, type RolesActionState } from "../actions";
+import { ROLE_HUES } from "../role-hues";
 import { isPrivilegedRole, type RoleEditing } from "../roles";
+import { RoleChip } from "./role-chip";
 
 export type StaffMemberView = {
   id: string;
@@ -33,7 +35,7 @@ export type StaffMemberView = {
 /** Everyone with an account, their roles, and (for staff managers) a way to change them. */
 export function StaffList({ members }: { members: StaffMemberView[] }) {
   return (
-    <ul className="space-y-3">
+    <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border glass">
       {members.map((member) => (
         <StaffRow key={member.id} member={member} />
       ))}
@@ -103,22 +105,39 @@ function StaffRow({ member }: { member: StaffMemberView }) {
 
   const names = (roles: AppRole[]) => roles.map((role) => tRoles(role)).join(", ");
   const initial = (member.name.trim()[0] ?? "?").toUpperCase();
+  // Roles arrive most privileged first, so the avatar takes the person's main role colour.
+  const mainRole = member.roles[0];
   const editing = member.editing;
+  const note = editing.editable
+    ? null
+    : editing.reason === "self"
+      ? t("notEditableSelf")
+      : editing.reason === "privilegedAccount"
+        ? t("notEditablePrivileged")
+        : null;
 
   return (
-    <li id={`staff-${member.id}`} className="scroll-mt-24 rounded-2xl border border-border glass p-4 sm:p-5">
-      <div className="flex flex-wrap items-start gap-x-4 gap-y-3">
+    <li
+      id={`staff-${member.id}`}
+      className={cn("scroll-mt-24 px-4 py-4 transition-colors sm:px-5", open && "bg-glass-raised")}
+    >
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
         <span
           aria-hidden
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-linear-to-b from-action-top to-action-bottom text-sm font-bold text-action-foreground inset-shadow-sheen"
+          className={cn(
+            "flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold",
+            mainRole
+              ? cn("tint-chip", ROLE_HUES[mainRole])
+              : "border border-dashed border-border-strong text-muted-foreground",
+          )}
         >
           {initial}
         </span>
-        <div className="min-w-0 flex-1">
-          <p className="flex flex-wrap items-center gap-2 font-semibold">
-            <span className="min-w-0 break-words">{member.name}</span>
+        <div className="min-w-0 flex-1 basis-56">
+          <p className="flex flex-wrap items-center gap-2">
+            <span className="font-semibold break-words">{member.name}</span>
             {member.isYou && (
-              <span className="rounded-full border border-border bg-glass-raised px-2 py-0.5 text-xs">
+              <span className="rounded-full border border-border bg-glass-raised px-2 py-px text-xs font-medium">
                 {t("you")}
               </span>
             )}
@@ -126,7 +145,7 @@ function StaffRow({ member }: { member: StaffMemberView }) {
           {member.email && member.email !== member.name && (
             <p className="text-sm break-all text-muted-foreground">{member.email}</p>
           )}
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {[
               member.joined ? t("joined", { date: member.joined }) : null,
               member.lastSignIn ? t("lastSignIn", { date: member.lastSignIn }) : t("neverSignedIn"),
@@ -134,36 +153,29 @@ function StaffRow({ member }: { member: StaffMemberView }) {
               .filter(Boolean)
               .join(" · ")}
           </p>
+          {note && (
+            <p className="mt-1.5 flex items-start gap-1.5 text-xs text-muted-foreground">
+              <Lock aria-hidden className="mt-px size-3.5 shrink-0" />
+              {note}
+            </p>
+          )}
         </div>
-        <ul aria-label={t("rolesOf", { name: member.name })} className="flex flex-wrap gap-1.5">
+        <ul aria-label={t("rolesOf", { name: member.name })} className="flex flex-wrap items-center gap-1.5">
           {member.roles.length > 0 ? (
             member.roles.map((role) => (
-              <li
-                key={role}
-                className={cn(
-                  "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold",
-                  isPrivilegedRole(role)
-                    ? "border-action-bottom/40 bg-action-bottom/10"
-                    : "border-border bg-glass-raised",
-                )}
-              >
-                {isPrivilegedRole(role) && (
-                  <ShieldCheck aria-hidden className="size-3.5 text-action-bottom" />
-                )}
-                {tRoles(role)}
+              <li key={role}>
+                <RoleChip role={role} label={tRoles(role)} />
               </li>
             ))
           ) : (
-            <li className="rounded-full border border-dashed border-border-strong px-2.5 py-1 text-xs text-muted-foreground">
+            <li className="rounded-full border border-dashed border-border-strong px-2.5 py-0.5 text-xs text-muted-foreground">
               {t("noRole")}
             </li>
           )}
         </ul>
-      </div>
-
-      {editing.editable ? (
-        !open && (
-          <div className="mt-3 flex flex-wrap items-center gap-3">
+        {editing.editable && !open && (
+          <div className="flex flex-wrap items-center gap-3">
+            <Outcome state={state} resultRef={resultRef} />
             <Button
               ref={openerRef}
               type="button"
@@ -175,19 +187,19 @@ function StaffRow({ member }: { member: StaffMemberView }) {
                 setOpen(true);
               }}
             >
+              <UserCog aria-hidden />
               {t("changeRoles")}
             </Button>
-            <Outcome state={state} resultRef={resultRef} />
           </div>
-        )
-      ) : editing.reason !== "noPermission" ? (
-        <p className="mt-3 text-xs text-muted-foreground">
-          {editing.reason === "self" ? t("notEditableSelf") : t("notEditablePrivileged")}
-        </p>
-      ) : null}
+        )}
+      </div>
 
       {editing.editable && open && (
-        <form ref={formRef} onSubmit={onSubmit} className="mt-4 space-y-4 border-t border-border pt-4">
+        <form
+          ref={formRef}
+          onSubmit={onSubmit}
+          className="mt-4 space-y-4 rounded-xl border border-border bg-glass p-4 sm:ml-14"
+        >
           <input type="hidden" name="userId" value={member.id} />
           <fieldset>
             <legend className="text-sm font-semibold">{t("rolesLegend", { name: member.name })}</legend>
@@ -198,7 +210,7 @@ function StaffRow({ member }: { member: StaffMemberView }) {
                   <label
                     key={role}
                     className={cn(
-                      "flex items-start gap-3 rounded-xl border border-border bg-glass-raised p-3 transition-colors has-checked:border-action-bottom/60",
+                      "flex items-start gap-3 rounded-xl border border-border bg-glass-raised p-3 transition-colors has-checked:border-action-bottom/60 has-checked:bg-action-bottom/5",
                       locked ? "cursor-not-allowed opacity-65" : "cursor-pointer hover:border-border-strong",
                     )}
                   >
@@ -209,14 +221,19 @@ function StaffRow({ member }: { member: StaffMemberView }) {
                       checked={selected.has(role)}
                       disabled={locked || pending}
                       onChange={(event) => toggle(role, event.target.checked)}
-                      className="mt-0.5 size-4 shrink-0 accent-action-bottom"
+                      className="mt-1 size-4 shrink-0 accent-action-bottom"
                     />
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold">{tRoles(role)}</span>
+                    <span className="min-w-0 space-y-1">
+                      <RoleChip role={role} label={tRoles(role)} />
                       <span className="block text-xs leading-relaxed text-muted-foreground">
                         {t(`roleDescriptions.${role}`)}
                       </span>
-                      {locked && <span className="mt-1 block text-xs font-medium">{t("lockedHint")}</span>}
+                      {locked && (
+                        <span className="flex items-center gap-1 text-xs font-medium">
+                          <Lock aria-hidden className="size-3" />
+                          {t("lockedHint")}
+                        </span>
+                      )}
                     </span>
                   </label>
                 );

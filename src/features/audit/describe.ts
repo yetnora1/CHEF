@@ -178,3 +178,13 @@ export function auditDay(iso: string, timeZone: string): string {
     day: "2-digit",
   }).format(new Date(iso));
 }
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** The business days shown as "Today" and "Yesterday". */
+export function recentDays(timeZone: string, now: Date = new Date()): { today: string; yesterday: string } {
+  return {
+    today: auditDay(now.toISOString(), timeZone),
+    yesterday: auditDay(new Date(now.getTime() - DAY_MS).toISOString(), timeZone),
+  };
+}

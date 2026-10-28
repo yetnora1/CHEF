@@ -1,4 +1,4 @@
-import { ArrowRight, Info } from "lucide-react";
+import { ArrowRight, CalendarClock, Clock, Info } from "lucide-react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { NextIntlClientProvider } from "next-intl";
@@ -92,6 +92,12 @@ async function InquiryFormSection() {
     const services = navigation.find((link) => link.key === "services")?.href ?? "/";
     return (
       <div role="status" className="rounded-3xl border border-border glass p-7 sm:p-10">
+        <span
+          aria-hidden
+          className="mb-5 inline-flex size-12 items-center justify-center rounded-2xl tint-chip hue-amber"
+        >
+          {paused ? <CalendarClock className="size-6" /> : <Clock className="size-6" />}
+        </span>
         <h2 className="display-md">{paused ? t("pausedTitle") : t("unavailableTitle")}</h2>
         <p className="mt-4 text-muted-foreground">{paused ? t("pausedBody") : t("unavailableBody")}</p>
         <div className="mt-8 flex flex-wrap gap-3">

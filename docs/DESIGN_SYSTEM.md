@@ -159,6 +159,21 @@ hue. There is no "Plan an event" button in the header bar (removed at the owner'
 2026-10-28); the event form is reached from the homepage call to action, the phone menu and the
 footer.
 
+## Colour-coded chips
+
+`tint-chip` (paired with a `hue-*` utility) gives small surfaces the same pastel face, rim and text
+as a `tint` button, without its shading. It marks things that belong to a fixed set, so a colour
+always means the same thing:
+
+- **Staff roles** (`features/staff/role-hues.ts`): owner violet, administrator indigo, content
+  editor teal, event manager amber, analyst sky. Badges, and the avatar of each person's main role.
+- **Audit log areas**: roles violet, inquiries amber, messages sky, content teal, images rose,
+  settings indigo.
+- **Ways to get in touch** on the Contact page: phone amber, WhatsApp teal, Telegram sky, email
+  indigo, location rose.
+
+Chips carry a text label or sit beside one; the colour is never the only cue.
+
 ## Admin sidebar
 
 A floating `glass` panel (`admin/admin-shell`, contents in `admin/admin-sidebar`), modelled on the

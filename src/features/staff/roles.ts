@@ -69,6 +69,15 @@ function holds(role: AppRole, permissions: readonly AppPermission[]): boolean {
   return permissions.every((permission) => granted.includes(permission));
 }
 
+/** Whether a role can do something, itself or through the broader capability that covers it. */
+export function roleCan(role: AppRole, key: RoleCapability): boolean {
+  const capability: Capability | undefined = ROLE_CAPABILITIES.find((c) => c.key === key);
+  if (!capability) return false;
+  if (holds(role, capability.permissions)) return true;
+  const broader = ROLE_CAPABILITIES.find((c) => c.key === capability.impliedBy);
+  return broader ? holds(role, broader.permissions) : false;
+}
+
 /** What one role can do, in guide order, without capabilities a broader one already covers. */
 export function capabilitiesOf(role: AppRole): RoleCapability[] {
   const held = ROLE_CAPABILITIES.filter((capability) => holds(role, capability.permissions));

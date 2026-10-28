@@ -1,9 +1,10 @@
-import { AtSign, Mail, MapPin, MessageCircle, Phone, Send, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, MessageCircle, Phone, Send, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { buttonVariants } from "@/components/ui/button";
 import { getContactConfig } from "@/features/bookings/server/config";
 import { ContactForm } from "@/features/contact/components/contact-form";
 import { contactSubjectFor } from "@/features/contact/service-subject";
@@ -11,6 +12,7 @@ import { getPublicSiteSettings } from "@/features/settings/public-data";
 import { telHref, whatsappDigits } from "@/features/settings/schema";
 import { getClientMessages } from "@/i18n/client-messages";
 import { resolveLocalized } from "@/lib/localization/translations";
+import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -22,7 +24,18 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-type Detail = { key: string; icon: LucideIcon; label: string; value: string; href?: string; lang?: string };
+type DetailKey = "phone" | "whatsapp" | "telegram" | "email" | "location";
+
+type Detail = { key: DetailKey; label: string; value: string; href?: string; lang?: string };
+
+/** Each way to reach CHEF SIS has its own icon and colour (a `hue-*` utility in globals.css). */
+const DETAIL_STYLE: Record<DetailKey, { icon: LucideIcon; hue: string }> = {
+  phone: { icon: Phone, hue: "hue-amber" },
+  whatsapp: { icon: MessageCircle, hue: "hue-teal" },
+  telegram: { icon: Send, hue: "hue-sky" },
+  email: { icon: Mail, hue: "hue-indigo" },
+  location: { icon: MapPin, hue: "hue-rose" },
+};
 
 /**
  * Contact: the message form, beside the contact details and social links that
@@ -48,8 +61,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
         ...(settings.phone
           ? [
               {
-                key: "phone",
-                icon: Phone,
+                key: "phone" as const,
                 label: t("phone"),
                 value: settings.phone,
                 href: telHref(settings.phone),
@@ -59,8 +71,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
         ...(settings.whatsapp
           ? [
               {
-                key: "whatsapp",
-                icon: MessageCircle,
+                key: "whatsapp" as const,
                 label: t("whatsapp"),
                 value: settings.whatsapp,
                 href: `https://wa.me/${whatsappDigits(settings.whatsapp)}`,
@@ -70,8 +81,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
         ...(settings.telegram
           ? [
               {
-                key: "telegram",
-                icon: Send,
+                key: "telegram" as const,
                 label: t("telegram"),
                 value: `@${settings.telegram}`,
                 href: `https://t.me/${settings.telegram}`,
@@ -81,8 +91,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
         ...(settings.email
           ? [
               {
-                key: "email",
-                icon: Mail,
+                key: "email" as const,
                 label: t("email"),
                 value: settings.email,
                 href: `mailto:${settings.email}`,
@@ -90,7 +99,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
             ]
           : []),
         ...(place
-          ? [{ key: "location", icon: MapPin, label: t("location"), value: place.text, lang: place.lang }]
+          ? [{ key: "location" as const, label: t("location"), value: place.text, lang: place.lang }]
           : []),
       ]
     : [];
@@ -114,55 +123,73 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
 
         {(details.length > 0 || social.length > 0) && (
           <div className="lg:col-start-1 lg:row-start-2 lg:self-start">
-            <div className="rounded-2xl border border-border glass p-6">
-              <h2 className="text-lg font-semibold">{t("detailsTitle")}</h2>
-              <dl className="mt-2 divide-y divide-border">
-                {details.map(({ key, icon: Icon, label, value, href, lang }) => (
-                  <div key={key} className="flex items-center gap-4 py-4">
-                    <Icon aria-hidden className="size-5 shrink-0 text-accent-ink" />
-                    <div>
-                      <dt className="text-xs text-muted-foreground">{label}</dt>
-                      <dd className="font-semibold" lang={lang}>
-                        {href ? (
-                          <a href={href} className="underline-offset-4 hover:text-primary hover:underline">
-                            {value}
-                          </a>
-                        ) : (
-                          value
-                        )}
-                      </dd>
-                    </div>
-                  </div>
-                ))}
-                {social.length > 0 && (
-                  <div className="flex items-center gap-4 py-4">
-                    <AtSign aria-hidden className="size-5 shrink-0 text-accent-ink" />
-                    <div>
-                      <dt className="text-xs text-muted-foreground">{t("social")}</dt>
-                      <dd>
-                        <ul className="flex flex-wrap gap-x-4 gap-y-1 font-semibold">
-                          {social.map(({ platform, url }) => (
-                            <li key={platform}>
-                              <a
-                                href={url}
-                                rel="me"
-                                className="underline-offset-4 hover:text-primary hover:underline"
-                              >
-                                {tFooter(`social.${platform}`)}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </dd>
-                    </div>
-                  </div>
-                )}
-              </dl>
+            <div className="rounded-2xl border border-border glass p-3 sm:p-4">
+              <h2 className="px-3 pt-2 text-lg font-semibold">{t("detailsTitle")}</h2>
+              {details.length > 0 && (
+                <ul className="mt-2 space-y-0.5">
+                  {details.map((detail) => (
+                    <li key={detail.key}>
+                      <DetailRow detail={detail} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {social.length > 0 && (
+                <div className="mt-2 border-t border-border px-3 pt-4 pb-2">
+                  <h3 className="text-xs font-semibold text-muted-foreground">{t("social")}</h3>
+                  <ul className="mt-2.5 flex flex-wrap gap-2">
+                    {social.map(({ platform, url }) => (
+                      <li key={platform}>
+                        <a href={url} rel="me" className={buttonVariants({ variant: "outline", size: "sm" })}>
+                          {tFooter(`social.${platform}`)}
+                          <ArrowUpRight
+                            aria-hidden
+                            className="group-hover/button:translate-x-0.5 group-hover/button:-translate-y-0.5"
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
     </section>
+  );
+}
+
+/** One way to reach CHEF SIS: the whole row is the link (call, chat, write), with room for a thumb. */
+function DetailRow({ detail }: { detail: Detail }) {
+  const { icon: Icon, hue } = DETAIL_STYLE[detail.key];
+  const body = (
+    <>
+      <span
+        className={cn("inline-flex size-10 shrink-0 items-center justify-center rounded-xl tint-chip", hue)}
+      >
+        <Icon aria-hidden className="size-5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-xs text-muted-foreground">{detail.label}</span>
+        <span className="block font-semibold break-words" lang={detail.lang}>
+          {detail.value}
+        </span>
+      </span>
+    </>
+  );
+  if (!detail.href) return <div className="flex items-center gap-4 px-3 py-2.5">{body}</div>;
+  return (
+    <a
+      href={detail.href}
+      className="group flex items-center gap-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-glass-raised focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring"
+    >
+      {body}
+      <ArrowUpRight
+        aria-hidden
+        className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground motion-reduce:transition-none"
+      />
+    </a>
   );
 }
 

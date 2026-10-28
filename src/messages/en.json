@@ -207,7 +207,6 @@
     "phoneHint": "Include the country code if you are outside Ethiopia, for example +251.",
     "contactMethod": "How should we contact you?",
     "eventType": "Type of event",
-    "eventTypePlaceholder": "Choose an event type",
     "eventDate": "Event date",
     "eventDateHint": "Leave empty if you have not chosen a date yet.",
     "guestCount": "Approximate number of guests",
@@ -222,7 +221,6 @@
     "submit": "Send inquiry",
     "submitting": "Sending…",
     "captchaLabel": "Security check",
-    "localBypassNotice": "Development mode: the security check (CAPTCHA) is switched off for local testing.",
     "errorSummaryTitle": "Please check {count, plural, one {# field} other {# fields}}",
     "errors": {
       "required": "This field is required.",
@@ -251,7 +249,18 @@
     "successBody": "Your inquiry is now awaiting review by CHEF SIS. This is not a booking confirmation and it does not confirm availability for your date.",
     "referenceLabel": "Your reference",
     "referenceHint": "Please keep this reference and mention it if you get in touch.",
-    "newInquiry": "Send another inquiry"
+    "newInquiry": "Send another inquiry",
+    "stepsLabel": "Inquiry steps",
+    "stepCounter": "Step {current} of {total}",
+    "next": "Next",
+    "back": "Back",
+    "guestsFewer": "Fewer guests",
+    "guestsMore": "More guests",
+    "reviewTitle": "Check your inquiry",
+    "edit": "Edit",
+    "notGiven": "Not given",
+    "copyReference": "Copy reference",
+    "copied": "Copied"
   },
   "Privacy": {
     "metaTitle": "Privacy notice",

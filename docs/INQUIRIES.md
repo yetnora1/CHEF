@@ -8,16 +8,19 @@ that a date is available or an event is confirmed.
 
 ```
 Browser (/en/book, /am/book)
-  │  client-side validation (same Zod schema as the server), idempotency key, Turnstile token
+  │  step-by-step form, client-side validation (same Zod schema as the server), idempotency key,
+  │  Turnstile token (only when its optional keys are set)
   ▼
 Server action submitInquiryAction  (src/features/bookings/submit-action.ts)
   │  Next.js: same-origin check (CSRF), 64 KB body limit
   │  processInquirySubmission (src/features/bookings/server/submission.ts):
-  │    1. configuration check → "not open yet" if storage or CAPTCHA is missing (fail closed)
+  │    1. configuration check → "not open yet" if storage, the production client-IP header or one
+  │       of a Turnstile key pair is missing (fail closed)
   │    2. honeypot field
   │    3. validation + normalisation (server is authoritative)
   │    4. per-IP rate limits (Postgres, shared by all instances)
-  │    5. Turnstile verification (Cloudflare unreachable ⇒ rejected); each solved token is accepted once
+  │    5. Turnstile verification, only when configured (Cloudflare unreachable ⇒ rejected); each
+  │       solved token is accepted once
   │    6. per-mailbox and site-wide rate limits (only verified requests count)
   │    7. public.submit_inquiry(...) with the server secret key
   │    8. email delivery queued with after() (optional)
@@ -66,14 +69,14 @@ currency, and a budget question would imply pricing the business has not set.
 
 ## Abuse protection
 
-| Control             | Detail                                                                                                                                                         | Status                                                                                       |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| CAPTCHA             | Cloudflare Turnstile, verified server-side with action `inquiry` (and, in production, the hostname of `NEXT_PUBLIC_SITE_URL`); each solved token accepted once | Verified with Cloudflare's **test** keys (siteverify and widget); **not with a live widget** |
-| Rate limits         | see below                                                                                                                                                      | Implemented in Postgres; tested on PGlite and e2e                                            |
-| Honeypot            | hidden `website` field                                                                                                                                         | Implemented                                                                                  |
-| Body size           | server actions ≤ 64 KB                                                                                                                                         | Configured                                                                                   |
-| Field limits        | schema + database constraints                                                                                                                                  | Tested                                                                                       |
-| Privacy of counters | IP and email are HMAC-hashed with a key derived from the server secret; windows expire within a day                                                            | Tested                                                                                       |
+| Control             | Detail                                                                                                                                                                                                                  | Status                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| CAPTCHA (optional)  | Off by default (owner's decision, 2026-10-28). With keys: Cloudflare Turnstile, verified server-side with action `inquiry` (in production also the hostname of `NEXT_PUBLIC_SITE_URL`); each solved token accepted once | Verified with Cloudflare's **test** keys (siteverify and widget); **not with a live widget** |
+| Rate limits         | see below                                                                                                                                                                                                               | Implemented in Postgres; tested on PGlite and e2e                                            |
+| Honeypot            | hidden `website` field                                                                                                                                                                                                  | Implemented                                                                                  |
+| Body size           | server actions ≤ 64 KB                                                                                                                                                                                                  | Configured                                                                                   |
+| Field limits        | schema + database constraints                                                                                                                                                                                           | Tested                                                                                       |
+| Privacy of counters | IP and email are HMAC-hashed with a key derived from the server secret; windows expire within a day                                                                                                                     | Tested                                                                                       |
 
 ### Rate limits
 
@@ -83,9 +86,10 @@ currency, and a budget question would imply pricing the business has not set.
 | after CAPTCHA  | mailbox    | 3 / hour             | case and `+tag` variants count as one address  |
 | after CAPTCHA  | whole site | 300 / hour           | ceiling on stored inquiries and outgoing email |
 
-Only requests that solved a challenge are charged to the mailbox and site-wide budgets, so junk
-traffic cannot lock a customer (or everyone) out without solving CAPTCHAs. A rejected request still
-counts against its IP.
+With Turnstile configured, only requests that solved a challenge are charged to the mailbox and
+site-wide budgets, so junk traffic cannot lock a customer (or everyone) out without solving CAPTCHAs.
+Without it (the default) every valid request counts against them, as for the contact form; the
+per-IP limits come first either way. A rejected request still counts against its IP.
 
 Each verified token is also recorded (a keyed hash, one day) and accepted only once. The server sends
 Cloudflare the submission key as `idempotency_key`, and Cloudflare answers a token resent with the
@@ -98,18 +102,20 @@ to twice a limit (a known gap; sliding windows are a hardening work item in
 
 ### CAPTCHA modes
 
-| Environment      | Turnstile keys                             | `INQUIRY_LOCAL_CAPTCHA_BYPASS` | Result                                                             |
-| ---------------- | ------------------------------------------ | ------------------------------ | ------------------------------------------------------------------ |
-| production build | real pair                                  | any                            | verified, including the hostname of `NEXT_PUBLIC_SITE_URL`         |
-| production build | real pair, no valid `NEXT_PUBLIC_SITE_URL` | any                            | **form closed** (`site-url-not-configured`)                        |
-| production build | Cloudflare test keys                       | any                            | **form closed** (test keys refused)                                |
-| production build | missing                                    | any                            | **form closed**                                                    |
-| development      | real or test pair                          | any                            | verified                                                           |
-| development      | missing                                    | `true`                         | accepted without CAPTCHA, with a visible "development mode" notice |
-| development      | missing                                    | unset                          | form closed                                                        |
+Turnstile is optional (owner's decision, 2026-10-28, matching the contact form): the live site runs
+without it. Setting both keys switches it on for every submission.
 
-"Production" means `NODE_ENV=production`, which every `next build`/`next start` sets, so the bypass
-cannot be switched on in a deployed build.
+| Environment      | Turnstile keys                             | Result                                                     |
+| ---------------- | ------------------------------------------ | ---------------------------------------------------------- |
+| any              | none                                       | accepted without CAPTCHA (honeypot and rate limits)        |
+| any              | only one of the two                        | **form closed** (`captcha-partially-configured`)           |
+| production build | real pair                                  | verified, including the hostname of `NEXT_PUBLIC_SITE_URL` |
+| production build | real pair, no valid `NEXT_PUBLIC_SITE_URL` | **form closed** (`site-url-not-configured`)                |
+| production build | Cloudflare test keys                       | **form closed** (test keys refused)                        |
+| development      | real or test pair                          | verified                                                   |
+
+"Production" means `NODE_ENV=production`, which every `next build`/`next start` sets. The former
+`INQUIRY_LOCAL_CAPTCHA_BYPASS` switch is gone: without keys no bypass is needed.
 
 ### Client IP
 
@@ -219,10 +225,10 @@ inquiries with two differences:
   never uses up the other's budget. With no CAPTCHA in front of them, the mailbox and site-wide
   limits count every valid message.
 
-It therefore needs only storage, not Turnstile (`getContactConfig`): `NEXT_PUBLIC_SUPABASE_URL`,
+It therefore needs only storage, never Turnstile (`getContactConfig`): `NEXT_PUBLIC_SUPABASE_URL`,
 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY`, plus `CLIENT_IP_HEADER` in
 production (the per-IP limits are its main defence, so a header the client controls is refused).
-The contact form can be open while the inquiry form is still closed for lack of Turnstile keys.
+Since 2026-10-28 the inquiry form needs the same by default; only it can take an optional Turnstile.
 
 `public.submit_contact_message` (service_role only) stores the message with a `CM-` reference and is
 idempotent per submission key, like inquiries. **No email is sent**: owners and admins
@@ -236,13 +242,14 @@ form's consent links to it.
 ## Enabling the form in production
 
 1. Apply the migrations to the production Supabase project (`npx supabase db push`).
-2. Create a Cloudflare Turnstile widget for the production hostname; set
-   `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`.
+2. Optional CAPTCHA: create a Cloudflare Turnstile widget for the production hostname and set
+   both `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` (off by default; see "CAPTCHA
+   modes").
 3. Set `SUPABASE_SECRET_KEY` in the host's secret store (never `NEXT_PUBLIC_`).
 4. Set `CLIENT_IP_HEADER` to a header your platform sets (required; see "Client IP"), and
-   `CLIENT_IP_TRUSTED_HOPS` if it is a list header behind more than one proxy you control. Set
-   `NEXT_PUBLIC_SITE_URL` to the `https` origin (required: CAPTCHA tokens must match its hostname,
-   so serve the form on one hostname and redirect the other, e.g. `www`).
+   `CLIENT_IP_TRUSTED_HOPS` if it is a list header behind more than one proxy you control. With
+   Turnstile or email, set `NEXT_PUBLIC_SITE_URL` to the `https` origin (CAPTCHA tokens must match
+   its hostname, so serve the form on one hostname and redirect the other, e.g. `www`).
 5. Optional email: verify a sending domain in Resend; set `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`,
    `INQUIRY_NOTIFY_TO`; optionally `CRON_SECRET` plus a scheduled call to the retry endpoint.
 6. Have CHEF SIS complete the privacy-notice review items, and get it legally reviewed.
@@ -250,9 +257,9 @@ form's consent links to it.
 
 ## Testing locally
 
-- Without Docker or keys: `INQUIRY_LOCAL_CAPTCHA_BYPASS=true` plus a reachable Supabase (hosted dev
-  project) and its secret key, then `npm run dev`.
-- With a widget: use Cloudflare's test keys (see README) to exercise the real Turnstile flow locally.
+- Without Docker: a reachable Supabase (hosted dev project) and its secret key, then `npm run dev`;
+  the form runs without a CAPTCHA, as on the live site. Or `npm run dev:demo` (no Supabase at all).
+- With a widget: use Cloudflare's test keys (see README) to exercise the optional Turnstile flow.
 - Automated: `npm run test:db` (SQL and RLS), `npm test` (pipeline, CAPTCHA, email) and
   `npm run test:e2e` (form and admin workflow against the Supabase test double).
 - Real database: `npm run test:db:pg` (the same SQL suites plus concurrency on a disposable

@@ -39,7 +39,8 @@ export type InquiryFormState = PublicFormState<InquiryFieldErrors>;
 
 /** What the shared pipeline needs, regardless of which form: whether it is open,
  *  the server secret (for hashing rate-limit identifiers) and whether to run a
- *  CAPTCHA. The contact form passes "skip"; the inquiry form "turnstile". */
+ *  CAPTCHA. The contact form always passes "skip"; the inquiry form passes
+ *  "turnstile" only when its optional Turnstile keys are set. */
 export type FormConfig =
   | { available: false; reason: string }
   | { available: true; secretKey: string; captcha: "turnstile" | "skip" };

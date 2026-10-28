@@ -99,7 +99,7 @@ Nothing is saved, sent or published, and real keys in `.env.local` cannot reach 
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | Sign-in, roles, inbox, CMS, uploads in the browser | Exercised only against the test double (simulated Auth, real SQL on PGlite, in-memory Storage) |
 | Public content                                     | Placeholders without a database; CMS content only in demo mode and tests                       |
-| Inquiry form                                       | Closed in production builds until Supabase, Turnstile and the site URL are configured          |
+| Inquiry form                                       | Closed in production builds until Supabase and the client-IP header are configured             |
 | Email, Turnstile production widget, Storage API    | Not tested (see VERIFICATION.md)                                                               |
 
 ## Verification

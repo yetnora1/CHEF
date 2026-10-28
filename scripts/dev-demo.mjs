@@ -63,7 +63,6 @@ const next = spawn(process.execPath, [require.resolve("next/dist/bin/next"), ...
     SUPABASE_SECRET_KEY: fake.FAKE_SECRET_KEY,
     // Inquiries are stored in memory without a CAPTCHA, and no email is sent,
     // even if .env.local holds real keys (process values take precedence).
-    INQUIRY_LOCAL_CAPTCHA_BYPASS: "true",
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: "",
     TURNSTILE_SECRET_KEY: "",
     RESEND_API_KEY: "",

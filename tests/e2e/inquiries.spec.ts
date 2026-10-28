@@ -7,8 +7,8 @@ import { waitForHydration } from "./support/hydration";
 /*
  * Runs against the dev server wired to the fake Supabase test double: Auth is
  * simulated, but every data call executes the real SQL functions, grants and
- * RLS on PGlite. CAPTCHA runs in the explicit local-bypass mode (production
- * builds refuse it; see tests/unit/inquiry-config.test.ts).
+ * RLS on PGlite. No Turnstile keys are set, so the inquiry form runs without a
+ * CAPTCHA, exactly as on the live site (see tests/unit/inquiry-config.test.ts).
  */
 
 const unique = () => randomUUID().slice(0, 8);
@@ -29,15 +29,26 @@ type InquiryInput = {
   eventDate?: string;
 };
 
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  wedding: "Wedding or celebration",
+  corporate: "Corporate event",
+  summit: "Conference or summit",
+};
+
+const next = (page: Page) => page.getByRole("button", { name: "Next", exact: true }).click();
+
+/** Fills the three steps (the event, what is needed, about you) and stops before sending. */
 async function fillInquiry(page: Page, input: InquiryInput) {
-  await page.getByLabel("Full name").fill(input.name);
-  await page.getByRole("textbox", { name: "Email", exact: true }).fill(input.email);
-  await page.getByLabel("Type of event").selectOption(input.eventType ?? "wedding");
+  await page.getByRole("radio", { name: EVENT_TYPE_LABELS[input.eventType ?? "wedding"] }).check();
   if (input.eventDate) await page.getByLabel("Event date").fill(input.eventDate);
   await page.getByLabel("Approximate number of guests").fill(input.guests ?? "120");
+  await next(page);
   await page
     .getByLabel("What would you like CHEF SIS to provide?")
     .fill(input.requirements ?? "Dinner for guests");
+  await next(page);
+  await page.getByLabel("Full name").fill(input.name);
+  await page.getByRole("textbox", { name: "Email", exact: true }).fill(input.email);
   await page.getByRole("checkbox").check();
 }
 
@@ -67,39 +78,85 @@ async function signOut(page: Page) {
 }
 
 test.describe("public inquiry form", () => {
-  test("renders in English and Amharic with the local-testing notice", async ({ page }) => {
+  test("renders step by step in English and Amharic, without a CAPTCHA", async ({ page }) => {
     await page.goto("/en/book");
     await expect(page.getByRole("heading", { level: 1, name: "Tell us about your event" })).toBeVisible();
-    await expect(
-      page.getByText("Development mode: the security check (CAPTCHA) is switched off"),
-    ).toBeVisible();
-    await expect(page.getByLabel("Full name")).toBeVisible();
+    await expect(page.getByText("Step 1 of 3")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Your event" })).toBeVisible();
+    await expect(page.getByRole("radio", { name: "Wedding or celebration" })).toBeVisible();
+    // As on the live site: no security check and no development notice.
+    await expect(page.getByText("Security check")).toHaveCount(0);
+    await expect(page.getByText(/Development mode/)).toHaveCount(0);
 
     await page.goto("/am/book");
     await expect(page.getByRole("heading", { level: 1, name: "ስለ ዝግጅትዎ ይንገሩን" })).toBeVisible();
-    await expect(page.getByLabel("ሙሉ ስም")).toBeVisible();
-    await expect(page.getByRole("button", { name: "ጥያቄውን ይላኩ" })).toBeVisible();
+    await expect(page.getByRole("radio", { name: "ሠርግ ወይም ክብረ በዓል" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "ቀጣይ", exact: true })).toBeVisible();
   });
 
-  test("validates in the browser with an accessible error summary", async ({ page }) => {
+  test("goes step by step, keeps answers when going back, and shows them for review", async ({ page }) => {
     await page.goto("/en/book");
-    await page.getByRole("button", { name: "Send inquiry" }).click();
+    const progress = page.getByRole("list", { name: "Inquiry steps" });
+    await expect(progress.locator('[aria-current="step"]')).toContainText("Your event");
+
+    await page.getByRole("radio", { name: "Corporate event" }).check();
+    await page.getByLabel("Approximate number of guests").fill("40");
+    await page.getByRole("button", { name: "More guests" }).click();
+    await expect(page.getByLabel("Approximate number of guests")).toHaveValue("50");
+    await page.getByLabel("Location or venue").fill("Addis Ababa");
+    await next(page);
+    await expect(page.getByRole("heading", { level: 2, name: "What you need" })).toBeFocused();
+    await expect(progress.locator('[aria-current="step"]')).toContainText("What you need");
+    await page.getByLabel("What would you like CHEF SIS to provide?").fill("Lunch for the team");
+
+    // Nothing is lost going back and forth.
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page.getByRole("radio", { name: "Corporate event" })).toBeChecked();
+    await expect(page.getByLabel("Approximate number of guests")).toHaveValue("50");
+    await next(page);
+    await expect(page.getByLabel("What would you like CHEF SIS to provide?")).toHaveValue(
+      "Lunch for the team",
+    );
+    await next(page);
+
+    const review = page.getByRole("region", { name: "Check your inquiry" });
+    for (const text of ["Corporate event", "50", "Addis Ababa", "Lunch for the team"]) {
+      await expect(review).toContainText(text);
+    }
+    await review.getByRole("button", { name: "Edit: Your event" }).click();
+    await expect(page.getByRole("heading", { level: 2, name: "Your event" })).toBeFocused();
+  });
+
+  test("checks each step before the next, with an accessible error summary", async ({ page }) => {
+    await page.goto("/en/book");
+    await next(page);
     const summary = page.getByRole("alert").filter({ hasText: "Please check" });
     await expect(summary).toBeFocused();
-    await expect(summary).toContainText("Please check 6 fields");
-    await expect(page.getByLabel("Full name")).toHaveAttribute("aria-invalid", "true");
+    await expect(summary).toContainText("Please check 2 fields");
+    await expect(summary).toContainText("Type of event");
+    await expect(summary).toContainText("Approximate number of guests");
+    await expect(page.getByText("Step 1 of 3")).toBeVisible();
 
     await page.getByLabel("Approximate number of guests").fill("0");
     await expect(page.getByText("There must be at least 1 guest.")).toBeVisible();
+
+    await page.getByRole("radio", { name: "Wedding or celebration" }).check();
+    await page.getByLabel("Approximate number of guests").fill("80");
+    await next(page);
+    await page.getByLabel("What would you like CHEF SIS to provide?").fill("Dinner for guests");
+    await next(page);
+    await page.getByLabel("Full name").fill("Email Tester");
     await page.getByRole("textbox", { name: "Email", exact: true }).fill("not-an-email");
+    await page.getByRole("button", { name: "Send inquiry" }).click();
     await expect(page.getByText("Enter a valid email address.")).toBeVisible();
   });
 
   test("rejects past event dates", async ({ page }) => {
     await page.goto("/en/book");
-    await fillInquiry(page, { name: "Date Tester", email: `date-${unique()}@example.test` });
+    await page.getByRole("radio", { name: "Wedding or celebration" }).check();
+    await page.getByLabel("Approximate number of guests").fill("80");
     await page.getByLabel("Event date").fill("2020-01-01");
-    await page.getByRole("button", { name: "Send inquiry" }).click();
+    await next(page);
     await expect(page.getByText("Choose a date from tomorrow onwards.")).toBeVisible();
   });
 
@@ -191,7 +248,7 @@ test.describe("public inquiry form", () => {
       await page.goto("/en/book");
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow).toBeLessThanOrEqual(0);
-      const box = await page.getByLabel("Full name").boundingBox();
+      const box = await page.getByLabel("Location or venue").boundingBox();
       expect(box!.width).toBeGreaterThan(300);
       await fillInquiry(page, { name: "Mobile Tester", email: `mobile-${unique()}@example.test` });
       await page.getByRole("button", { name: "Send inquiry" }).click();

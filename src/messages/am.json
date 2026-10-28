@@ -207,7 +207,6 @@
     "phoneHint": "ከኢትዮጵያ ውጭ ከሆኑ የሀገር ኮድ ያካትቱ፤ ለምሳሌ +251።",
     "contactMethod": "በምን እንድናገኝዎ ይፈልጋሉ?",
     "eventType": "የዝግጅቱ አይነት",
-    "eventTypePlaceholder": "የዝግጅት አይነት ይምረጡ",
     "eventDate": "የዝግጅቱ ቀን",
     "eventDateHint": "ቀን ገና ካልወሰኑ ባዶ ይተዉት።",
     "guestCount": "የእንግዶች ግምታዊ ብዛት",
@@ -222,7 +221,6 @@
     "submit": "ጥያቄውን ይላኩ",
     "submitting": "በመላክ ላይ…",
     "captchaLabel": "የደኅንነት ማረጋገጫ",
-    "localBypassNotice": "የማበልጸጊያ ሁነታ፦ የደኅንነት ማረጋገጫው (CAPTCHA) ለአካባቢ ሙከራ ጠፍቷል።",
     "errorSummaryTitle": "እባክዎ {count, plural, one {# መስክ} other {# መስኮችን}} ያረጋግጡ",
     "errors": {
       "required": "ይህ መስክ የግድ ነው።",
@@ -251,7 +249,18 @@
     "successBody": "ጥያቄዎ አሁን በCHEF SIS ግምገማ ላይ ነው። ይህ የቦታ ማስያዣ ማረጋገጫ አይደለም፤ ለቀንዎ መገኘታችንንም አያረጋግጥም።",
     "referenceLabel": "መለያ ቁጥርዎ",
     "referenceHint": "እባክዎ ይህን መለያ ቁጥር ይያዙ፤ ሲያገኙን ይጥቀሱት።",
-    "newInquiry": "ሌላ ጥያቄ ይላኩ"
+    "newInquiry": "ሌላ ጥያቄ ይላኩ",
+    "stepsLabel": "የጥያቄው ደረጃዎች",
+    "stepCounter": "ደረጃ {current} ከ{total}",
+    "next": "ቀጣይ",
+    "back": "ይመለሱ",
+    "guestsFewer": "እንግዶችን ይቀንሱ",
+    "guestsMore": "እንግዶችን ይጨምሩ",
+    "reviewTitle": "ጥያቄዎን ያረጋግጡ",
+    "edit": "ያስተካክሉ",
+    "notGiven": "አልተገለጸም",
+    "copyReference": "መለያ ቁጥሩን ይቅዱ",
+    "copied": "ተቀድቷል"
   },
   "Privacy": {
     "metaTitle": "የግላዊነት መግለጫ",

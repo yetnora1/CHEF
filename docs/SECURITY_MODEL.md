@@ -116,8 +116,8 @@ contact-message table. A leaked key or a server bug can create inquiries and con
 consume rate-limit counters, and claim and complete queued
 notifications (an acknowledgement includes the customer's email address); it cannot list, alter or
 delete inquiries or messages. It still carries Supabase Auth admin rights, so it must be treated as a full
-secret and rotated if exposed. See [INQUIRIES.md](INQUIRIES.md) for abuse controls (rate limits, Turnstile,
-honeypot, body limit) and their verification status.
+secret and rotated if exposed. See [INQUIRIES.md](INQUIRIES.md) for abuse controls (rate limits, optional
+Turnstile, honeypot, body limit) and their verification status.
 
 Helper `private.has_permission(p)` is SECURITY DEFINER (so policies on `user_roles` don't recurse),
 `STABLE`, has a fixed empty `search_path`, and only ever answers for `auth.uid()`. Policies call it

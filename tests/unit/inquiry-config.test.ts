@@ -58,31 +58,31 @@ describe("resolveInquiryConfig", () => {
     ).toEqual({ available: false, reason: "storage-key-not-privileged" });
   });
 
-  it("fails closed in production without CAPTCHA keys", () => {
-    const env = { ...base, NEXT_PUBLIC_TURNSTILE_SITE_KEY: "", TURNSTILE_SECRET_KEY: "" };
-    expect(resolveInquiryConfig(env, { production: true })).toEqual({
-      available: false,
-      reason: "captcha-not-configured",
-    });
-  });
-
-  it("never honours the local CAPTCHA bypass in production", () => {
+  it("is available in production without CAPTCHA keys: Turnstile is optional", () => {
     const env = {
       ...base,
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: "",
       TURNSTILE_SECRET_KEY: "",
-      INQUIRY_LOCAL_CAPTCHA_BYPASS: "true",
+      NEXT_PUBLIC_SITE_URL: "",
     };
-    expect(resolveInquiryConfig(env, { production: true })).toMatchObject({ available: false });
-    expect(resolveInquiryConfig(env, { production: false })).toMatchObject({
-      available: true,
-      captcha: { mode: "local-bypass" },
-    });
+    for (const production of [true, false]) {
+      expect(resolveInquiryConfig(env, { production })).toMatchObject({
+        available: true,
+        captcha: { mode: "none" },
+        clientIpHeader: "cf-connecting-ip",
+      });
+    }
   });
 
-  it("requires an explicit opt-in for the local bypass outside production", () => {
-    const env = { ...base, NEXT_PUBLIC_TURNSTILE_SITE_KEY: "", TURNSTILE_SECRET_KEY: "" };
-    expect(resolveInquiryConfig(env, { production: false })).toMatchObject({ available: false });
+  it("closes the form when only one of the two Turnstile keys is set", () => {
+    for (const missing of ["NEXT_PUBLIC_TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY"] as const) {
+      for (const production of [true, false]) {
+        expect(resolveInquiryConfig({ ...base, [missing]: "" }, { production })).toEqual({
+          available: false,
+          reason: "captcha-partially-configured",
+        });
+      }
+    }
   });
 
   it("refuses Cloudflare test keys in production but allows them locally", () => {

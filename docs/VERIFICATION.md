@@ -243,15 +243,16 @@ commit;
 (Checked on Real PG17: the role is granted and a `role.assigned` audit entry is written.)
 
 Then sign in as each role in the app (`.env.local` with the dev project's URL, publishable key,
-secret key, `NEXT_PUBLIC_SITE_URL=http://localhost:3000` and Cloudflare's test keys or
-`INQUIRY_LOCAL_CAPTCHA_BYPASS=true`), submit an inquiry, and check the inbox per role. This is the
-first test of real Supabase Auth.
+secret key, `NEXT_PUBLIC_SITE_URL=http://localhost:3000` and, to exercise the optional CAPTCHA,
+Cloudflare's test keys), submit an inquiry, and check the inbox per role. This is the first test of
+real Supabase Auth.
 
 ### Before launch
 
-- **L1.** Turnstile: create a widget for the production hostname (redirect `www` ↔ apex so only one
-  hostname serves the form); set the keys; submit a real inquiry on a preview deployment; confirm the
-  log line `accepted:`; then decide W2.
+- **L1.** Turnstile is optional since 2026-10-28 (owner's decision: the inquiry form, like the
+  contact form, runs without a CAPTCHA). If spam appears, create a widget for the production
+  hostname (redirect `www` ↔ apex so only one hostname serves the form); set both keys; submit a
+  real inquiry on a preview deployment; confirm the log line `accepted:`; then decide W2.
 - **L2.** Resend: verify the sending domain (SPF, DKIM, DMARC), use a sending-only API key, send to an
   approved test recipient, check spam placement.
 - **L3.** Retries: set `CRON_SECRET` (≥ 32 characters) and a platform schedule (e.g. every 10 minutes)

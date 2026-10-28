@@ -109,6 +109,24 @@ describe("parseInquiry", () => {
     expect(errorsFor({ guestCount }).guestCount).toBe(code);
   });
 
+  // The form validates one step at a time, so these rules must not wait for the other fields.
+  it("checks the event date even while every other field is still empty", () => {
+    expect(parseInquiry({ eventDate: "2020-01-01" }, now)).toMatchObject({
+      success: false,
+      fieldErrors: { eventDate: "dateNotFuture" },
+    });
+    expect(parseInquiry({ eventDate: "2026-02-30" }, now)).toMatchObject({
+      fieldErrors: { eventDate: "invalidDate" },
+    });
+  });
+
+  it("reports a missing phone number together with other problems", () => {
+    expect(parseInquiry({ contactMethod: "messaging_app", phone: "" }, now)).toMatchObject({
+      success: false,
+      fieldErrors: { phone: "phoneRequired", fullName: "required", consent: "consentRequired" },
+    });
+  });
+
   it("requires a phone number when phone or messaging contact is preferred", () => {
     expect(errorsFor({ contactMethod: "phone", phone: "" }).phone).toBe("phoneRequired");
     expect(errorsFor({ contactMethod: "messaging_app", phone: "" }).phone).toBe("phoneRequired");

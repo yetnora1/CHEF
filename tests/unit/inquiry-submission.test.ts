@@ -75,7 +75,7 @@ describe("processInquirySubmission", () => {
   });
 
   it("fails closed when submissions are not configured", async () => {
-    const d = deps({ config: { available: false, reason: "captcha-not-configured" } });
+    const d = deps({ config: { available: false, reason: "storage-not-configured" } });
     expect(await processInquirySubmission(form(), d)).toEqual({ status: "unavailable" });
     expect(d.store.consumeRateLimit).not.toHaveBeenCalled();
     expect(d.store.submitInquiry).not.toHaveBeenCalled();
@@ -194,13 +194,13 @@ describe("processInquirySubmission", () => {
     expect(d.store.submitInquiry).not.toHaveBeenCalled();
   });
 
-  it("skips CAPTCHA only in the explicit local-bypass mode", async () => {
-    const d = deps({ config: config({ captcha: { mode: "local-bypass" } }) });
+  it("without Turnstile keys skips the CAPTCHA but still applies every rate limit", async () => {
+    const d = deps({ config: config({ captcha: { mode: "none" } }) });
     expect((await processInquirySubmission(form(), d)).status).toBe("success");
     expect(d.verifyCaptcha).not.toHaveBeenCalled();
-    expect(d.store.consumeRateLimit.mock.calls.map(([bucket]) => String(bucket).split(":")[1])).not.toContain(
-      "captcha",
-    );
+    const scopes = d.store.consumeRateLimit.mock.calls.map(([bucket]) => String(bucket).split(":")[1]);
+    expect(scopes).not.toContain("captcha");
+    expect(new Set(scopes)).toEqual(new Set(["ip", "email", "global"]));
   });
 
   it("returns the original reference for a retried submission and does not re-send email", async () => {

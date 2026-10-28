@@ -8,15 +8,15 @@ import { isPrivilegedKey, parseSupabasePublicConfig } from "@/lib/supabase/confi
  *
  * Fail-closed rules:
  *  - Storage needs the Supabase URL and the server-only secret key.
- *  - Production needs a real Cloudflare Turnstile key pair. Cloudflare's
- *    published test keys are refused in production.
- *  - Production needs NEXT_PUBLIC_SITE_URL: CAPTCHA tokens are checked
- *    against its hostname.
  *  - Production needs CLIENT_IP_HEADER: a header the hosting proxy sets, so
- *    clients cannot pick their own rate-limit identity.
- *  - Outside production, a developer may opt out of CAPTCHA with
- *    INQUIRY_LOCAL_CAPTCHA_BYPASS=true. NODE_ENV is "production" for every
- *    `next build`/`next start`, so the bypass cannot apply to a deployed build.
+ *    clients cannot pick their own rate-limit identity. Without a CAPTCHA the
+ *    rate limits are the main defence, as for the contact form.
+ *  - Cloudflare Turnstile is optional (owner's decision, 2026-10-28): with no
+ *    keys the form relies on the honeypot and rate limits. Setting both keys
+ *    switches the check on for every submission; then production refuses
+ *    Cloudflare's published test keys and needs NEXT_PUBLIC_SITE_URL, whose
+ *    hostname tokens are checked against. Only one of the two keys is a
+ *    misconfiguration and closes the form rather than silently dropping the check.
  *  - Email is optional: without a complete provider configuration, inquiries
  *    are still stored and no email is claimed.
  */
@@ -29,7 +29,7 @@ export type CaptchaConfig =
       /** In production, tokens must have been issued for this hostname. */
       expectedHostname: string | null;
     }
-  | { mode: "local-bypass" };
+  | { mode: "none" };
 
 export type EmailConfig = {
   provider: "resend";
@@ -42,7 +42,7 @@ export type EmailConfig = {
 export type UnavailableReason =
   | "storage-not-configured"
   | "storage-key-not-privileged"
-  | "captcha-not-configured"
+  | "captcha-partially-configured"
   | "captcha-test-key-in-production"
   | "site-url-not-configured"
   | "client-ip-header-not-configured";
@@ -73,7 +73,6 @@ const envSchema = z.object({
   SUPABASE_SECRET_KEY: optional(z.string().trim()),
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: optional(z.string().trim()),
   TURNSTILE_SECRET_KEY: optional(z.string().trim()),
-  INQUIRY_LOCAL_CAPTCHA_BYPASS: optional(z.string().trim()),
   RESEND_API_KEY: optional(z.string().trim()),
   // A plain address or `Display Name <address>`.
   INQUIRY_EMAIL_FROM: optional(
@@ -125,7 +124,10 @@ export function resolveInquiryConfig(
   if (!isPrivilegedKey(env.SUPABASE_SECRET_KEY))
     return { available: false, reason: "storage-key-not-privileged" };
 
-  let captcha: CaptchaConfig;
+  let captcha: CaptchaConfig = { mode: "none" };
+  if (Boolean(env.TURNSTILE_SECRET_KEY) !== Boolean(env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)) {
+    return { available: false, reason: "captcha-partially-configured" };
+  }
   if (env.TURNSTILE_SECRET_KEY && env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
     if (production && isTurnstileTestSecret(env.TURNSTILE_SECRET_KEY)) {
       return { available: false, reason: "captcha-test-key-in-production" };
@@ -142,10 +144,6 @@ export function resolveInquiryConfig(
       expectedHostname:
         production && env.NEXT_PUBLIC_SITE_URL ? new URL(env.NEXT_PUBLIC_SITE_URL).hostname : null,
     };
-  } else if (!production && env.INQUIRY_LOCAL_CAPTCHA_BYPASS === "true") {
-    captcha = { mode: "local-bypass" };
-  } else {
-    return { available: false, reason: "captcha-not-configured" };
   }
 
   // Per-IP limits are only meaningful with a header the platform's proxy sets.

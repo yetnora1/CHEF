@@ -143,7 +143,17 @@ function createSchema(now: () => Date) {
       eventType: optionalString.pipe(
         z.string().min(1, "required").pipe(z.enum(EVENT_TYPES, "invalidChoice")),
       ),
-      eventDate: optionalString.transform((v) => v.trim()),
+      // Checked on the field itself, so a past date is caught even while other fields are
+      // still empty (the form validates one step at a time).
+      eventDate: optionalString
+        .transform((v) => v.trim())
+        .superRefine((value, ctx) => {
+          if (value === "") return;
+          const { min, max } = eventDateBounds(now());
+          if (!isRealDate(value)) ctx.addIssue({ code: "custom", message: "invalidDate" });
+          else if (value < min) ctx.addIssue({ code: "custom", message: "dateNotFuture" });
+          else if (value > max) ctx.addIssue({ code: "custom", message: "dateTooFar" });
+        }),
       guestCount: optionalString
         .transform((v) => v.trim())
         .pipe(
@@ -163,20 +173,13 @@ function createSchema(now: () => Date) {
       message: optionalString.transform(cleanMultiline).pipe(z.string().max(L.messageMax, "tooLong")),
       consent: z.union([z.literal("on"), z.literal("true"), z.literal(true)], "consentRequired"),
     })
-    .superRefine((data, ctx) => {
-      if (data.contactMethod !== "email" && data.phone === "") {
-        ctx.addIssue({ code: "custom", path: ["phone"], message: "phoneRequired" });
-      }
-      if (data.eventDate !== "") {
-        const { min, max } = eventDateBounds(now());
-        if (!isRealDate(data.eventDate)) {
-          ctx.addIssue({ code: "custom", path: ["eventDate"], message: "invalidDate" });
-        } else if (data.eventDate < min) {
-          ctx.addIssue({ code: "custom", path: ["eventDate"], message: "dateNotFuture" });
-        } else if (data.eventDate > max) {
-          ctx.addIssue({ code: "custom", path: ["eventDate"], message: "dateTooFar" });
-        }
-      }
+    .refine((data) => data.contactMethod === "email" || data.phone !== "", {
+      path: ["phone"],
+      message: "phoneRequired",
+      // A whole-form rule normally waits until every field is valid; this one needs only the
+      // two fields it reads, so it is reported together with any other problems.
+      when: ({ issues }) =>
+        !issues.some((issue) => issue.path?.[0] === "phone" || issue.path?.[0] === "contactMethod"),
     });
 }
 

@@ -103,16 +103,18 @@ starts at `/admin/pages`.
 
 ### Event inquiries configuration
 
-The inquiry form accepts submissions only when storage **and** abuse protection are configured;
-otherwise `/book` says plainly that online inquiries are not open yet (fail closed).
+The inquiry form accepts submissions only when storage and, in production, the rate limits' client-IP
+source are configured; otherwise `/book` says plainly that online inquiries are not open yet (fail
+closed). Like the contact form it needs no CAPTCHA (owner's decision, 2026-10-28): its abuse
+protection is a honeypot field plus per-IP, per-mailbox and site-wide rate limits. Cloudflare
+Turnstile can be added at any time by setting its two keys.
 
-| To enable…                     | Set                                                                                                                               |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| Storage (required)             | `SUPABASE_SECRET_KEY` (server-only secret key) plus the public Supabase variables                                                 |
-| CAPTCHA (required, production) | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` from a Cloudflare Turnstile widget, and `NEXT_PUBLIC_SITE_URL`          |
-| Local testing without CAPTCHA  | `INQUIRY_LOCAL_CAPTCHA_BYPASS=true` (ignored by every production build)                                                           |
-| Rate-limit IP source           | `CLIENT_IP_HEADER` (required in production): a header your proxy sets; `CLIENT_IP_TRUSTED_HOPS`                                   |
-| Email (optional)               | `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`, `INQUIRY_NOTIFY_TO`, https `NEXT_PUBLIC_SITE_URL` in production; optionally `CRON_SECRET` |
+| To enable…           | Set                                                                                                                               |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Storage (required)   | `SUPABASE_SECRET_KEY` (server-only secret key) plus the public Supabase variables                                                 |
+| CAPTCHA (optional)   | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` from a Cloudflare Turnstile widget, and `NEXT_PUBLIC_SITE_URL`          |
+| Rate-limit IP source | `CLIENT_IP_HEADER` (required in production): a header your proxy sets; `CLIENT_IP_TRUSTED_HOPS`                                   |
+| Email (optional)     | `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`, `INQUIRY_NOTIFY_TO`, https `NEXT_PUBLIC_SITE_URL` in production; optionally `CRON_SECRET` |
 
 For local tests with a real widget, Cloudflare publishes always-pass test keys
 (site `1x00000000000000000000AA`, secret `1x0000000000000000000000000000000AA`); production refuses them.
@@ -155,11 +157,10 @@ Needs Node.js 22.18+ or 24; stop `npm run dev` and the e2e suite first (they sha
 | ----------------------------------------------------------- | ----------- | ---------------------- | ----------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SUPABASE_URL`                                  | public      | for admin              | Supabase API URL                                                              |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`                      | public      | for admin              | Supabase publishable key (RLS still applies)                                  |
-| `NEXT_PUBLIC_SITE_URL`                                      | public      | inquiries (production) | Canonical origin; email links, Turnstile hostname check (https in production) |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`                            | public      | inquiries              | Cloudflare Turnstile widget                                                   |
+| `NEXT_PUBLIC_SITE_URL`                                      | public      | with email/Turnstile   | Canonical origin; email links, Turnstile hostname check (https in production) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`                            | public      | no (optional CAPTCHA)  | Cloudflare Turnstile widget; set with `TURNSTILE_SECRET_KEY`                  |
 | `SUPABASE_SECRET_KEY`                                       | server-only | inquiries              | Calls only the inquiry/rate-limit/outbox functions                            |
-| `TURNSTILE_SECRET_KEY`                                      | server-only | inquiries              | Turnstile verification (production refuses test keys)                         |
-| `INQUIRY_LOCAL_CAPTCHA_BYPASS`                              | server-only | no                     | `true` = local testing without CAPTCHA; ignored in production                 |
+| `TURNSTILE_SECRET_KEY`                                      | server-only | no (optional CAPTCHA)  | Turnstile verification (production refuses test keys)                         |
 | `CLIENT_IP_HEADER`                                          | server-only | inquiries (production) | Proxy-set header carrying the client IP for rate limiting                     |
 | `CLIENT_IP_TRUSTED_HOPS`                                    | server-only | no                     | Proxies you control in front of a list header (1–5, default 1)                |
 | `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`, `INQUIRY_NOTIFY_TO` | server-only | no                     | Optional email via Resend                                                     |

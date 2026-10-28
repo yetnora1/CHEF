@@ -26,16 +26,27 @@ const PROCESS_STEPS = ["processStep1", "processStep2", "processStep3"] as const;
 export default async function BookPage() {
   const t = await getTranslations("Booking");
 
+  // Phones read the title, then the form, then how inquiries work; from lg the
+  // title and the explanation share the left column beside the form.
   return (
     <section aria-labelledby="book-heading" className="page-container py-14 md:py-20">
-      <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
-        <div className="lg:sticky lg:top-28 lg:self-start">
+      <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:grid-rows-[auto_1fr] lg:gap-x-16 lg:gap-y-8">
+        <div className="lg:col-start-1 lg:row-start-1">
           <p className="eyebrow text-accent-ink">{t("eyebrow")}</p>
           <h1 id="book-heading" className="mt-5 display-lg">
             {t("title")}
           </h1>
           <p className="mt-5 text-lg text-muted-foreground">{t("intro")}</p>
-          <div className="mt-8 rounded-2xl border border-border glass p-5 sm:p-6">
+        </div>
+
+        <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <Suspense fallback={<FormPlaceholder />}>
+            <InquiryFormSection />
+          </Suspense>
+        </div>
+
+        <div className="lg:col-start-1 lg:row-start-2 lg:self-start">
+          <div className="rounded-2xl border border-border glass p-5 sm:p-6">
             <h2 className="text-sm font-semibold">{t("processTitle")}</h2>
             <ol className="mt-4 space-y-3 text-sm leading-relaxed">
               {PROCESS_STEPS.map((step, index) => (
@@ -56,10 +67,6 @@ export default async function BookPage() {
             </p>
           </div>
         </div>
-
-        <Suspense fallback={<FormPlaceholder />}>
-          <InquiryFormSection />
-        </Suspense>
       </div>
     </section>
   );
@@ -80,7 +87,7 @@ async function InquiryFormSection() {
     ]);
     const services = navigation.find((link) => link.key === "services")?.href ?? "/";
     return (
-      <div role="status" className="self-start rounded-3xl border border-border glass p-7 sm:p-10">
+      <div role="status" className="rounded-3xl border border-border glass p-7 sm:p-10">
         <h2 className="display-md">{t("unavailableTitle")}</h2>
         <p className="mt-4 text-muted-foreground">{t("unavailableBody")}</p>
         <div className="mt-8 flex flex-wrap gap-3">
@@ -102,7 +109,7 @@ async function InquiryFormSection() {
   const captcha: InquiryCaptcha =
     config.captcha.mode === "turnstile"
       ? { mode: "turnstile", siteKey: config.captcha.siteKey }
-      : { mode: "local-bypass" };
+      : { mode: "none" };
   const messages = await getClientMessages(["Booking", "EventType", "ContactMethod"]);
 
   return (
@@ -112,15 +119,25 @@ async function InquiryFormSection() {
   );
 }
 
+/** The form's shape while it loads: progress bar, heading, choice cards, two fields. */
 function FormPlaceholder() {
   return (
-    <div aria-hidden className="animate-pulse space-y-6">
-      {Array.from({ length: 6 }, (_, i) => (
-        <div key={i} className="space-y-2">
-          <div className="h-4 w-32 rounded bg-surface-muted" />
-          <div className="h-12 rounded-xl bg-surface-muted" />
-        </div>
-      ))}
+    <div aria-hidden className="animate-pulse rounded-3xl border border-border glass p-5 sm:p-8">
+      <div className="grid grid-cols-3 gap-3">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div key={i} className="h-1.5 rounded-full bg-surface-muted" />
+        ))}
+      </div>
+      <div className="mt-10 h-7 w-48 rounded bg-surface-muted" />
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {Array.from({ length: 6 }, (_, i) => (
+          <div key={i} className="h-24 rounded-2xl bg-surface-muted" />
+        ))}
+      </div>
+      <div className="mt-8 grid gap-6 sm:grid-cols-2">
+        <div className="h-12 rounded-xl bg-surface-muted" />
+        <div className="h-12 rounded-xl bg-surface-muted" />
+      </div>
     </div>
   );
 }

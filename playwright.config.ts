@@ -49,7 +49,6 @@ export default defineConfig({
         NEXT_PUBLIC_SUPABASE_URL: "",
         NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "",
         SUPABASE_SECRET_KEY: "",
-        INQUIRY_LOCAL_CAPTCHA_BYPASS: "",
       },
     },
     {
@@ -61,7 +60,9 @@ export default defineConfig({
         NEXT_PUBLIC_SUPABASE_URL: FAKE_SUPABASE_URL,
         NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: FAKE_PUBLISHABLE_KEY,
         SUPABASE_SECRET_KEY: FAKE_SECRET_KEY,
-        INQUIRY_LOCAL_CAPTCHA_BYPASS: "true",
+        // No Turnstile keys: the inquiry form runs without a CAPTCHA, as in production.
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: "",
+        TURNSTILE_SECRET_KEY: "",
         CLIENT_IP_HEADER: E2E_CLIENT_IP_HEADER,
       },
     },

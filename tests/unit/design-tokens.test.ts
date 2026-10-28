@@ -91,7 +91,7 @@ const PAIRS: [string, string, number][] = [
  * stacks translucent layers (top first) over the page background and over each
  * backdrop colour at full strength, the worst case of its soft gradients.
  */
-const BACKDROPS = ["background", "backdrop-violet", "backdrop-blue"];
+const BACKDROPS = ["background", "backdrop-sky", "backdrop-blue"];
 const TEXT = ["foreground", "muted-foreground", "accent-ink", "terracotta", "danger", "success", "warning"];
 
 // [text tokens, translucent layers from the top down, minimum ratio, extra grounds]

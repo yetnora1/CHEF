@@ -7,17 +7,17 @@ themes change in one place.
 ## Colour
 
 **Neutral black and white text and actions on frosted glass** (owner's choices, 2026-10-27 and
-2026-10-28): cards, bars and the admin sidebar are translucent panels over a soft violet and blue
-page backdrop (see [Glass](#glass)). No green, ivory or gold tint in the interface:
+2026-10-28): cards, bars and the admin sidebar are translucent panels over a soft watercolour
+backdrop of sky and deeper blue (see [Glass](#glass)). No green, ivory or gold tint in the interface:
 
-|                 | Light                                     | Dark                                         |
-| --------------- | ----------------------------------------- | -------------------------------------------- |
-| Background      | `#FFFFFF`                                 | `#0A0A0A`                                    |
-| Backdrop        | violet `#EBE5FF` glow, blue `#DBE7FF` arc | violet `#1E0C44` glow, blue `#0C1A40` arc    |
-| Glass           | white at 55% (cards), 85% (bars, menus)   | white at 5% (cards), `#101016` at 85% (bars) |
-| Text            | `#0A0A0A`; secondary `#525252`            | `#F5F5F5`; secondary `#A3A3A3`               |
-| Primary buttons | black, white text                         | white, black text                            |
-| Kept hues       | feedback colours, terracotta status dot   | feedback colours, terracotta status dot      |
+|                 | Light                                    | Dark                                         |
+| --------------- | ---------------------------------------- | -------------------------------------------- |
+| Background      | `#FFFFFF`                                | `#0A0A0A`                                    |
+| Backdrop        | sky `#E0F2FE` washes, blue `#DBE7FF` arc | sky `#081F38` washes, blue `#0C1A40` arc     |
+| Glass           | white at 55% (cards), 85% (bars, menus)  | white at 5% (cards), `#101016` at 85% (bars) |
+| Text            | `#0A0A0A`; secondary `#525252`           | `#F5F5F5`; secondary `#A3A3A3`               |
+| Primary buttons | black, white text                        | white, black text                            |
+| Kept hues       | feedback colours, terracotta status dot  | feedback colours, terracotta status dot      |
 
 The original brand palette stays defined in `@theme` (`globals.css`), but the interface and the
 logo no longer use forest, gold or ivory:
@@ -46,7 +46,7 @@ Tokens: `background`, `foreground`, `surface`, `surface-foreground`, `surface-mu
 `muted-foreground`, `border`, `border-strong`, `primary`, `primary-hover`, `primary-foreground`,
 `accent`, `accent-ink` (small labels, such as section eyebrows), `terracotta`, `ring`, `band`,
 `band-foreground`, `band-muted`, `band-accent`, `success`, `warning`, `danger`, and for glass
-`backdrop-violet`, `backdrop-blue`, `glass`, `glass-thick`, `glass-raised`, `glass-raised-hover`,
+`backdrop-sky`, `backdrop-blue`, `glass`, `glass-thick`, `glass-raised`, `glass-raised-hover`,
 `glass-shine`, `glass-shadow`, `field`.
 
 Translucent tokens carry their alpha in the colour (`#rrggbbaa`): the glass tokens, `field`, and
@@ -130,7 +130,9 @@ fine dotted pattern marking photography placeholders (only where no sample photo
 Owner's request (2026-10-28), after a "glassy sidebar" reference: the whole site is frosted glass.
 
 - **Backdrop.** `body::before` is fixed to the viewport (the body has no background of its own):
-  a violet glow from the top left and a broad blue arc from the bottom right. Glass blurs it as it
+  soft watercolour washes, sky blue from the top left and across the middle (2026-10-28: the
+  first violet glow read as magenta in dark mode), and a deeper blue arc from the bottom right.
+  In dark mode the washes are as light as text contrast allows. Glass blurs it as it
   scrolls past, so the arc's edge shows softly through cards. Text also sits straight on it.
 - **`glass`** (`globals.css`): translucent fill, 24px backdrop blur with extra saturation, a line of
   light on the top edge (`inset-shadow-glass`) and a soft shadow (`shadow-glass`). Pair it with

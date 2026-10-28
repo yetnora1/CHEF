@@ -88,8 +88,8 @@
 
 /*
  * Neutral text and actions (black in light, white in dark) on frosted glass:
- * cards, bars and the admin sidebar are translucent panels over a soft violet
- * and blue page backdrop. Only the feedback colours (and terracotta status
+ * cards, bars and the admin sidebar are translucent panels over a soft
+ * watercolour backdrop of sky and deeper blue. Only the feedback colours (and terracotta status
  * accents) keep a hue of their own, because they carry meaning. The brand
  * palette above is the logo's.
  *
@@ -111,9 +111,10 @@
   --border: light-dark(#0f172a17, #ffffff1f);
   --border-strong: light-dark(#8a8a8a, #737373);
 
-  /* Page backdrop (body::before): violet light from the top left and a broad blue
-   * arc from the bottom right. Text sits directly on it too. */
-  --backdrop-violet: light-dark(#ebe5ff, #1e0c44);
+  /* Page backdrop (body::before): watercolour washes of sky blue from the top left
+   * and across the middle, and a deeper blue arc from the bottom right. Text sits
+   * directly on it too, which caps how light the dark-theme washes can be. */
+  --backdrop-sky: light-dark(#e0f2fe, #081f38);
   --backdrop-blue: light-dark(#dbe7ff, #0c1a40);
 
   /* Glass (`glass` and `glass-thick` utilities below). */
@@ -310,7 +311,9 @@
   }
 
   /* The page backdrop, fixed to the viewport so glass frosts it as it scrolls past.
-   * It sits above the html background and below all content. */
+   * It sits above the html background and below all content. Soft-edged washes that
+   * overlap like watercolour: a sky wash across the middle, the blue arc, and sky
+   * light from the top left. */
   body::before {
     content: "";
     position: fixed;
@@ -318,8 +321,13 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(circle 90vmax at 105% 112%, var(--backdrop-blue) 0 58%, transparent 62%),
-      radial-gradient(95% 80% at 0% 0%, var(--backdrop-violet) 10%, transparent 75%);
+      radial-gradient(
+        55% 45% at 72% 38%,
+        color-mix(in oklab, var(--backdrop-sky) 70%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(circle 90vmax at 105% 112%, var(--backdrop-blue) 0 54%, transparent 63%),
+      radial-gradient(95% 80% at 0% 0%, var(--backdrop-sky) 10%, transparent 75%);
   }
 
   /* Ethiopic script needs more vertical room than Latin. */

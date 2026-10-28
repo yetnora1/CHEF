@@ -57,7 +57,13 @@
     "aboutMore": "More about the chef",
     "videosLabel": "Short videos of Ethiopian food",
     "videosPause": "Pause the videos",
-    "videosPlay": "Play the videos"
+    "videosPlay": "Play the videos",
+    "videosOpen": "Watch full screen",
+    "videosExit": "Exit full screen",
+    "videosPrevious": "Previous video",
+    "videosNext": "Next video",
+    "videoPause": "Pause the video",
+    "videoPlay": "Play the video"
   },
   "Footer": {
     "navigationLabel": "Footer",

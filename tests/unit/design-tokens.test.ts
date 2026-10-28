@@ -80,6 +80,8 @@ const PAIRS: [string, string, number][] = [
   ["warning", "background", 4.5],
   // Demo-mode banner: page background colour as text on the warning colour.
   ["background", "warning", 4.5],
+  // Full-screen video viewer: its counter on the black stage.
+  ["stage-foreground", "stage", 4.5],
   ["ring", "background", 3],
   ["ring", "surface", 3],
   ["border-strong", "background", 3],

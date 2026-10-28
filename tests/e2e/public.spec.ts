@@ -135,7 +135,7 @@ test.describe("locale routing", () => {
 test.describe("food videos", () => {
   const reel = (page: Page) => page.getByRole("region", { name: "Short videos of Ethiopian food" });
 
-  test("three silent loops under the hero, with one button to pause and play them", async ({ page }) => {
+  test("six silent loops under the hero, with one button to pause and play them", async ({ page }) => {
     await page.goto("/en");
     const videos = reel(page).locator("video");
     await expect(videos).toHaveCount(6);
@@ -145,6 +145,39 @@ test.describe("food videos", () => {
     await reel(page).getByRole("button", { name: "Pause the videos" }).click();
     await expect(reel(page).getByRole("button", { name: "Play the videos" })).toBeVisible();
     expect(await videos.evaluateAll((all: HTMLVideoElement[]) => all.every((v) => v.paused))).toBe(true);
+  });
+
+  test("a tile opens its clip full screen, with previous, next and minimize", async ({ page }) => {
+    await page.goto("/en");
+    const tiles = reel(page).getByRole("button", { name: /^Watch full screen: / });
+    await expect(tiles).toHaveCount(6);
+    // The tiles play light previews; the viewer plays the full-quality file.
+    await expect(reel(page).locator("video").first()).toHaveAttribute("src", /^\/videos\/preview\//);
+
+    await tiles.first().click();
+    const viewer = page.getByRole("dialog");
+    await expect(viewer).toBeVisible();
+    await expect(viewer.locator("video")).toHaveAttribute("src", /^\/videos\/[a-z-]+\.mp4$/);
+    await expect(viewer.getByText("1 / 6")).toBeVisible();
+    // The tiles pause while a clip plays full screen.
+    expect(
+      await reel(page)
+        .locator("video")
+        .evaluateAll((all: HTMLVideoElement[]) => all.every((v) => v.paused)),
+    ).toBe(true);
+
+    await viewer.getByRole("button", { name: "Next video" }).click();
+    await expect(viewer.getByText("2 / 6")).toBeVisible();
+    await page.keyboard.press("ArrowLeft");
+    await expect(viewer.getByText("1 / 6")).toBeVisible();
+    await viewer.getByRole("button", { name: "Previous video" }).click();
+    await expect(viewer.getByText("6 / 6")).toBeVisible();
+    await viewer.getByRole("button", { name: "Pause the video" }).click();
+    expect(await viewer.locator("video").evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+
+    await viewer.getByRole("button", { name: "Exit full screen" }).click();
+    await expect(viewer).toBeHidden();
+    await expect(tiles.first()).toBeFocused();
   });
 
   test("stay paused for visitors who prefer reduced motion", async ({ page }) => {

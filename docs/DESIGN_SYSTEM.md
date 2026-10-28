@@ -227,11 +227,27 @@ Under the homepage hero, six short, silent loops (`components/public/food-reel`,
 two on phones): injera platters, a stew served onto injera, and the coffee ceremony (roasting, the
 beans shown above the cups, popcorn among petals). All are Pexels clips from one Addis Ababa shoot
 by @kelly, with no identifiable faces and no captions, credited on `/credits`. Free Ethiopian food
-footage is scarce: other "Ethiopian" search results were other cuisines or showed faces. Each clip
-is cut to 4-7 s, cropped to 16:10 to keep bystanders out, 960x600 H.264 without sound (about
-0.5-0.7 MB), with its first frame as the poster. Nothing loads until the reel is in view
-(`preload="none"`); clips play only while visible, stay paused for `prefers-reduced-motion`, and
-one button pauses or plays them all.
+footage is scarce: other "Ethiopian" search results were other cuisines or showed faces.
+
+Each clip is cut to 4-7 s, cropped to 16:10 to keep bystanders out, without sound, in two sizes:
+
+| File                           | Size              | Used by                         |
+| ------------------------------ | ----------------- | ------------------------------- |
+| `public/videos/preview/*.mp4`  | 640x400, ~0.25 MB | the reel's tiles                |
+| `public/videos/*.mp4`          | 960x600, ~0.6 MB  | the full-screen viewer          |
+| `public/videos/*.jpg` (poster) | 640x400, ~35 KB   | first frame, tiles and /credits |
+
+Loading (2026-10-28, "it lags"): tiles stay at `preload="none"` until the reel is within 400px of
+the viewport, then buffer, so clips are ready when seen; they play only while visible, stay paused
+for `prefers-reduced-motion`, and one button pauses or plays them all. `next.config.ts` caches
+`/videos/*` in the browser for a day (then refreshed in the background; files in `public` otherwise
+get `max-age=0`), so **a changed clip needs a new file name**.
+
+Clicking a tile opens `components/public/video-viewer`: the clip at full quality on a black stage
+(`--stage` tokens, dark controls whatever the theme), in the browser's full screen where allowed and
+filling the window otherwise (iPhone). Previous/next buttons, the arrow keys and a swipe move
+between clips ("2 / 6"); a play/pause button; minimize or Escape leaves full screen and closes it,
+returning focus to the tile. The tiles pause while it is open. Radix Dialog provides the focus trap.
 
 ## Photography
 

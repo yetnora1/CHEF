@@ -61,6 +61,13 @@ const nextConfig: NextConfig = {
         source: "/admin/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
+      {
+        // Sample videos and posters (public/videos): files in public get max-age=0 by
+        // default, so every visit re-checked each clip. A day in the browser cache, then
+        // refreshed in the background; a changed clip therefore needs a new file name.
+        source: "/videos/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
     ];
   },
 };

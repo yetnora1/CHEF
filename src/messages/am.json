@@ -57,7 +57,13 @@
     "aboutMore": "ስለ ሼፉ ተጨማሪ",
     "videosLabel": "የኢትዮጵያ ምግብ አጫጭር ቪዲዮዎች",
     "videosPause": "ቪዲዮዎቹን ያቁሙ",
-    "videosPlay": "ቪዲዮዎቹን ያጫውቱ"
+    "videosPlay": "ቪዲዮዎቹን ያጫውቱ",
+    "videosOpen": "በሙሉ ስክሪን ይመልከቱ",
+    "videosExit": "ከሙሉ ስክሪን ይውጡ",
+    "videosPrevious": "ቀዳሚው ቪዲዮ",
+    "videosNext": "ቀጣዩ ቪዲዮ",
+    "videoPause": "ቪዲዮውን ያቁሙ",
+    "videoPlay": "ቪዲዮውን ያጫውቱ"
   },
   "Footer": {
     "navigationLabel": "የግርጌ ማውጫ",

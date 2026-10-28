@@ -128,6 +128,10 @@
   /* Form inputs: lighter than the card in light, darker in dark. */
   --field: light-dark(#ffffffb3, #00000033);
 
+  /* Full-screen video stage (VideoViewer) and chips over video: black and white in both themes. */
+  --stage: light-dark(#000000, #000000);
+  --stage-foreground: light-dark(#ffffff, #ffffff);
+
   /* Actions and accents */
   --primary: light-dark(#0a0a0a, #f5f5f5);
   --primary-hover: light-dark(#333333, #d4d4d4);
@@ -257,6 +261,8 @@
   --color-glass-raised: var(--glass-raised);
   --color-glass-raised-hover: var(--glass-raised-hover);
   --color-field: var(--field);
+  --color-stage: var(--stage);
+  --color-stage-foreground: var(--stage-foreground);
   --color-cta-top: var(--cta-top);
   --color-cta-bottom: var(--cta-bottom);
   --color-cta-hover-top: var(--cta-hover-top);

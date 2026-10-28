@@ -77,8 +77,24 @@ export default async function HomePage() {
         />
       )}
       <FoodReel
-        clips={sampleVideos}
-        labels={{ region: tHome("videosLabel"), pause: tHome("videosPause"), play: tHome("videosPlay") }}
+        clips={sampleVideos.map(({ key, src, preview, poster, description }) => ({
+          key,
+          src,
+          preview,
+          poster,
+          description: placeholder(description),
+        }))}
+        labels={{
+          region: tHome("videosLabel"),
+          pauseAll: tHome("videosPause"),
+          playAll: tHome("videosPlay"),
+          open: tHome("videosOpen"),
+          exit: tHome("videosExit"),
+          previous: tHome("videosPrevious"),
+          next: tHome("videosNext"),
+          pause: tHome("videoPause"),
+          play: tHome("videoPlay"),
+        }}
       />
       {aboutTitle || aboutBody ? (
         <AboutSection

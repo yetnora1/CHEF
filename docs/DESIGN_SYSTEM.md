@@ -238,6 +238,25 @@ the semantic tokens above.
   scroll; see [UI_REVIEW.md](UI_REVIEW.md)).
 - Links that open a new tab say so (an icon plus "opens in a new tab" for screen readers).
 
+## Kitchen animation
+
+Directly under the header on the homepage (owner's request, 2026-10-28), a glass card holds a small
+animated kitchen (`components/public/chef-scene`): a chef in a toque stirs a pot of stew over a
+flame, with injera cooking on a mitad (its "eyes" open as it cooks), spice jars, a bowl of onions and
+a jebena of coffee. It is an inline SVG drawn with one outline weight and its own `--scene-*` palette
+in `globals.css` (food keeps its colours in both themes; outlines, coat, metal and counter follow the
+theme). The chef is a simple figure without facial features, like the photography, which shows no
+faces.
+
+- Motion is CSS only (`animate-scene-*` keyframes in `globals.css`): rotate, scale and fade, gentle
+  and looping. Staggered parts use negative delays, so a paused frame still shows steam and holes.
+- On narrow screens the drawing is cropped from the sides (`preserveAspectRatio="xMidYMax slice"`,
+  140/180/220px tall), keeping the chef and the pot in the middle.
+- A pause button (top right) stops it, as moving content must be stoppable; it also pauses while
+  off screen. With `prefers-reduced-motion: reduce` it is a still picture and the button is hidden.
+- The SVG is one image with a description (`role="img"`, "Animation: a chef stirring a pot of
+  stew…"), not a set of separate graphics.
+
 ## Videos
 
 Under the homepage hero, six short, silent loops (`components/public/food-reel`, data in

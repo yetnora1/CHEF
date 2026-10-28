@@ -132,6 +132,44 @@ test.describe("locale routing", () => {
   });
 });
 
+test.describe("kitchen animation", () => {
+  const scene = (page: Page) => page.getByRole("img", { name: /^Animation: a chef stirring a pot of stew/ });
+  const animated = (page: Page) =>
+    scene(page).evaluate((svg) =>
+      [...svg.querySelectorAll("[class*='animate-scene']")].map(
+        (element) => getComputedStyle(element).animationPlayState,
+      ),
+    );
+
+  test("plays under the header, before the hero, and can be paused", async ({ page }) => {
+    await page.goto("/en");
+    await expect(scene(page)).toBeVisible();
+    // Directly under the header: above the page's main heading.
+    const sceneBox = (await scene(page).boundingBox())!;
+    const headingBox = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
+    expect(sceneBox.y).toBeLessThan(headingBox.y);
+
+    const states = await animated(page);
+    expect(states.length).toBeGreaterThan(10);
+    expect(new Set(states)).toEqual(new Set(["running"]));
+
+    await page.getByRole("button", { name: "Pause the animation" }).click();
+    await expect(page.getByRole("button", { name: "Play the animation" })).toBeVisible();
+    expect(new Set(await animated(page))).toEqual(new Set(["paused"]));
+    await page.getByRole("button", { name: "Play the animation" }).click();
+    expect(new Set(await animated(page))).toEqual(new Set(["running"]));
+  });
+
+  test("keeps the chef in view on a phone without widening the page", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/am");
+    await expect(page.getByRole("img", { name: /ሼፍ ወጥ ሲያማስል/ })).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+    ).toBeLessThanOrEqual(0);
+  });
+});
+
 test.describe("food videos", () => {
   const reel = (page: Page) => page.getByRole("region", { name: "Short videos of Ethiopian food" });
 
@@ -324,6 +362,12 @@ test.describe("accessibility basics", () => {
       expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe(
         "auto",
       );
+    });
+
+    test("shows the kitchen animation as a still picture, without a pause button", async ({ page }) => {
+      await page.goto("/en");
+      await expect(page.getByRole("img", { name: /^Animation: a chef stirring/ })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Pause the animation" })).toBeHidden();
     });
   });
 });

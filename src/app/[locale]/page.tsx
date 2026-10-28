@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { AboutSection } from "@/components/public/about-section";
+import { ChefScene } from "@/components/public/chef-scene";
 import { FoodReel } from "@/components/public/food-reel";
 import { Hero } from "@/components/public/hero";
 import { ServicesSection, type ServiceCard } from "@/components/public/services-section";
@@ -60,6 +61,11 @@ export default async function HomePage() {
 
   return (
     <>
+      <div className="page-container pt-4 md:pt-6">
+        <ChefScene
+          labels={{ scene: tHome("sceneLabel"), pause: tHome("scenePause"), play: tHome("scenePlay") }}
+        />
+      </div>
       {heroHeadline ? (
         <Hero
           eyebrow={field("hero", "eyebrow")}

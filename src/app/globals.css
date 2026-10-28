@@ -84,6 +84,87 @@
       transform: translateY(-4px) scale(0.98);
     }
   }
+
+  /* Homepage kitchen scene (components/public/chef-scene.tsx): gentle loops that
+   * only move and fade, paused by its button or off screen. */
+  --animate-scene-stir: scene-stir 1.5s ease-in-out infinite alternate;
+  --animate-scene-sway: scene-sway 1.5s ease-in-out infinite alternate;
+  --animate-scene-flame: scene-flame 0.8s ease-in-out infinite alternate;
+  --animate-scene-steam: scene-steam 3.6s ease-out infinite;
+  --animate-scene-bubble: scene-bubble 2.4s ease-out infinite;
+  --animate-scene-eye: scene-eye 6s ease-out infinite;
+
+  @keyframes scene-stir {
+    from {
+      transform: rotate(-7deg);
+    }
+    to {
+      transform: rotate(6deg);
+    }
+  }
+  @keyframes scene-sway {
+    from {
+      transform: rotate(-2deg);
+    }
+    to {
+      transform: rotate(2deg);
+    }
+  }
+  @keyframes scene-flame {
+    from {
+      transform: scale(1.06, 0.82);
+    }
+    to {
+      transform: scale(0.94, 1.1);
+    }
+  }
+  @keyframes scene-steam {
+    0% {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    30% {
+      opacity: 0.85;
+    }
+    100% {
+      transform: translateY(-30px);
+      opacity: 0;
+    }
+  }
+  @keyframes scene-bubble {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    20% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    45% {
+      transform: scale(1.25);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(0);
+      opacity: 0;
+    }
+  }
+  /* Injera's "eyes": the little holes that open across it as it cooks. */
+  @keyframes scene-eye {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    10%,
+    85% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
 }
 
 /*
@@ -215,6 +296,32 @@
   --green-bottom: light-dark(#bbf7d0, #bbf7d0);
   --green-border: light-dark(#86efac, #86efac);
   --green-text: light-dark(#166534, #166534);
+
+  /* Homepage kitchen scene (components/public/chef-scene.tsx): its own small
+   * palette. Food keeps its warm colours in both themes; outlines, the coat,
+   * metal and the counter follow the theme. */
+  --scene-line: light-dark(#1e293b, #cbd5e1);
+  --scene-coat: light-dark(#ffffff, #f1f5f9);
+  --scene-skin: light-dark(#8a5a3c, #8a5a3c);
+  --scene-scarf: light-dark(#c2410c, #ea580c);
+  --scene-metal: light-dark(#64748b, #64748b);
+  --scene-metal-dark: light-dark(#334155, #334155);
+  --scene-stew: light-dark(#9a3412, #9a3412);
+  --scene-bubble: light-dark(#ea580c, #f97316);
+  --scene-wood: light-dark(#b45309, #d97706);
+  --scene-flame: light-dark(#f97316, #f97316);
+  --scene-flame-core: light-dark(#fde047, #fde047);
+  --scene-steam: light-dark(#94a3b8, #e2e8f0);
+  --scene-mitad: light-dark(#1f2937, #0f172a);
+  --scene-injera: light-dark(#ecdcb8, #e2cfa6);
+  --scene-injera-eye: light-dark(#b89c6c, #a88c5c);
+  --scene-counter: light-dark(#e2e8f0, #334155);
+  --scene-jar: light-dark(#f8fafc, #e2e8f0);
+  --scene-berbere: light-dark(#b91c1c, #dc2626);
+  --scene-turmeric: light-dark(#eab308, #facc15);
+  --scene-herb: light-dark(#4d7c0f, #65a30d);
+  --scene-onion: light-dark(#9f1239, #be123c);
+  --scene-clay: light-dark(#292524, #44403c);
 }
 
 :root[data-theme="dark"] {

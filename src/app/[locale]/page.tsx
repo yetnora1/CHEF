@@ -107,7 +107,7 @@ export default async function HomePage() {
           title={placeholder(story.title)}
           body={placeholder(story.body)}
           photo={samplePhotos[story.photo]}
-          // "Meet Chef Harena" has its image on the left, so these start on the right.
+          // "Meet CHEF SIS" has its image on the left, so these start on the right.
           imageRight={index % 2 === 0}
         />
       ))}

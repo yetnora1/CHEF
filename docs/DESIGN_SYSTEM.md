@@ -178,8 +178,8 @@ keeps the tile's edge visible on dark backgrounds. Each instance gets unique gra
 
 | Where                                   | How                                                                          |
 | --------------------------------------- | ---------------------------------------------------------------------------- |
-| Public header and footer                | `Wordmark` (logo, "Chef Harena", tagline)                                    |
-| Admin sidebar/header and sign-in screen | `Logo` at 32px beside "Chef Harena · Admin"                                  |
+| Public header and footer                | `Wordmark` (logo, "CHEF SIS", tagline)                                       |
+| Admin sidebar/header and sign-in screen | `Logo` at 32px beside "CHEF SIS · Admin"                                     |
 | Browser tab                             | `src/app/icon.svg`, the same drawing in fixed hex colours                    |
 | Phone home screen                       | `src/app/apple-icon.png`, 180px, full-bleed (iOS rounds the corners; no rim) |
 
@@ -236,7 +236,7 @@ licensed **sample photo** from Wikimedia Commons (`src/features/content/sample-p
 - Samples carry no caption on the image (owner's request, 2026-10-27). The credits page
   (`/credits`, "Photo credits" in the footer) names each photographer and licence (linked to its
   Creative Commons deed), links the Commons original, notes the resize, and says the photos are
-  samples, not Chef Harena's work, which keeps the CC BY / CC BY-SA attribution terms.
+  samples, not CHEF SIS's work, which keeps the CC BY / CC BY-SA attribution terms.
 - No sample shows an identifiable face, so no stranger stands in for the chef or a client. The
   "chef" slot uses a coffee-ceremony still life, not a portrait.
 - Only CC BY / CC BY-SA (or more permissive) images; copies are resized to 1600px and keep the
@@ -252,5 +252,5 @@ licensed **sample photo** from Wikimedia Commons (`src/features/content/sample-p
 | Service: culinary experiences  | Jebena on a stove beside roasted coffee | Radosław Botev, CC BY 3.0 PL |
 
 A slot with no sample keeps the labelled placeholder, which names the intended shot (for example
-"a portrait of Chef Harena") so the chef can supply or commission it. Replacing the samples with
-Chef Harena's own photography is the single biggest step toward a site that feels personal.
+"a portrait of CHEF SIS") so the chef can supply or commission it. Replacing the samples with
+CHEF SIS's own photography is the single biggest step toward a site that feels personal.

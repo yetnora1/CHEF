@@ -11,10 +11,10 @@ import storyInjera from "@/assets/samples/story-injera.jpg";
 import storyWat from "@/assets/samples/story-wat.jpg";
 
 /*
- * SAMPLE PHOTOGRAPHY — not Chef Harena's work
+ * SAMPLE PHOTOGRAPHY — not CHEF SIS's work
  * ---------------------------------------------------------------------------
  * Openly licensed photographs from Wikimedia Commons that fill the photo slots
- * until Chef Harena's own photography is published through the media library
+ * until CHEF SIS's own photography is published through the media library
  * (a published image always takes precedence). The images carry no caption: the
  * credits page (/credits, linked from every page's footer) names each
  * photographer, licence and source, and says plainly that these are samples, not

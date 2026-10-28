@@ -38,7 +38,7 @@ test.describe("locale routing", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Ethiopian cuisine for your most important gatherings.",
     );
-    await expect(page).toHaveTitle(/Chef Harena/);
+    await expect(page).toHaveTitle(/CHEF SIS/);
     await expect(page.locator('link[rel="alternate"][hreflang="am"]')).toHaveAttribute("href", /\/am$/);
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     // The site-wide preview banner was removed at the owner's request (Stage 3.6).

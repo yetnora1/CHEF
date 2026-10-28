@@ -3,8 +3,8 @@ import type { samplePhotos } from "./sample-photos";
 
 /*
  * Short pieces about Ethiopian food for the homepage, shown in alternating
- * image-and-text rows after "Meet Chef Harena". They describe the cuisine in
- * general (widely documented facts), never Chef Harena's own dishes, menus or
+ * image-and-text rows after "Meet CHEF SIS". They describe the cuisine in
+ * general (widely documented facts), never CHEF SIS's own dishes, menus or
  * history, which only the chef can supply. The Amharic is a draft for a fluent
  * speaker to review, like the rest of the site's Amharic placeholder copy.
  */

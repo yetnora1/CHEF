@@ -19,7 +19,7 @@ type PhotoSlotProps = {
 };
 
 /**
- * Fills a photo slot until Chef Harena's own photography is published: an
+ * Fills a photo slot until CHEF SIS's own photography is published: an
  * openly licensed sample photograph, or, where there is no sample, a labelled
  * placeholder naming the photograph to supply. Samples carry no caption; their
  * photographers, licences and the note that they are not the chef's work are

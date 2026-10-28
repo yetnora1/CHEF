@@ -17,7 +17,7 @@ const base = {
 
 const emailEnv = {
   RESEND_API_KEY: "re_test_key",
-  INQUIRY_EMAIL_FROM: "Chef Harena <inquiries@mail.example>",
+  INQUIRY_EMAIL_FROM: "CHEF SIS <inquiries@mail.example>",
   INQUIRY_NOTIFY_TO: "owner@example.test, events@example.test",
 };
 

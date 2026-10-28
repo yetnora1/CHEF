@@ -12,7 +12,7 @@ import type { ClaimedNotification } from "@/features/bookings/server/store";
 const email: EmailConfig = {
   provider: "resend",
   apiKey: "re_test",
-  from: "Chef Harena <inquiries@mail.example>",
+  from: "CHEF SIS <inquiries@mail.example>",
   staffRecipients: ["owner@example.test"],
   siteUrl: new URL("https://chefharena.example"),
 };

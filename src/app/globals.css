@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Chef Harena design tokens
+ * CHEF SIS design tokens
  * ---------------------------------------------------------------------------
  * Brand palette (raw) → semantic tokens (role-based) → Tailwind utilities.
  * Components use semantic utilities (bg-background, text-muted-foreground…),

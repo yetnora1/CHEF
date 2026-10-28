@@ -4,7 +4,7 @@ import { useId } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * The Chef Harena logo: a white chef's toque on a black tile, shaded for a
+ * The CHEF SIS logo: a white chef's toque on a black tile, shaded for a
  * clean 3D look (tile gradient and top rim, lit hat, soft drop shadow). Logo
  * colours are fixed tokens, so it looks the same in both themes; the rim keeps
  * the tile's edge visible on dark backgrounds. The same drawing is the favicon

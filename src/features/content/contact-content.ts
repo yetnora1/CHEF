@@ -1,11 +1,11 @@
 import type { Localized } from "@/lib/localization/translations";
 
 /*
- * CONTACT DETAILS — business facts, filled in only once Chef Harena confirms them
+ * CONTACT DETAILS — business facts, filled in only once CHEF SIS confirms them
  * ---------------------------------------------------------------------------
  * Never invent a number, address or email here. Each detail appears on
  * /contact as soon as it is set; until then the page offers the inquiry form,
- * which is the working way to reach Chef Harena.
+ * which is the working way to reach CHEF SIS.
  */
 export type ContactDetails = {
   /** In international format, e.g. "+251 …". */

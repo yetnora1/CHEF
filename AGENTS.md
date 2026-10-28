@@ -8,7 +8,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-## Chef Harena project rules
+## CHEF SIS project rules
 
 Read `docs/ARCHITECTURE.md` and `docs/SECURITY_MODEL.md` before changing routes, auth or data access.
 

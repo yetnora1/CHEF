@@ -64,7 +64,7 @@ previews), while its interface labels follow the admin's interface language.
   access to fetch it. Stage 3.6 dropped the serif display faces (Fraunces, Noto Serif Ethiopic)
   and then the Manrope web font, at the owner's request for a "normal" font.
 - Stacks list the Latin system fonts first; the browser falls through to the Ethiopic face per
-  glyph, so mixed text such as "Chef Harena ለሠርግ…" renders correctly.
+  glyph, so mixed text such as "CHEF SIS ለሠርግ…" renders correctly.
 - Only the `ethiopic` subset is requested (Ethiopic U+1200–137F, Supplement U+1380–139F and the
   Extended blocks).
 - Ethiopic-specific typography via `:lang(am)`: body line-height 1.85; headings with looser
@@ -102,9 +102,10 @@ Staff alert emails are English-only for now (the business has not chosen a staff
 
 Open questions for the reviewer:
 
-- The brand name is kept in Latin script ("Chef Harena") inside Amharic text. Confirm whether an
+- The brand name is kept in Latin script ("CHEF SIS") inside Amharic text. Confirm whether an
   official Ethiopic spelling should be used.
 - Register: the drafts use the polite/formal imperative (ይግቡ, ያቅዱ). Confirm the preferred tone.
-- Prefix forms attached to Latin text (e.g. "የChef Harena", "ከ Chef Harena ጋር").
-- Brand spelling: confirmed by the owner as **Chef Harena** (Stage 3.6); "Chief" is no longer
-  used anywhere visible.
+- Prefix forms attached to Latin text (e.g. "የCHEF SIS", "ከ CHEF SIS ጋር").
+- Brand name: **CHEF SIS**, in capitals (owner's choice, 2026-10-28), replacing "Chef Harena"
+  everywhere visible. Internal identifiers (storage keys such as `chef-harena:theme`, the package
+  name, the Supabase project id and the applied migrations) keep the old name.

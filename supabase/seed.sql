@@ -1,5 +1,5 @@
 -- =============================================================================
--- Chef Harena · local development seed
+-- CHEF SIS · local development seed
 -- =============================================================================
 -- Runs after migrations on `supabase db reset` (local only). Contains placeholder
 -- content only: no users, no customers, no bookings, no real business claims.
@@ -24,7 +24,7 @@ insert into public.service_translations (service_id, locale, status, title, summ
 select s.id, t.locale, t.status::public.publication_status, t.title, t.summary
 from (values
   ('weddings', 'en', 'published', 'Weddings',
-   'Placeholder: Ethiopian menus for wedding celebrations. Final copy to be provided by Chef Harena.'),
+   'Placeholder: Ethiopian menus for wedding celebrations. Final copy to be provided by CHEF SIS.'),
   ('weddings', 'am', 'draft', 'ሠርግ',
    'ጊዜያዊ ጽሑፍ፦ ለሠርግ በዓላት የኢትዮጵያ ምግብ ዝግጅት። የመጨረሻው ጽሑፍ ይቀርባል።'),
   ('corporate-events', 'en', 'published', 'Corporate events',
@@ -36,7 +36,7 @@ from (values
   ('summits-and-conferences', 'am', 'draft', 'ጉባኤዎችና ኮንፈረንሶች',
    'ጊዜያዊ ጽሑፍ፦ ለጉባኤዎችና ለሙያዊ ስብሰባዎች የምግብ አገልግሎት። የመጨረሻው ጽሑፍ ይቀርባል።'),
   ('culinary-experiences', 'en', 'draft', 'Culinary experiences',
-   'Placeholder: offering to be confirmed by Chef Harena before publication.')
+   'Placeholder: offering to be confirmed by CHEF SIS before publication.')
 ) as t (slug, locale, status, title, summary)
 join public.services s on s.slug = t.slug
 on conflict (service_id, locale) do nothing;

@@ -248,7 +248,7 @@ test.describe("editorial workflow", () => {
     const live = exists && (await english.getByText("Published", { exact: true }).isVisible());
 
     const heading = `Cooking for Ethiopia's celebrations ${unique("x").slice(-6)}`;
-    await english.getByRole("textbox", { name: "Title", exact: true }).fill("About Chef Harena");
+    await english.getByRole("textbox", { name: "Title", exact: true }).fill("About CHEF SIS");
     const intro = english.getByRole("group", { name: "Introduction" });
     await intro.getByLabel("Heading").fill(heading);
     await intro.getByLabel(/^Text/).fill("Recipes learned at home.");

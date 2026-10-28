@@ -174,7 +174,7 @@ enable_refresh_token_rotation = true
 # Requires enable_refresh_token_rotation = true.
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
-# Chef Harena: public registration is disabled. Staff accounts are created by an
+# CHEF SIS: public registration is disabled. Staff accounts are created by an
 # authorized operator (Studio "Add user" locally; invitations in a later stage).
 enable_signup = false
 # Allow/disallow anonymous sign-ins to your project.

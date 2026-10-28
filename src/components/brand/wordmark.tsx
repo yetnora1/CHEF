@@ -7,7 +7,7 @@ export function Wordmark({ tagline, className }: { tagline: string; className?: 
       <Logo />
       <span className="flex flex-col leading-none">
         <span className="font-display text-[1.2rem] font-bold" lang="en">
-          Chef Harena
+          CHEF SIS
         </span>
         <span className="mt-1 text-xs font-medium text-muted-foreground [&:lang(am)]:text-[0.78rem]">
           {tagline}

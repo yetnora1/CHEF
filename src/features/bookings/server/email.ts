@@ -68,24 +68,24 @@ const ACK_COPY = {
   en: {
     subject: (ref: string) => `We received your inquiry (${ref})`,
     greeting: "Hello,",
-    received: "Thank you for contacting Chef Harena. We have received your event inquiry.",
+    received: "Thank you for contacting CHEF SIS. We have received your event inquiry.",
     reference: (ref: string) => `Reference: ${ref}`,
     event: (type: string, date: string | null, guests: number | null) =>
       `Event: ${[type, date, guests ? `about ${guests} guests` : null].filter(Boolean).join(", ")}`,
     notConfirmed:
-      "This message only confirms that your request arrived. It is not a booking confirmation and does not confirm availability for your date. Chef Harena will review your inquiry before replying.",
+      "This message only confirms that your request arrived. It is not a booking confirmation and does not confirm availability for your date. CHEF SIS will review your inquiry before replying.",
     ignore: "If you did not send this inquiry, you can ignore this email.",
   },
   // Draft Amharic: requires native-speaker review before launch (docs/LOCALIZATION.md).
   am: {
     subject: (ref: string) => `ጥያቄዎ ደርሶናል (${ref})`,
     greeting: "ሰላም፣",
-    received: "Chef Harenaን ስላነጋገሩ እናመሰግናለን። የዝግጅት ጥያቄዎ ደርሶናል።",
+    received: "CHEF SISን ስላነጋገሩ እናመሰግናለን። የዝግጅት ጥያቄዎ ደርሶናል።",
     reference: (ref: string) => `መለያ ቁጥር፦ ${ref}`,
     event: (type: string, date: string | null, guests: number | null) =>
       `ዝግጅት፦ ${[type, date, guests ? `ወደ ${guests} እንግዶች` : null].filter(Boolean).join("፣ ")}`,
     notConfirmed:
-      "ይህ መልዕክት ጥያቄዎ መድረሱን ብቻ ያረጋግጣል። የቦታ ማስያዣ ማረጋገጫ አይደለም፤ ለቀንዎ መገኘታችንንም አያረጋግጥም። Chef Harena ጥያቄዎን ከገመገሙ በኋላ ምላሽ ይሰጣሉ።",
+      "ይህ መልዕክት ጥያቄዎ መድረሱን ብቻ ያረጋግጣል። የቦታ ማስያዣ ማረጋገጫ አይደለም፤ ለቀንዎ መገኘታችንንም አያረጋግጥም። CHEF SIS ጥያቄዎን ከገመገሙ በኋላ ምላሽ ይሰጣሉ።",
     ignore: "ይህን ጥያቄ ያልላኩ ከሆነ ይህን ኢሜይል ችላ ማለት ይችላሉ።",
   },
 } as const;

@@ -15,7 +15,7 @@ type StorySectionProps = {
   imageRight?: boolean;
 };
 
-/** An image-and-text row in the style of "Meet Chef Harena"; phones stack image first. */
+/** An image-and-text row in the style of "Meet CHEF SIS"; phones stack image first. */
 export function StorySection({ id, eyebrow, title, body, photo, imageRight }: StorySectionProps) {
   return (
     <section aria-labelledby={`${id}-heading`} className="py-14 md:py-20">

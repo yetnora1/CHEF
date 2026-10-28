@@ -53,7 +53,7 @@ export async function AdminShell({
     <span className="inline-flex items-center gap-2.5 text-sm font-semibold whitespace-nowrap">
       <Logo className="size-8 shrink-0" />
       <span className={railHidden}>
-        <span lang="en">Chef Harena</span>
+        <span lang="en">CHEF SIS</span>
         <span className="block text-xs font-medium text-muted-foreground">{t("appName")}</span>
       </span>
     </span>

@@ -20,7 +20,7 @@ export const instant = false;
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Admin");
   return {
-    title: { default: `${t("appName")} · Chef Harena`, template: `%s · Chef Harena ${t("appName")}` },
+    title: { default: `${t("appName")} · CHEF SIS`, template: `%s · CHEF SIS ${t("appName")}` },
     robots: { index: false, follow: false },
     referrer: "same-origin",
   };

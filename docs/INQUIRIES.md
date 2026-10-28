@@ -245,7 +245,7 @@ form's consent links to it.
    so serve the form on one hostname and redirect the other, e.g. `www`).
 5. Optional email: verify a sending domain in Resend; set `RESEND_API_KEY`, `INQUIRY_EMAIL_FROM`,
    `INQUIRY_NOTIFY_TO`; optionally `CRON_SECRET` plus a scheduled call to the retry endpoint.
-6. Have Chef Harena complete the privacy-notice review items, and get it legally reviewed.
+6. Have CHEF SIS complete the privacy-notice review items, and get it legally reviewed.
 7. Rebuild and deploy, then submit a test inquiry and check it in `/admin/bookings`.
 
 ## Testing locally

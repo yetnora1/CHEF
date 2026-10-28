@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "siteName": "Chef Harena",
-    "homeTitle": "Chef Harena · Ethiopian cuisine for weddings, events and private occasions",
+    "siteName": "CHEF SIS",
+    "homeTitle": "CHEF SIS · Ethiopian cuisine for weddings, events and private occasions",
     "homeDescription": "Ethiopian chef preparing food for weddings, corporate events, summits and private occasions.",
     "notFoundTitle": "Page not found"
   },
@@ -24,7 +24,7 @@
   },
   "Brand": {
     "tagline": "Ethiopian cuisine",
-    "homeLink": "Chef Harena, homepage"
+    "homeLink": "CHEF SIS, homepage"
   },
   "Navigation": {
     "primaryLabel": "Primary",
@@ -61,7 +61,7 @@
   },
   "Footer": {
     "navigationLabel": "Footer",
-    "copyright": "© {year} Chef Harena. All rights reserved."
+    "copyright": "© {year} CHEF SIS. All rights reserved."
   },
   "Admin": {
     "appName": "Admin",
@@ -133,7 +133,7 @@
   },
   "Auth": {
     "loginTitle": "Sign in",
-    "loginSubtitle": "Staff access to the Chef Harena admin.",
+    "loginSubtitle": "Staff access to the CHEF SIS admin.",
     "email": "Email",
     "password": "Password",
     "submit": "Sign in",
@@ -182,14 +182,14 @@
   },
   "Booking": {
     "metaTitle": "Plan an event",
-    "metaDescription": "Send Chef Harena an inquiry about Ethiopian catering or a culinary experience for your event.",
+    "metaDescription": "Send CHEF SIS an inquiry about Ethiopian catering or a culinary experience for your event.",
     "eyebrow": "Event inquiry",
     "title": "Tell us about your event",
-    "intro": "Share a few details and Chef Harena will review your request.",
-    "notBookingNote": "An inquiry is not a booking. Dates and services are confirmed only after Chef Harena has reviewed your request and agreed the details with you.",
+    "intro": "Share a few details and CHEF SIS will review your request.",
+    "notBookingNote": "An inquiry is not a booking. Dates and services are confirmed only after CHEF SIS has reviewed your request and agreed the details with you.",
     "processTitle": "How inquiries work",
     "processStep1": "You receive a reference number as soon as your inquiry is sent.",
-    "processStep2": "Chef Harena reviews your date, guest count and requirements.",
+    "processStep2": "CHEF SIS reviews your date, guest count and requirements.",
     "processStep3": "You are contacted by the method you chose, to agree the details.",
     "requiredHint": "Fields marked * are required.",
     "sectionYou": "About you",
@@ -207,11 +207,11 @@
     "guestCount": "Approximate number of guests",
     "venue": "Location or venue",
     "venueHint": "City, venue name or address, as far as you know.",
-    "requirements": "What would you like Chef Harena to provide?",
+    "requirements": "What would you like CHEF SIS to provide?",
     "requirementsHint": "For example the kind of meal, style of service or any dietary needs.",
     "message": "Anything else we should know?",
     "optional": "optional",
-    "consent": "I agree that Chef Harena may use these details to respond to my inquiry, as described in the <link>privacy notice</link>.",
+    "consent": "I agree that CHEF SIS may use these details to respond to my inquiry, as described in the <link>privacy notice</link>.",
     "opensInNewTab": "opens in a new tab",
     "submit": "Send inquiry",
     "submitting": "Sending…",
@@ -242,24 +242,24 @@
     "error": "Your inquiry could not be sent and nothing was saved. Please try again in a moment.",
     "networkError": "The connection was interrupted, so we cannot tell whether your inquiry arrived. Please send it again: sending the same inquiry again will not create a duplicate.",
     "successTitle": "Thank you. Your inquiry has been received",
-    "successBody": "Your inquiry is now awaiting review by Chef Harena. This is not a booking confirmation and it does not confirm availability for your date.",
+    "successBody": "Your inquiry is now awaiting review by CHEF SIS. This is not a booking confirmation and it does not confirm availability for your date.",
     "referenceLabel": "Your reference",
     "referenceHint": "Please keep this reference and mention it if you get in touch.",
     "newInquiry": "Send another inquiry"
   },
   "Privacy": {
     "metaTitle": "Privacy notice",
-    "metaDescription": "How the Chef Harena website handles the information you share in an event inquiry.",
+    "metaDescription": "How the CHEF SIS website handles the information you share in an event inquiry.",
     "eyebrow": "Privacy",
-    "draftNotice": "Draft for review. This notice describes how the website currently handles inquiry information. Items marked for review must be completed by Chef Harena, and the notice should be checked by a qualified adviser before launch. On its own it does not establish legal compliance.",
+    "draftNotice": "Draft for review. This notice describes how the website currently handles inquiry information. Items marked for review must be completed by CHEF SIS, and the notice should be checked by a qualified adviser before launch. On its own it does not establish legal compliance.",
     "reviewTag": "Owner review required",
     "lastUpdated": "Last updated {date}"
   },
   "Contact": {
     "metaTitle": "Contact",
-    "metaDescription": "Contact Chef Harena about weddings, corporate events and private occasions.",
+    "metaDescription": "Contact CHEF SIS about weddings, corporate events and private occasions.",
     "title": "Contact",
-    "lede": "Have a question for Chef Harena? Send a message using the form.",
+    "lede": "Have a question for CHEF SIS? Send a message using the form.",
     "detailsTitle": "Direct contact",
     "phone": "Phone",
     "email": "Email",
@@ -267,14 +267,14 @@
   },
   "ContactForm": {
     "title": "Send a message",
-    "intro": "For questions that are not about a specific event. Chef Harena will reply using the contact details you give.",
+    "intro": "For questions that are not about a specific event. CHEF SIS will reply using the contact details you give.",
     "fullName": "Full name",
     "email": "Email",
     "phone": "Phone number",
     "subject": "Subject",
     "message": "Message",
     "optional": "optional",
-    "consent": "I agree that Chef Harena may use these details to reply to my message, as described in the <link>privacy notice</link>.",
+    "consent": "I agree that CHEF SIS may use these details to reply to my message, as described in the <link>privacy notice</link>.",
     "opensInNewTab": "opens in a new tab",
     "submit": "Send message",
     "submitting": "Sending…",
@@ -293,7 +293,7 @@
     "error": "Your message could not be sent and nothing was saved. Please try again in a moment.",
     "networkError": "The connection was interrupted, so we cannot tell whether your message arrived. Please send it again: sending the same message again will not create a duplicate.",
     "successTitle": "Thank you. Your message has been received",
-    "successBody": "Chef Harena will reply using the contact details you gave.",
+    "successBody": "CHEF SIS will reply using the contact details you gave.",
     "referenceLabel": "Your reference",
     "newMessage": "Send another message"
   },
@@ -461,28 +461,28 @@
       "intro": "Ethiopian cuisine for weddings, organisations, summits and private occasions.",
       "more": "Read more",
       "emptyTitle": "Service descriptions are on their way",
-      "emptyBody": "You can already tell Chef Harena about your event.",
+      "emptyBody": "You can already tell CHEF SIS about your event.",
       "back": "All services",
       "inquire": "Ask about this service"
     },
     "menu": {
       "eyebrow": "Menu",
       "title": "The menu",
-      "intro": "A selection of dishes. Menus for each event are agreed with Chef Harena.",
+      "intro": "A selection of dishes. Menus for each event are agreed with CHEF SIS.",
       "emptyTitle": "The menu will be published soon",
-      "emptyBody": "Tell us about your event and Chef Harena will suggest dishes."
+      "emptyBody": "Tell us about your event and CHEF SIS will suggest dishes."
     },
     "gallery": {
       "eyebrow": "Gallery",
       "title": "Gallery",
-      "intro": "Food and events by Chef Harena.",
+      "intro": "Food and events by CHEF SIS.",
       "emptyTitle": "Photographs are on their way",
       "emptyBody": "In the meantime, you can tell us about your event."
     },
     "journal": {
       "eyebrow": "Journal",
       "title": "Journal",
-      "intro": "Stories and notes from Chef Harena's kitchen.",
+      "intro": "Stories and notes from CHEF SIS's kitchen.",
       "read": "Read the article",
       "emptyTitle": "No articles yet",
       "emptyBody": "Articles will appear here once published.",
@@ -680,7 +680,7 @@
       "menu_item": {
         "singular": "Dish",
         "plural": "Dishes",
-        "intro": "Dishes on the public menu. Describe only what Chef Harena has confirmed.",
+        "intro": "Dishes on the public menu. Describe only what CHEF SIS has confirmed.",
         "new": "New dish",
         "edit": "Edit dish",
         "empty": "No dishes yet."
@@ -728,7 +728,7 @@
       },
       "dietary_tags": {
         "label": "Dietary information",
-        "hint": "Tick only what Chef Harena has confirmed for this dish."
+        "hint": "Tick only what CHEF SIS has confirmed for this dish."
       },
       "event_type": {
         "label": "Kind of event pictured"
@@ -917,7 +917,7 @@
     "metaDescription": "Who made the openly licensed sample photographs and videos on this website, and under which licence.",
     "eyebrow": "Credits",
     "title": "Photo and video credits",
-    "intro": "The photographs and videos on this website are openly licensed samples, shown until Chef Harena's own are ready. They are not Chef Harena's work.",
+    "intro": "The photographs and videos on this website are openly licensed samples, shown until CHEF SIS's own are ready. They are not CHEF SIS's work.",
     "changes": "Photographs were resized for the web; videos were shortened, cropped, resized and silenced. Nothing else was changed.",
     "photos": "Photographs",
     "videos": "Videos",

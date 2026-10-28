@@ -12,7 +12,7 @@ import type { Localized } from "@/lib/localization/translations";
  *   - Amharic is a machine-assisted draft that needs native-speaker review
  *     before launch (docs/LOCALIZATION.md lists every string to review).
  *   - Photo subjects describe the photograph to commission or supply; no stock
- *     photo is presented as Chef Harena's work.
+ *     photo is presented as CHEF SIS's work.
  */
 
 export type ServicePreview = {
@@ -20,7 +20,7 @@ export type ServicePreview = {
   title: Localized;
   summary: Localized;
   photoSubject: Localized;
-  /** False until Chef Harena confirms the offering exists. */
+  /** False until CHEF SIS confirms the offering exists. */
 };
 
 export const homeContent = {
@@ -34,8 +34,8 @@ export const homeContent = {
       am: "ለልዩ አጋጣሚዎችዎ የተዘጋጀ የኢትዮጵያ ምግብ።",
     },
     lede: {
-      en: "Chef Harena prepares Ethiopian food for weddings, corporate events, summits and private occasions.",
-      am: "Chef Harena ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች የኢትዮጵያ ምግብ ያዘጋጃሉ።",
+      en: "CHEF SIS prepares Ethiopian food for weddings, corporate events, summits and private occasions.",
+      am: "CHEF SIS ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች የኢትዮጵያ ምግብ ያዘጋጃሉ።",
     },
     photoSubject: {
       en: "a signature dish or a set event table",
@@ -44,17 +44,17 @@ export const homeContent = {
   },
   about: {
     title: {
-      en: "Meet Chef Harena",
-      am: "ከ Chef Harena ጋር ይተዋወቁ",
+      en: "Meet CHEF SIS",
+      am: "ከ CHEF SIS ጋር ይተዋወቁ",
     },
     body: {
       // No invented biography: the chef's own story replaces this through the CMS (Pages → Homepage).
-      en: "Ethiopian food is made to be shared: injera is spread across the table and the stews are served side by side, so every guest eats from the same platter. Chef Harena prepares this food for weddings, corporate events, summits and private occasions. Share your date, guest count and occasion, and Chef Harena will review your request.",
-      am: "የኢትዮጵያ ምግብ በጋራ የሚበላ ነው፤ እንጀራ በገበታው ላይ ይዘረጋል፣ ወጦቹም ጎን ለጎን ይቀርባሉ፤ ሁሉም እንግዳ ከአንድ ገበታ ይቋደሳል። Chef Harena ይህንን ምግብ ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች ያዘጋጃሉ። የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት ያጋሩ፤ Chef Harena ጥያቄዎን ይገመግማሉ።",
+      en: "Ethiopian food is made to be shared: injera is spread across the table and the stews are served side by side, so every guest eats from the same platter. CHEF SIS prepares this food for weddings, corporate events, summits and private occasions. Share your date, guest count and occasion, and CHEF SIS will review your request.",
+      am: "የኢትዮጵያ ምግብ በጋራ የሚበላ ነው፤ እንጀራ በገበታው ላይ ይዘረጋል፣ ወጦቹም ጎን ለጎን ይቀርባሉ፤ ሁሉም እንግዳ ከአንድ ገበታ ይቋደሳል። CHEF SIS ይህንን ምግብ ለሠርግ፣ ለድርጅት ዝግጅቶች፣ ለጉባኤዎችና ለግል ግብዣዎች ያዘጋጃሉ። የዝግጅትዎን ቀን፣ የእንግዶች ብዛትና አይነት ያጋሩ፤ CHEF SIS ጥያቄዎን ይገመግማሉ።",
     },
     photoSubject: {
-      en: "a portrait of Chef Harena",
-      am: "የ Chef Harena ምስል",
+      en: "a portrait of CHEF SIS",
+      am: "የ CHEF SIS ምስል",
     },
   },
   services: {

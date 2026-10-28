@@ -1,7 +1,7 @@
 import type { Localized } from "@/lib/localization/translations";
 
 /*
- * SAMPLE VIDEO — not Chef Harena's work
+ * SAMPLE VIDEO — not CHEF SIS's work
  * ---------------------------------------------------------------------------
  * Short, silent loops of Ethiopian food from Pexels (Pexels License: free to use
  * and modify, no attribution required; credited anyway on /credits, where they

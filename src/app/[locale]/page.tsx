@@ -1,8 +1,8 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { AboutSection } from "@/components/public/about-section";
-import { ChefScene } from "@/components/public/chef-scene";
 import { FoodReel } from "@/components/public/food-reel";
 import { Hero } from "@/components/public/hero";
+import { KitchenVideo } from "@/components/public/kitchen-video";
 import { ServicesSection, type ServiceCard } from "@/components/public/services-section";
 import { StorySection } from "@/components/public/story-section";
 import { getPublicNavigation, getPublicPage, getPublicServices } from "@/features/cms/public-data";
@@ -11,7 +11,7 @@ import { contactHrefFor } from "@/features/contact/service-subject";
 import { foodStories } from "@/features/content/food-stories";
 import { homeContent } from "@/features/content/home-content";
 import { samplePhotos } from "@/features/content/sample-photos";
-import { sampleVideos } from "@/features/content/sample-videos";
+import { kitchenVideo, sampleVideos } from "@/features/content/sample-videos";
 import { resolveLocalized, type Localized, type ResolvedText } from "@/lib/localization/translations";
 
 /*
@@ -62,8 +62,9 @@ export default async function HomePage() {
   return (
     <>
       <div className="page-container pt-4 md:pt-6">
-        <ChefScene
-          labels={{ scene: tHome("sceneLabel"), pause: tHome("scenePause"), play: tHome("scenePlay") }}
+        <KitchenVideo
+          clip={kitchenVideo}
+          labels={{ video: tHome("kitchenVideo"), pause: tHome("kitchenPause"), play: tHome("kitchenPlay") }}
         />
       </div>
       {heroHeadline ? (

@@ -132,38 +132,42 @@ test.describe("locale routing", () => {
   });
 });
 
-test.describe("kitchen animation", () => {
-  const scene = (page: Page) => page.getByRole("img", { name: /^Animation: a chef stirring a pot of stew/ });
-  const animated = (page: Page) =>
-    scene(page).evaluate((svg) =>
-      [...svg.querySelectorAll("[class*='animate-scene']")].map(
-        (element) => getComputedStyle(element).animationPlayState,
-      ),
-    );
+test.describe("kitchen video", () => {
+  const KITCHEN_EN = "Video: a cook chopping red onions on a wooden board in a kitchen";
+  const poster = (page: Page) => page.locator('picture img[src="/videos/kitchen-narrow.webp"]');
 
-  test("plays under the header, before the hero, and can be paused", async ({ page }) => {
+  test("a real kitchen loop sits under the header, before the hero, and can be paused", async ({ page }) => {
     await page.goto("/en");
-    await expect(scene(page)).toBeVisible();
-    // Directly under the header: above the page's main heading.
-    const sceneBox = (await scene(page).boundingBox())!;
+    const video = page.getByLabel(KITCHEN_EN);
+    await expect(video).toBeVisible();
+    expect(await video.evaluate((v: HTMLVideoElement) => v.muted && v.loop && !v.controls)).toBe(true);
+    const videoBox = (await video.boundingBox())!;
     const headingBox = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
-    expect(sceneBox.y).toBeLessThan(headingBox.y);
+    expect(videoBox.y).toBeLessThan(headingBox.y);
 
-    const states = await animated(page);
-    expect(states.length).toBeGreaterThan(10);
-    expect(new Set(states)).toEqual(new Set(["running"]));
+    // Wide screens get the 3:1 crop; its first frame is painted at once as an image.
+    await expect(video.locator("source").first()).toHaveAttribute("media", "(min-width: 40rem)");
+    await expect(video.locator("source").first()).toHaveAttribute("src", "/videos/kitchen-wide.mp4");
+    await expect(video.locator("source").last()).toHaveAttribute("src", "/videos/kitchen-narrow.mp4");
+    await expect(poster(page)).toBeVisible();
+    await expect
+      .poll(() => poster(page).evaluate((img: HTMLImageElement) => img.currentSrc))
+      .toMatch(/\/videos\/kitchen-wide\.webp$/);
 
-    await page.getByRole("button", { name: "Pause the animation" }).click();
-    await expect(page.getByRole("button", { name: "Play the animation" })).toBeVisible();
-    expect(new Set(await animated(page))).toEqual(new Set(["paused"]));
-    await page.getByRole("button", { name: "Play the animation" }).click();
-    expect(new Set(await animated(page))).toEqual(new Set(["running"]));
+    await page.getByRole("button", { name: "Pause the kitchen video" }).click();
+    await expect(page.getByRole("button", { name: "Play the kitchen video" })).toBeVisible();
+    expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
   });
 
-  test("keeps the chef in view on a phone without widening the page", async ({ page }) => {
+  test("phones get the 4:3 crop, in Amharic, without widening the page", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/am");
-    await expect(page.getByRole("img", { name: /ሼፍ ወጥ ሲያማስል/ })).toBeVisible();
+    await expect(page.getByLabel("ቪዲዮ፦ በወጥ ቤት ውስጥ በእንጨት ሰሌዳ ላይ ቀይ ሽንኩርት ሲከተፍ")).toBeVisible();
+    await expect
+      .poll(() => poster(page).evaluate((img: HTMLImageElement) => img.currentSrc))
+      .toMatch(/\/videos\/kitchen-narrow\.webp$/);
+    const box = (await poster(page).boundingBox())!;
+    expect(box.width / box.height).toBeCloseTo(4 / 3, 1);
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
     ).toBeLessThanOrEqual(0);
@@ -232,7 +236,8 @@ test.describe("food videos", () => {
   test("are credited, with the photos, on the credits page", async ({ page }) => {
     await page.goto("/en/credits");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Photo and video credits");
-    await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(6);
+    // The six reel clips and the kitchen loop under the header.
+    await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(7);
     await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(9);
   });
 });
@@ -364,10 +369,17 @@ test.describe("accessibility basics", () => {
       );
     });
 
-    test("shows the kitchen animation as a still picture, without a pause button", async ({ page }) => {
+    test("shows the kitchen video's still frame and downloads nothing until played", async ({ page }) => {
+      const requested: string[] = [];
+      page.on("request", (request) => {
+        if (/\/videos\/kitchen-[a-z]+\.mp4/.test(request.url())) requested.push(request.url());
+      });
       await page.goto("/en");
-      await expect(page.getByRole("img", { name: /^Animation: a chef stirring/ })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Pause the animation" })).toBeHidden();
+      await expect(page.locator('picture img[src="/videos/kitchen-narrow.webp"]')).toBeVisible();
+      await expect(page.getByRole("button", { name: "Play the kitchen video" })).toBeVisible();
+      const video = page.getByLabel("Video: a cook chopping red onions on a wooden board in a kitchen");
+      expect(await video.evaluate((v: HTMLVideoElement) => v.paused && v.preload === "none")).toBe(true);
+      expect(requested).toEqual([]);
     });
   });
 });

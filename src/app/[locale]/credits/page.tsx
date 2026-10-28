@@ -4,7 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { licenseUrl } from "@/features/content/licenses";
 import { samplePhotos } from "@/features/content/sample-photos";
-import { sampleVideos } from "@/features/content/sample-videos";
+import { kitchenVideo, sampleVideos } from "@/features/content/sample-videos";
 import type { AppLocale } from "@/i18n/routing";
 import { resolveLocalized, type Localized } from "@/lib/localization/translations";
 
@@ -46,12 +46,20 @@ export default async function CreditsPage() {
     description: photo.alt,
     credit: photo.credit,
   }));
-  const videos: Entry[] = sampleVideos.map((video) => ({
-    key: video.key,
-    thumbnail: video.poster,
-    description: video.description,
-    credit: video.credit,
-  }));
+  const videos: Entry[] = [
+    {
+      key: kitchenVideo.key,
+      thumbnail: kitchenVideo.narrow.poster,
+      description: kitchenVideo.description,
+      credit: kitchenVideo.credit,
+    },
+    ...sampleVideos.map((video) => ({
+      key: video.key,
+      thumbnail: video.poster,
+      description: video.description,
+      credit: video.credit,
+    })),
+  ];
 
   return (
     <article className="page-container max-w-4xl py-14 md:py-20">

@@ -238,24 +238,25 @@ the semantic tokens above.
   scroll; see [UI_REVIEW.md](UI_REVIEW.md)).
 - Links that open a new tab say so (an icon plus "opens in a new tab" for screen readers).
 
-## Kitchen animation
+## Kitchen video
 
-Directly under the header on the homepage (owner's request, 2026-10-28), a glass card holds a small
-animated kitchen (`components/public/chef-scene`): a chef in a toque stirs a pot of stew over a
-flame, with injera cooking on a mitad (its "eyes" open as it cooks), spice jars, a bowl of onions and
-a jebena of coffee. It is an inline SVG drawn with one outline weight and its own `--scene-*` palette
-in `globals.css` (food keeps its colours in both themes; outlines, coat, metal and counter follow the
-theme). The chef is a simple figure without facial features, like the photography, which shows no
-faces.
+Directly under the header on the homepage, a rounded card plays a real kitchen loop
+(`components/public/kitchen-video`, data `kitchenVideo` in `src/features/content/sample-videos.ts`):
+a cook chopping red onions beside diced meat on a wooden board. It replaced a drawn SVG scene on
+2026-10-28 at the owner's request ("make it like real person, food and materials"). It is an openly
+licensed Pexels sample like the reel, credited on `/credits`, and nothing on the page presents the
+cook as CHEF SIS's chef; both crops start below the shoulders, so no face is shown.
 
-- Motion is CSS only (`animate-scene-*` keyframes in `globals.css`): rotate, scale and fade, gentle
-  and looping. Staggered parts use negative delays, so a paused frame still shows steam and holes.
-- On narrow screens the drawing is cropped from the sides (`preserveAspectRatio="xMidYMax slice"`,
-  140/180/220px tall), keeping the chef and the pot in the middle.
-- A pause button (top right) stops it, as moving content must be stoppable; it also pauses while
-  off screen. With `prefers-reduced-motion: reduce` it is a still picture and the button is hidden.
-- The SVG is one image with a description (`role="img"`, "Animation: a chef stirring a pot of
-  stew…"), not a set of separate graphics.
+- Two crops of one six-second loop: 3:1 (1920x640, ~0.8 MB) from `sm`, 4:3 (960x720, ~0.6 MB) for
+  phones, chosen with `<source media>`; the card's aspect ratio changes at the same breakpoint and
+  the video covers it (`object-cover`). The loop's last 0.75 s is cross-faded into its start, so it
+  has no visible jump; it is lightly brightened and has no sound.
+- Its first frame is painted at once (a WebP per crop in a `<picture>`, `fetchpriority="high"`) and
+  the video fades in over it once it actually plays. Nothing downloads until it may play
+  (`preload="none"`, raised to `auto` then).
+- It plays only while on screen; a pause button (bottom right, on a dark stage face) stops it. With
+  `prefers-reduced-motion: reduce` it shows the still frame and downloads nothing until the visitor
+  presses play.
 
 ## Videos
 

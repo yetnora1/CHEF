@@ -27,7 +27,8 @@ create table auth.users (
   email text unique,
   raw_user_meta_data jsonb not null default '{}'::jsonb,
   raw_app_meta_data jsonb not null default '{}'::jsonb,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  last_sign_in_at timestamptz
 );
 
 create function auth.uid() returns uuid

@@ -239,6 +239,16 @@ messages. There is no delete button yet; erase a message in the database if a se
 Before launch, the privacy notice (written for inquiries) should also describe contact messages; the
 form's consent links to it.
 
+## Pausing new inquiries
+
+Owners and admins (`settings.manage`) can switch off **Accept new event inquiries** in Admin →
+Settings (confirmed before saving, audited as `settings.updated`). While it is off, `/book` explains
+that new inquiries are paused and links to the contact page, and `submitInquiryAction` returns
+`paused` before validation, rate limits or storage. Because `submit_inquiry` is executable only by
+`service_role`, that server action is the only way in, so the check holds. It is a business switch,
+not a security control: if the settings cannot be read, the form stays open. Existing inquiries are
+not affected.
+
 ## Enabling the form in production
 
 1. Apply the migrations to the production Supabase project (`npx supabase db push`).

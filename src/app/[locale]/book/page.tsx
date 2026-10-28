@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { InquiryForm, type InquiryCaptcha } from "@/features/bookings/components/inquiry-form";
 import { getInquiryConfig } from "@/features/bookings/server/config";
 import { siteNavigation } from "@/features/cms/navigation";
+import { getPublicSiteSettings } from "@/features/settings/public-data";
 import { getClientMessages } from "@/i18n/client-messages";
 import { Link } from "@/i18n/navigation";
 
@@ -78,19 +79,27 @@ async function InquiryFormSection() {
   const locale = await getLocale();
   const config = getInquiryConfig();
 
-  if (!config.available) {
-    const [t, tHome, tCommon, navigation] = await Promise.all([
+  // Not set up on this server, or paused by staff in Admin → Settings.
+  const paused = config.available && (await getPublicSiteSettings())?.inquiriesOpen === false;
+  if (!config.available || paused) {
+    const [t, tHome, tCommon, tNav, navigation] = await Promise.all([
       getTranslations("Booking"),
       getTranslations("Home"),
       getTranslations("Common"),
+      getTranslations("Navigation"),
       siteNavigation(locale),
     ]);
     const services = navigation.find((link) => link.key === "services")?.href ?? "/";
     return (
       <div role="status" className="rounded-3xl border border-border glass p-7 sm:p-10">
-        <h2 className="display-md">{t("unavailableTitle")}</h2>
-        <p className="mt-4 text-muted-foreground">{t("unavailableBody")}</p>
+        <h2 className="display-md">{paused ? t("pausedTitle") : t("unavailableTitle")}</h2>
+        <p className="mt-4 text-muted-foreground">{paused ? t("pausedBody") : t("unavailableBody")}</p>
         <div className="mt-8 flex flex-wrap gap-3">
+          {paused && (
+            <Button asChild variant="primary">
+              <Link href="/contact">{tNav("contact")}</Link>
+            </Button>
+          )}
           <Button asChild variant="outline">
             <Link href={services}>
               {tHome("heroSecondaryCta")}

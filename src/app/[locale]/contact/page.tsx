@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone, type LucideIcon } from "lucide-react";
+import { AtSign, Mail, MapPin, MessageCircle, Phone, Send, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { NextIntlClientProvider } from "next-intl";
@@ -7,7 +7,8 @@ import { Suspense } from "react";
 import { getContactConfig } from "@/features/bookings/server/config";
 import { ContactForm } from "@/features/contact/components/contact-form";
 import { contactSubjectFor } from "@/features/contact/service-subject";
-import { contactDetails } from "@/features/content/contact-content";
+import { getPublicSiteSettings } from "@/features/settings/public-data";
+import { telHref, whatsappDigits } from "@/features/settings/schema";
 import { getClientMessages } from "@/i18n/client-messages";
 import { resolveLocalized } from "@/lib/localization/translations";
 
@@ -24,34 +25,76 @@ export async function generateMetadata(): Promise<Metadata> {
 type Detail = { key: string; icon: LucideIcon; label: string; value: string; href?: string; lang?: string };
 
 /**
- * Contact: the message form, beside the phone, email and location shown only
- * once confirmed in contact-content.ts.
+ * Contact: the message form, beside the contact details and social links that
+ * staff have entered in Admin → Settings (each shown only once it is set).
  */
 export default async function ContactPage({ searchParams }: PageProps<"/[locale]/contact">) {
   const locale = await getLocale();
-  const t = await getTranslations("Contact");
+  const [t, tFooter, settings] = await Promise.all([
+    getTranslations("Contact"),
+    getTranslations("Footer"),
+    getPublicSiteSettings(),
+  ]);
 
-  const { phone, email, location } = contactDetails;
-  const place = location ? resolveLocalized(location, locale) : null;
-  const details: Detail[] = [
-    ...(phone
-      ? [
-          {
-            key: "phone",
-            icon: Phone,
-            label: t("phone"),
-            value: phone,
-            href: `tel:${phone.replace(/[^\d+]/g, "")}`,
-          },
-        ]
-      : []),
-    ...(email
-      ? [{ key: "email", icon: Mail, label: t("email"), value: email, href: `mailto:${email}` }]
-      : []),
-    ...(place
-      ? [{ key: "location", icon: MapPin, label: t("location"), value: place.text, lang: place.lang }]
-      : []),
-  ];
+  // An Amharic location reaches this page only once reviewed; else English, marked lang="en".
+  const place = settings
+    ? resolveLocalized(
+        { en: settings.location.en ?? undefined, am: settings.location.am ?? undefined },
+        locale,
+      )
+    : null;
+  const details: Detail[] = settings
+    ? [
+        ...(settings.phone
+          ? [
+              {
+                key: "phone",
+                icon: Phone,
+                label: t("phone"),
+                value: settings.phone,
+                href: telHref(settings.phone),
+              },
+            ]
+          : []),
+        ...(settings.whatsapp
+          ? [
+              {
+                key: "whatsapp",
+                icon: MessageCircle,
+                label: t("whatsapp"),
+                value: settings.whatsapp,
+                href: `https://wa.me/${whatsappDigits(settings.whatsapp)}`,
+              },
+            ]
+          : []),
+        ...(settings.telegram
+          ? [
+              {
+                key: "telegram",
+                icon: Send,
+                label: t("telegram"),
+                value: `@${settings.telegram}`,
+                href: `https://t.me/${settings.telegram}`,
+              },
+            ]
+          : []),
+        ...(settings.email
+          ? [
+              {
+                key: "email",
+                icon: Mail,
+                label: t("email"),
+                value: settings.email,
+                href: `mailto:${settings.email}`,
+              },
+            ]
+          : []),
+        ...(place
+          ? [{ key: "location", icon: MapPin, label: t("location"), value: place.text, lang: place.lang }]
+          : []),
+      ]
+    : [];
+  const social = settings?.social ?? [];
 
   return (
     <section className="page-container py-14 md:py-20">
@@ -69,7 +112,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
           </Suspense>
         </div>
 
-        {details.length > 0 && (
+        {(details.length > 0 || social.length > 0) && (
           <div className="lg:col-start-1 lg:row-start-2 lg:self-start">
             <div className="rounded-2xl border border-border glass p-6">
               <h2 className="text-lg font-semibold">{t("detailsTitle")}</h2>
@@ -91,6 +134,29 @@ export default async function ContactPage({ searchParams }: PageProps<"/[locale]
                     </div>
                   </div>
                 ))}
+                {social.length > 0 && (
+                  <div className="flex items-center gap-4 py-4">
+                    <AtSign aria-hidden className="size-5 shrink-0 text-accent-ink" />
+                    <div>
+                      <dt className="text-xs text-muted-foreground">{t("social")}</dt>
+                      <dd>
+                        <ul className="flex flex-wrap gap-x-4 gap-y-1 font-semibold">
+                          {social.map(({ platform, url }) => (
+                            <li key={platform}>
+                              <a
+                                href={url}
+                                rel="me"
+                                className="underline-offset-4 hover:text-primary hover:underline"
+                              >
+                                {tFooter(`social.${platform}`)}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </dd>
+                    </div>
+                  </div>
+                )}
               </dl>
             </div>
           </div>

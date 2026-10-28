@@ -67,7 +67,14 @@
   },
   "Footer": {
     "navigationLabel": "Footer",
-    "copyright": "© {year} CHEF SIS. All rights reserved."
+    "copyright": "© {year} CHEF SIS. All rights reserved.",
+    "socialLabel": "Social media",
+    "social": {
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "youtube": "YouTube"
+    }
   },
   "Admin": {
     "appName": "Admin",
@@ -109,9 +116,9 @@
       "journal": "Write and publish journal articles.",
       "media": "Upload and manage images and files.",
       "translations": "Track and complete Amharic and English translations.",
-      "users": "Invite staff and manage their roles.",
-      "settings": "Manage public website settings.",
-      "auditLog": "Review security-sensitive administrative events.",
+      "users": "See who has an account and manage their roles.",
+      "settings": "Contact details, social links and whether event inquiries are open.",
+      "auditLog": "See who changed what in the admin, and when.",
       "pages": "Edit the homepage and the About page in English and Amharic."
     },
     "overview": {
@@ -260,7 +267,9 @@
     "edit": "Edit",
     "notGiven": "Not given",
     "copyReference": "Copy reference",
-    "copied": "Copied"
+    "copied": "Copied",
+    "pausedTitle": "New inquiries are paused",
+    "pausedBody": "CHEF SIS is not taking new event inquiries at the moment. Please check back soon, or send a message from the contact page."
   },
   "Privacy": {
     "metaTitle": "Privacy notice",
@@ -278,7 +287,10 @@
     "detailsTitle": "Direct contact",
     "phone": "Phone",
     "email": "Email",
-    "location": "Location"
+    "location": "Location",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "social": "Social media"
   },
   "ContactForm": {
     "title": "Send a message",
@@ -451,6 +463,222 @@
       "previous": "Previous",
       "next": "Next",
       "showing": "{from}–{to} of {total}"
+    }
+  },
+  "AdminStaff": {
+    "title": "Staff & roles",
+    "intro": "Everyone with an admin account, and what their roles let them do. A person can hold several roles and gets everything each one allows.",
+    "addTitle": "Adding a staff member",
+    "addStep1": "The owner creates the account in the Supabase dashboard (Authentication → Users → Add user) with the person's email address.",
+    "addStep2": "The new account appears in the list below with no role, so it cannot open the admin yet.",
+    "addStep3": "Choose “Change roles” next to the person and give them only the roles they need.",
+    "peopleHeading": "People",
+    "peopleCount": "{count, plural, one {# account} other {# accounts}}",
+    "withoutRoleCount": "{count, plural, one {# without a role} other {# without a role}}",
+    "empty": "No accounts yet.",
+    "you": "You",
+    "joined": "Joined {date}",
+    "lastSignIn": "Last signed in {date}",
+    "neverSignedIn": "Never signed in",
+    "rolesOf": "Roles of {name}",
+    "noRole": "No role",
+    "changeRoles": "Change roles",
+    "changeRolesFor": "Change roles: {name}",
+    "notEditableSelf": "You cannot change your own roles. Ask an owner to do it.",
+    "notEditablePrivileged": "Only an owner can change the roles of an owner or administrator.",
+    "rolesLegend": "Roles for {name}",
+    "lockedHint": "Only an owner can give or remove this role.",
+    "save": "Save roles",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "saved": "Roles saved.",
+    "confirm": {
+      "title": "Change the roles of {name}?",
+      "adds": "Adds: {roles}.",
+      "removes": "Removes: {roles}.",
+      "privileged": "Owners and administrators can change content, settings and other people's roles. Give these roles only to people you trust with the whole website.",
+      "noAccess": "{name} will have no role and will no longer be able to open the admin.",
+      "confirm": "Save roles"
+    },
+    "errors": {
+      "errorGeneric": "The roles could not be saved. Please reload the page and try again.",
+      "errorForbidden": "You do not have permission to change roles.",
+      "errorSelf": "You cannot change your own roles.",
+      "errorPrivileged": "Only an owner can give or remove the owner and administrator roles, or change the roles of an owner or administrator.",
+      "errorLastOwner": "This is the only owner. Make someone else an owner first.",
+      "errorNotFound": "This account no longer exists."
+    },
+    "guideHeading": "What each role can do",
+    "guideIntro": "Roles are fixed: their permissions are set in the database and checked again on every page and every change.",
+    "canDo": "What {role} can do",
+    "roleDescriptions": {
+      "owner": "Full control of the website, including other owners and administrators, and erasing inquiries.",
+      "admin": "Runs the website day to day: content, inquiries, messages, settings and other staff's roles.",
+      "content_editor": "Writes, edits and publishes the website's content, images and translations.",
+      "event_manager": "Works on the event inquiries assigned to them.",
+      "analyst": "Sees the inquiry figures on the overview, without any customer details."
+    },
+    "capabilities": {
+      "admin": "Sign in to the admin",
+      "reports": "See the inquiry figures on the overview",
+      "content": "Write, edit and publish content, images and translations",
+      "allInquiries": "See, update and assign every inquiry",
+      "assignedInquiries": "See and update the inquiries assigned to them",
+      "eraseInquiries": "Permanently erase inquiries",
+      "messages": "Read and handle contact messages",
+      "staff": "See staff and change their roles",
+      "privilegedStaff": "Give or remove the owner and administrator roles",
+      "settings": "Change the website settings",
+      "audit": "Read the audit log"
+    }
+  },
+  "AdminSettings": {
+    "title": "Settings",
+    "intro": "Contact details and links shown on the public website, and the switch for new event inquiries. Changes appear on the website as soon as you save.",
+    "unavailable": "The settings could not be loaded. Reload the page to try again.",
+    "sections": {
+      "inquiries": "Event inquiries",
+      "contact": "Contact details",
+      "location": "Location",
+      "social": "Social media"
+    },
+    "intros": {
+      "inquiries": "Pause the “Plan an event” form when CHEF SIS cannot take new events, for example during a busy season.",
+      "contact": "Shown on the Contact page. Leave a field empty to hide it.",
+      "location": "The city or area CHEF SIS serves, shown on the Contact page.",
+      "social": "Links to CHEF SIS's own pages, shown in the footer and on the Contact page. Leave a field empty to hide it."
+    },
+    "labels": {
+      "inquiries_open": "Accept new event inquiries",
+      "contact_email": "Email",
+      "contact_phone": "Phone",
+      "whatsapp_phone": "WhatsApp number",
+      "telegram_username": "Telegram username",
+      "location_en": "Location in English",
+      "location_am": "Location in Amharic",
+      "location_am_reviewed_at": "Amharic location review",
+      "instagram_url": "Instagram",
+      "facebook_url": "Facebook",
+      "tiktok_url": "TikTok",
+      "youtube_url": "YouTube"
+    },
+    "hints": {
+      "contact_email": "Visitors can write to this address directly.",
+      "contact_phone": "Shown with a call link. Include the country code for callers from abroad.",
+      "whatsapp_phone": "The full international number, starting with + and the country code.",
+      "telegram_username": "With or without the @. A t.me link works too.",
+      "location_en": "A city or an area, not a full address.",
+      "location_am": "Shown on the Amharic site only after a fluent speaker's review (below). Until then the English location is shown.",
+      "instagram_url": "The full link to the profile, starting with https://instagram.com/",
+      "facebook_url": "The full link to the page, starting with https://facebook.com/",
+      "tiktok_url": "The full link to the profile, starting with https://tiktok.com/@",
+      "youtube_url": "The full link to the channel, starting with https://youtube.com/"
+    },
+    "inquiriesOpenHint": "On: visitors can send event inquiries.",
+    "inquiriesPausedHint": "Off: the form says that new inquiries are paused, and nothing can be sent. Existing inquiries are not affected.",
+    "review": {
+      "label": "Reviewed by a fluent Amharic speaker",
+      "help": "Tick only when someone fluent in Amharic has read this exact text. Your name and the time are recorded.",
+      "reviewedOn": "Reviewed {date}",
+      "cleared": "The text changed, so the review will be cleared when you save. Tick the box again once the new text has been reviewed."
+    },
+    "fieldErrors": {
+      "tooLong": "This is too long.",
+      "invalidEmail": "Enter a valid email address.",
+      "invalidPhone": "Enter a valid phone number (7 to 15 digits).",
+      "needsCountryCode": "Start with + and the country code.",
+      "invalidTelegram": "Enter a Telegram username: 5 to 32 letters, digits or underscores, starting with a letter.",
+      "invalidLink": "Enter a link to a page on this platform, starting with https://"
+    },
+    "errors": {
+      "generic": "The settings could not be saved. Please reload the page and try again.",
+      "forbidden": "You do not have permission to change the settings.",
+      "invalid": "Some details are not valid. Check the highlighted fields.",
+      "conflict": "Someone else saved the settings after you opened this page. Reload the page and make your changes again."
+    },
+    "save": "Save settings",
+    "saving": "Saving…",
+    "saved": "Settings saved. The website is updated.",
+    "unsaved": "Unsaved changes",
+    "unsavedChanges": "You have unsaved changes. Leave this page and lose them?",
+    "cancel": "Cancel",
+    "lastSaved": "Last saved {date}",
+    "lastSavedBy": "Last saved {date} by {name}",
+    "confirmPause": {
+      "title": "Pause new event inquiries?",
+      "body": "Visitors will not be able to send event inquiries until you switch this back on. Existing inquiries are not affected.",
+      "confirm": "Pause and save"
+    }
+  },
+  "AdminAudit": {
+    "title": "Audit log",
+    "intro": "A permanent record of changes made in the admin: who did what, and when. Entries cannot be edited or deleted, and customers' personal details are not stored in them.",
+    "filters": {
+      "label": "Filter the log",
+      "category": "Area",
+      "anyCategory": "All areas",
+      "person": "Person",
+      "anyone": "Anyone",
+      "apply": "Apply",
+      "reset": "Reset"
+    },
+    "categories": {
+      "role": "Staff & roles",
+      "booking": "Inquiries",
+      "contact_message": "Messages",
+      "content": "Content",
+      "media": "Images",
+      "settings": "Settings"
+    },
+    "empty": "Nothing has been recorded yet.",
+    "emptyFiltered": "No entries match these filters.",
+    "emptyOlder": "There are no older entries.",
+    "newest": "Back to the newest",
+    "older": "Older entries",
+    "pagesLabel": "Audit log pages",
+    "by": "by {name}",
+    "formerStaff": "a former staff member",
+    "system": "the system",
+    "unknownValue": "unknown",
+    "changedFields": "Changed: {fields}",
+    "review": {
+      "confirmed": "Amharic review confirmed",
+      "cleared": "Amharic review cleared"
+    },
+    "actions": {
+      "unknown": "Other action ({action})",
+      "statusChanged": "Status changed: {from} → {to}",
+      "role": {
+        "assigned": "Role given: {role}",
+        "revoked": "Role removed: {role}",
+        "bootstrap_owner": "Set up as the first owner"
+      },
+      "booking": {
+        "assigned": "Assigned to {name}",
+        "unassigned": "Assignment removed",
+        "erased": "Inquiry erased"
+      },
+      "content": {
+        "created": "Created",
+        "updated": "Edited",
+        "deleted": "Deleted"
+      },
+      "media": {
+        "created": "Upload started",
+        "uploaded": "Image uploaded",
+        "replaced": "Image file replaced",
+        "updated": "Image details edited",
+        "deleted": "Image deleted"
+      },
+      "settings": {
+        "updated": "Website settings saved"
+      }
+    },
+    "targets": {
+      "booking": "Inquiry {reference}",
+      "message": "Message {reference}",
+      "media": "Image",
+      "settings": "Website settings"
     }
   },
   "PublicationStatus": {

@@ -67,7 +67,14 @@
   },
   "Footer": {
     "navigationLabel": "የግርጌ ማውጫ",
-    "copyright": "© {year} CHEF SIS። መብቱ በሕግ የተጠበቀ ነው።"
+    "copyright": "© {year} CHEF SIS። መብቱ በሕግ የተጠበቀ ነው።",
+    "socialLabel": "ማኅበራዊ ሚዲያ",
+    "social": {
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "youtube": "YouTube"
+    }
   },
   "Admin": {
     "appName": "አስተዳደር",
@@ -109,9 +116,9 @@
       "journal": "ጽሑፎችን ይጻፉና ያትሙ።",
       "media": "ምስሎችንና ፋይሎችን ይጫኑና ያስተዳድሩ።",
       "translations": "የአማርኛና የእንግሊዝኛ ትርጉሞችን ይከታተሉና ያጠናቅቁ።",
-      "users": "ሠራተኞችን ይጋብዙና ሚናዎቻቸውን ያስተዳድሩ።",
-      "settings": "የሕዝብ ድረ-ገጹን ቅንብሮች ያስተዳድሩ።",
-      "auditLog": "ደኅንነትን የሚመለከቱ የአስተዳደር ድርጊቶችን ይገምግሙ።",
+      "users": "መለያ ያላቸውን ሰዎች ይመልከቱና ሚናዎቻቸውን ያስተዳድሩ።",
+      "settings": "የመገናኛ ዝርዝሮች፣ የማኅበራዊ ሚዲያ አገናኞችና የዝግጅት ጥያቄዎች ክፍት መሆናቸው።",
+      "auditLog": "በአስተዳደሩ ውስጥ ማን ምን እንደቀየረና መቼ እንደሆነ ይመልከቱ።",
       "pages": "የመነሻ ገጹንና ስለ ሼፉ የሚናገረውን ገጽ በእንግሊዝኛና በአማርኛ ያርትዑ።"
     },
     "overview": {
@@ -260,7 +267,9 @@
     "edit": "ያስተካክሉ",
     "notGiven": "አልተገለጸም",
     "copyReference": "መለያ ቁጥሩን ይቅዱ",
-    "copied": "ተቀድቷል"
+    "copied": "ተቀድቷል",
+    "pausedTitle": "አዲስ ጥያቄዎች ለጊዜው ቆመዋል",
+    "pausedBody": "CHEF SIS በአሁኑ ጊዜ አዲስ የዝግጅት ጥያቄዎችን እየተቀበለ አይደለም። እባክዎ ቆይተው ይመለሱ፣ ወይም ከ\"ያግኙን\" ገጽ መልእክት ይላኩ።"
   },
   "Privacy": {
     "metaTitle": "የግላዊነት መግለጫ",
@@ -278,7 +287,10 @@
     "detailsTitle": "ቀጥታ ግንኙነት",
     "phone": "ስልክ",
     "email": "ኢሜይል",
-    "location": "አድራሻ"
+    "location": "አድራሻ",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "social": "ማኅበራዊ ሚዲያ"
   },
   "ContactForm": {
     "title": "መልእክት ይላኩ",
@@ -451,6 +463,222 @@
       "previous": "ቀዳሚ",
       "next": "ቀጣይ",
       "showing": "ከ{total} {from}–{to}"
+    }
+  },
+  "AdminStaff": {
+    "title": "ሠራተኞችና ሚናዎች",
+    "intro": "የአስተዳደር መለያ ያላቸው ሁሉ፣ እና ሚናዎቻቸው የሚፈቅዱላቸው። አንድ ሰው ብዙ ሚናዎች ሊኖሩት ይችላሉ፤ እያንዳንዱ ሚና የሚፈቅደውን ሁሉ ያገኛል።",
+    "addTitle": "ሠራተኛ ማከል",
+    "addStep1": "ባለቤቱ መለያውን በSupabase ዳሽቦርድ ውስጥ (Authentication > Users > Add user) በሰውየው የኢሜይል አድራሻ ይፈጥራል።",
+    "addStep2": "አዲሱ መለያ ያለ ሚና ከታች ባለው ዝርዝር ውስጥ ይታያል፤ ስለዚህ ገና አስተዳደሩን መክፈት አይችልም።",
+    "addStep3": "ከሰውየው አጠገብ \"ሚናዎችን ይቀይሩ\" የሚለውን ይምረጡና የሚያስፈልጓቸውን ሚናዎች ብቻ ይስጡ።",
+    "peopleHeading": "ሰዎች",
+    "peopleCount": "{count, plural, one {# መለያ} other {# መለያዎች}}",
+    "withoutRoleCount": "{count, plural, one {# ሚና የሌለው} other {# ሚና የሌላቸው}}",
+    "empty": "እስካሁን ምንም መለያ የለም።",
+    "you": "እርስዎ",
+    "joined": "የተቀላቀሉበት {date}",
+    "lastSignIn": "ለመጨረሻ ጊዜ የገቡበት {date}",
+    "neverSignedIn": "ገብተው አያውቁም",
+    "rolesOf": "የ{name} ሚናዎች",
+    "noRole": "ሚና የለም",
+    "changeRoles": "ሚናዎችን ይቀይሩ",
+    "changeRolesFor": "ሚናዎችን ይቀይሩ፦ {name}",
+    "notEditableSelf": "የራስዎን ሚናዎች መቀየር አይችሉም። ባለቤቱ እንዲቀይርልዎ ይጠይቁ።",
+    "notEditablePrivileged": "የባለቤትን ወይም የአስተዳዳሪን ሚናዎች መቀየር የሚችለው ባለቤት ብቻ ነው።",
+    "rolesLegend": "ለ{name} የሚሰጡ ሚናዎች",
+    "lockedHint": "ይህን ሚና መስጠት ወይም ማንሳት የሚችለው ባለቤት ብቻ ነው።",
+    "save": "ሚናዎችን አስቀምጥ",
+    "saving": "በማስቀመጥ ላይ…",
+    "cancel": "ተው",
+    "saved": "ሚናዎቹ ተቀምጠዋል።",
+    "confirm": {
+      "title": "የ{name}ን ሚናዎች ይቀይሩ?",
+      "adds": "የሚጨመሩ፦ {roles}።",
+      "removes": "የሚነሱ፦ {roles}።",
+      "privileged": "ባለቤቶችና አስተዳዳሪዎች ይዘትን፣ ቅንብሮችንና የሌሎችን ሚናዎች መቀየር ይችላሉ። እነዚህን ሚናዎች ሙሉውን ድረ-ገጽ በአደራ ለሚሰጧቸው ሰዎች ብቻ ይስጡ።",
+      "noAccess": "{name} ምንም ሚና አይኖራቸውም፤ ከእንግዲህ አስተዳደሩን መክፈት አይችሉም።",
+      "confirm": "ሚናዎችን አስቀምጥ"
+    },
+    "errors": {
+      "errorGeneric": "ሚናዎቹ ሊቀመጡ አልቻሉም። እባክዎ ገጹን እንደገና ጭነው ይሞክሩ።",
+      "errorForbidden": "ሚናዎችን ለመቀየር ፈቃድ የለዎትም።",
+      "errorSelf": "የራስዎን ሚናዎች መቀየር አይችሉም።",
+      "errorPrivileged": "የባለቤትና የአስተዳዳሪ ሚናዎችን መስጠት ወይም ማንሳት፣ ወይም የባለቤትን ወይም የአስተዳዳሪን ሚናዎች መቀየር የሚችለው ባለቤት ብቻ ነው።",
+      "errorLastOwner": "ይህ ብቸኛው ባለቤት ነው። መጀመሪያ ሌላ ሰው ባለቤት ያድርጉ።",
+      "errorNotFound": "ይህ መለያ ከእንግዲህ የለም።"
+    },
+    "guideHeading": "እያንዳንዱ ሚና ምን ማድረግ ይችላል",
+    "guideIntro": "ሚናዎች ቋሚ ናቸው፦ ፈቃዶቻቸው በዳታቤዙ ውስጥ ተወስነዋል፤ በእያንዳንዱ ገጽና በእያንዳንዱ ለውጥ ላይ እንደገና ይረጋገጣሉ።",
+    "canDo": "{role} ምን ማድረግ ይችላል",
+    "roleDescriptions": {
+      "owner": "ሌሎች ባለቤቶችንና አስተዳዳሪዎችን እንዲሁም ጥያቄዎችን መሰረዝን ጨምሮ በድረ-ገጹ ላይ ሙሉ ቁጥጥር።",
+      "admin": "ድረ-ገጹን በየዕለቱ ያስተዳድራል፦ ይዘት፣ ጥያቄዎች፣ መልእክቶች፣ ቅንብሮችና የሌሎች ሠራተኞች ሚናዎች።",
+      "content_editor": "የድረ-ገጹን ይዘት፣ ምስሎችና ትርጉሞች ይጽፋል፣ ያርትዓል፣ ያትማል።",
+      "event_manager": "በተመደቡለት የዝግጅት ጥያቄዎች ላይ ይሠራል።",
+      "analyst": "በአጠቃላይ እይታው ላይ የጥያቄዎችን አሃዞች ያያል፤ የደንበኞች ዝርዝር አይታይም።"
+    },
+    "capabilities": {
+      "admin": "ወደ አስተዳደሩ መግባት",
+      "reports": "በአጠቃላይ እይታው ላይ የጥያቄ አሃዞችን ማየት",
+      "content": "ይዘትን፣ ምስሎችንና ትርጉሞችን መጻፍ፣ ማርትዕና ማተም",
+      "allInquiries": "ሁሉንም ጥያቄዎች ማየት፣ ማዘመንና መመደብ",
+      "assignedInquiries": "የተመደቡለትን ጥያቄዎች ማየትና ማዘመን",
+      "eraseInquiries": "ጥያቄዎችን በቋሚነት መሰረዝ",
+      "messages": "የመገናኛ መልእክቶችን ማንበብና ማስተናገድ",
+      "staff": "ሠራተኞችን ማየትና ሚናዎቻቸውን መቀየር",
+      "privilegedStaff": "የባለቤትና የአስተዳዳሪ ሚናዎችን መስጠት ወይም ማንሳት",
+      "settings": "የድረ-ገጹን ቅንብሮች መቀየር",
+      "audit": "የኦዲት መዝገቡን ማንበብ"
+    }
+  },
+  "AdminSettings": {
+    "title": "ቅንብሮች",
+    "intro": "በሕዝብ ድረ-ገጹ ላይ የሚታዩ የመገናኛ ዝርዝሮችና አገናኞች፣ እንዲሁም የአዲስ ዝግጅት ጥያቄዎች ማብሪያ ማጥፊያ። ሲያስቀምጡ ለውጦቹ ወዲያውኑ በድረ-ገጹ ላይ ይታያሉ።",
+    "unavailable": "ቅንብሮቹ መጫን አልተቻለም። እንደገና ለመሞከር ገጹን ያድሱ።",
+    "sections": {
+      "inquiries": "የዝግጅት ጥያቄዎች",
+      "contact": "የመገናኛ ዝርዝሮች",
+      "location": "አድራሻ",
+      "social": "ማኅበራዊ ሚዲያ"
+    },
+    "intros": {
+      "inquiries": "CHEF SIS አዲስ ዝግጅቶችን መቀበል በማይችልበት ጊዜ፣ ለምሳሌ በሥራ በተጨናነቀ ወቅት፣ የ\"ዝግጅት ያቅዱ\" ቅጹን ለጊዜው ያቁሙ።",
+      "contact": "በ\"ያግኙን\" ገጽ ላይ ይታያሉ። ለመደበቅ መስኩን ባዶ ይተዉት።",
+      "location": "CHEF SIS የሚያገለግልበት ከተማ ወይም አካባቢ፤ በ\"ያግኙን\" ገጽ ላይ ይታያል።",
+      "social": "የCHEF SIS የራሱ ገጾች አገናኞች፤ በግርጌውና በ\"ያግኙን\" ገጽ ላይ ይታያሉ። ለመደበቅ መስኩን ባዶ ይተዉት።"
+    },
+    "labels": {
+      "inquiries_open": "አዲስ የዝግጅት ጥያቄዎችን ተቀበል",
+      "contact_email": "ኢሜይል",
+      "contact_phone": "ስልክ",
+      "whatsapp_phone": "የWhatsApp ቁጥር",
+      "telegram_username": "የTelegram የተጠቃሚ ስም",
+      "location_en": "አድራሻ በእንግሊዝኛ",
+      "location_am": "አድራሻ በአማርኛ",
+      "location_am_reviewed_at": "የአማርኛ አድራሻ ግምገማ",
+      "instagram_url": "የInstagram ገጽ",
+      "facebook_url": "የFacebook ገጽ",
+      "tiktok_url": "የTikTok ገጽ",
+      "youtube_url": "የYouTube ቻናል"
+    },
+    "hints": {
+      "contact_email": "ጎብኚዎች በቀጥታ ወደዚህ አድራሻ መጻፍ ይችላሉ።",
+      "contact_phone": "ከመደወያ አገናኝ ጋር ይታያል። ከውጭ አገር ለሚደውሉ የአገር ኮዱን ያካትቱ።",
+      "whatsapp_phone": "በ+ እና በአገር ኮዱ የሚጀምር ሙሉው ዓለም አቀፍ ቁጥር።",
+      "telegram_username": "ከ@ ጋር ወይም ያለ @። የt.me አገናኝም ይሠራል።",
+      "location_en": "ከተማ ወይም አካባቢ እንጂ ሙሉ አድራሻ አይደለም።",
+      "location_am": "በአማርኛው ድረ-ገጽ ላይ የሚታየው አቀላጥፎ በሚናገር ሰው ከተገመገመ በኋላ ብቻ ነው (ከታች)። እስከዚያ ድረስ የእንግሊዝኛው አድራሻ ይታያል።",
+      "instagram_url": "በhttps://instagram.com/ የሚጀምር የመገለጫው ሙሉ አገናኝ",
+      "facebook_url": "በhttps://facebook.com/ የሚጀምር የገጹ ሙሉ አገናኝ",
+      "tiktok_url": "በhttps://tiktok.com/@ የሚጀምር የመገለጫው ሙሉ አገናኝ",
+      "youtube_url": "በhttps://youtube.com/ የሚጀምር የቻናሉ ሙሉ አገናኝ"
+    },
+    "inquiriesOpenHint": "በርቷል፦ ጎብኚዎች የዝግጅት ጥያቄዎችን መላክ ይችላሉ።",
+    "inquiriesPausedHint": "ጠፍቷል፦ ቅጹ አዲስ ጥያቄዎች ለጊዜው መቆማቸውን ይገልጻል፤ ምንም መላክ አይቻልም። ያሉት ጥያቄዎች አይነኩም።",
+    "review": {
+      "label": "አማርኛን አቀላጥፎ በሚናገር ሰው ተገምግሟል",
+      "help": "አማርኛን አቀላጥፎ የሚናገር ሰው ይህን ጽሑፍ እንዳለ ካነበበው ብቻ ምልክት ያድርጉ። ስምዎና ሰዓቱ ይመዘገባሉ።",
+      "reviewedOn": "የተገመገመበት {date}",
+      "cleared": "ጽሑፉ ስለተቀየረ ሲያስቀምጡ ግምገማው ይነሳል። አዲሱ ጽሑፍ ከተገመገመ በኋላ ሳጥኑን እንደገና ምልክት ያድርጉ።"
+    },
+    "fieldErrors": {
+      "tooLong": "ይህ በጣም ረጅም ነው።",
+      "invalidEmail": "ትክክለኛ የኢሜይል አድራሻ ያስገቡ።",
+      "invalidPhone": "ትክክለኛ ስልክ ቁጥር ያስገቡ (ከ7 እስከ 15 አሃዝ)።",
+      "needsCountryCode": "በ+ እና በአገር ኮዱ ይጀምሩ።",
+      "invalidTelegram": "የTelegram የተጠቃሚ ስም ያስገቡ፦ በፊደል የሚጀምር፣ ከ5 እስከ 32 የላቲን ፊደሎች፣ አሃዞች ወይም _።",
+      "invalidLink": "በhttps:// የሚጀምር የዚህን መድረክ ገጽ አገናኝ ያስገቡ።"
+    },
+    "errors": {
+      "generic": "ቅንብሮቹ ሊቀመጡ አልቻሉም። እባክዎ ገጹን እንደገና ጭነው ይሞክሩ።",
+      "forbidden": "ቅንብሮቹን ለመቀየር ፈቃድ የለዎትም።",
+      "invalid": "አንዳንድ ዝርዝሮች ትክክል አይደሉም። የተጠቆሙትን መስኮች ይፈትሹ።",
+      "conflict": "ይህን ገጽ ከከፈቱ በኋላ ሌላ ሰው ቅንብሮቹን አስቀምጧል። ገጹን እንደገና ጭነው ለውጦችዎን እንደገና ያድርጉ።"
+    },
+    "save": "ቅንብሮችን አስቀምጥ",
+    "saving": "በማስቀመጥ ላይ…",
+    "saved": "ቅንብሮቹ ተቀምጠዋል። ድረ-ገጹ ተዘምኗል።",
+    "unsaved": "ያልተቀመጡ ለውጦች",
+    "unsavedChanges": "ያልተቀመጡ ለውጦች አሉ። ገጹን ትተው ለውጦቹ ይጥፉ?",
+    "cancel": "ተው",
+    "lastSaved": "ለመጨረሻ ጊዜ የተቀመጠው {date}",
+    "lastSavedBy": "ለመጨረሻ ጊዜ የተቀመጠው {date}፣ በ{name}",
+    "confirmPause": {
+      "title": "አዲስ የዝግጅት ጥያቄዎች ለጊዜው ይቁሙ?",
+      "body": "ይህን መልሰው እስኪያበሩት ድረስ ጎብኚዎች የዝግጅት ጥያቄዎችን መላክ አይችሉም። ያሉት ጥያቄዎች አይነኩም።",
+      "confirm": "አቁምና አስቀምጥ"
+    }
+  },
+  "AdminAudit": {
+    "title": "የኦዲት መዝገብ",
+    "intro": "በአስተዳደሩ ውስጥ የተደረጉ ለውጦች ቋሚ መዝገብ፦ ማን ምን እንዳደረገ እና መቼ። መዝገቦቹ ሊስተካከሉ ወይም ሊሰረዙ አይችሉም፤ የደንበኞች የግል መረጃም በውስጣቸው አይቀመጥም።",
+    "filters": {
+      "label": "መዝገቡን አጣራ",
+      "category": "ክፍል",
+      "anyCategory": "ሁሉም ክፍሎች",
+      "person": "ሰው",
+      "anyone": "ማንኛውም",
+      "apply": "አጣራ",
+      "reset": "አጽዳ"
+    },
+    "categories": {
+      "role": "ሠራተኞችና ሚናዎች",
+      "booking": "ጥያቄዎች",
+      "contact_message": "መልእክቶች",
+      "content": "ይዘት",
+      "media": "ምስሎች",
+      "settings": "ቅንብሮች"
+    },
+    "empty": "እስካሁን ምንም አልተመዘገበም።",
+    "emptyFiltered": "ከእነዚህ ማጣሪያዎች ጋር የሚዛመድ መዝገብ የለም።",
+    "emptyOlder": "ከዚህ የቆየ መዝገብ የለም።",
+    "newest": "ወደ አዲሶቹ ተመለስ",
+    "older": "የቆዩ መዝገቦች",
+    "pagesLabel": "የኦዲት መዝገብ ገጾች",
+    "by": "በ{name}",
+    "formerStaff": "የቀድሞ ሠራተኛ",
+    "system": "ሥርዓቱ",
+    "unknownValue": "ያልታወቀ",
+    "changedFields": "የተቀየሩ፦ {fields}",
+    "review": {
+      "confirmed": "የአማርኛ ግምገማ ተረጋግጧል",
+      "cleared": "የአማርኛ ግምገማ ተነስቷል"
+    },
+    "actions": {
+      "unknown": "ሌላ ድርጊት ({action})",
+      "statusChanged": "ሁኔታው ከ{from} ወደ {to} ተቀይሯል",
+      "role": {
+        "assigned": "ሚና ተሰጥቷል፦ {role}",
+        "revoked": "ሚና ተነስቷል፦ {role}",
+        "bootstrap_owner": "እንደ መጀመሪያ ባለቤት ተዘጋጅቷል"
+      },
+      "booking": {
+        "assigned": "ለ{name} ተመድቧል",
+        "unassigned": "ምደባው ተነስቷል",
+        "erased": "ጥያቄው ተሰርዟል"
+      },
+      "content": {
+        "created": "ተፈጥሯል",
+        "updated": "ተስተካክሏል",
+        "deleted": "ተሰርዟል"
+      },
+      "media": {
+        "created": "መጫን ተጀምሯል",
+        "uploaded": "ምስል ተጭኗል",
+        "replaced": "የምስሉ ፋይል ተተክቷል",
+        "updated": "የምስሉ ዝርዝሮች ተስተካክለዋል",
+        "deleted": "ምስሉ ተሰርዟል"
+      },
+      "settings": {
+        "updated": "የድረ-ገጹ ቅንብሮች ተቀምጠዋል"
+      }
+    },
+    "targets": {
+      "booking": "ጥያቄ {reference}",
+      "message": "መልእክት {reference}",
+      "media": "ምስል",
+      "settings": "የድረ-ገጹ ቅንብሮች"
     }
   },
   "PublicationStatus": {

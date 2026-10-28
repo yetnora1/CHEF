@@ -73,8 +73,9 @@ Nothing is saved, sent or published, and real keys in `.env.local` cannot reach 
   `object-cover`; there is no focal-point control.
 - **Gallery** has no enlarged view.
 - **Contact and terms pages** do not exist: they need confirmed contact details and business terms.
-- **Staff & roles, settings and audit log** are planned (Stage 4); they show as non-interactive
-  "Planned" items.
+- **Staff & roles, settings and audit log** were built in Stage 4: role changes are confirmed when
+  they touch owner or administrator access or remove every role; settings save with a version check
+  and confirm before pausing inquiries; the audit log reads as plain sentences grouped by day.
 - **Overview on phones**: the owner's module list is long (twelve cards); it duplicates the menu.
 - **Testing not done**: a screen-reader session (NVDA, VoiceOver), Safari, Firefox and real devices.
 - **Security items unchanged** (VERIFICATION.md §6–7): no CAPTCHA on admin sign-in, no MFA for

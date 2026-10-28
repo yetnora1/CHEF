@@ -40,6 +40,8 @@ export const TEST_USERS = {
   editor: { email: "editor@example.test", role: "content_editor", name: "Editor Test" },
   analyst: { email: "analyst@example.test", role: "analyst", name: "Analyst Test" },
   noRole: { email: "visitor@example.test", role: null, name: "Visitor Test" },
+  // Only tests/e2e/staff.spec.ts changes this account's roles.
+  newcomer: { email: "newcomer@example.test", role: null, name: "Newcomer Test" },
 } as const;
 
 export type TestUser = { id: string; email: string };

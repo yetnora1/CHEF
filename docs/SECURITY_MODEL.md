@@ -68,6 +68,15 @@ grant roles outside these rules or forge/erase audit entries through the Data AP
 **First owner**: `private.bootstrap_first_owner(email)` can be run only by the database owner
 (SQL editor/psql), only while no owner exists, and is audited.
 
+**Staff screen** (Stage 4): `/admin/users` changes one person's roles with
+`public.set_user_roles(target, roles)`, SECURITY INVOKER: it takes the same advisory lock and calls
+`assign_role` / `revoke_role` for each difference, so every rule above and every audit entry still
+applies, and one refused change rolls back the whole save. `public.list_staff()` (SECURITY DEFINER,
+`users.read`) returns each account's email, name, roles and sign-in times, because `auth.users` is
+not readable through the Data API. New accounts cannot be created from the admin: that needs the
+secret key's Auth admin rights, which the application uses only for inquiry storage. The owner
+creates them in the Supabase dashboard; they appear with no role.
+
 ## Table access summary
 
 | Table                                                                                     | anon                                                                                                                                                              | authenticated (by policy)                                                                                                                                                                                                           |
@@ -83,6 +92,7 @@ grant roles outside these rules or forge/erase audit entries through the Data AP
 | `bookings`                                                                                | **none**                                                                                                                                                          | all with `bookings.read_all`; only rows assigned to them with `bookings.read_assigned`; **no direct INSERT or UPDATE** (status, assignee and notes only via audited functions); delete with `bookings.delete` (audited)             |
 | `booking_status_history`, `booking_notes`                                                 | **none**                                                                                                                                                          | readable exactly when the parent inquiry is readable; **no direct writes** (history by trigger, notes via `add_booking_note`)                                                                                                       |
 | `contact_messages` (Stage 3.7)                                                            | **none**                                                                                                                                                          | read with `messages.read`; **no direct writes** (status only via `set_contact_message_status`, audited)                                                                                                                             |
+| `site_settings` (Stage 4)                                                                 | **none** (public columns through `public_site_settings()`; Amharic location only once reviewed)                                                                   | read and update the public columns with `settings.manage`; no insert or delete; version, editor and review stamped by trigger; every save audited                                                                                   |
 | `private.rate_limits`, `private.notification_outbox`                                      | **none**                                                                                                                                                          | **none** (only SECURITY DEFINER functions, executable by `service_role`)                                                                                                                                                            |
 
 ### Inquiry functions (Stage 2)
@@ -97,6 +107,19 @@ grant roles outside these rules or forge/erase audit entries through the Data AP
 | `submit_contact_message` (Stage 3.7)                                                   | `service_role` only | Server-side callers only; status and handling are not parameters                                            |
 | `list_contact_messages`, `contact_message_counts`                                      | `authenticated`     | SECURITY INVOKER: RLS (`messages.read`) decides; unauthorized callers get no rows                           |
 | `set_contact_message_status`                                                           | `authenticated`     | `messages.write`; audited                                                                                   |
+
+### Staff, settings and audit functions (Stage 4)
+
+| Function               | Caller                  | Authorization                                                                                               |
+| ---------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `list_staff`           | `authenticated`         | SECURITY DEFINER (reads `auth.users`); raises unless the caller holds `users.read`                          |
+| `set_user_roles`       | `authenticated`         | SECURITY INVOKER; `users.manage`, then `assign_role` / `revoke_role` decide each change, in one transaction |
+| `public_site_settings` | `anon`, `authenticated` | SECURITY DEFINER; the public columns only, the Amharic location only once reviewed                          |
+| `get_site_settings`    | `authenticated`         | SECURITY INVOKER: RLS (`settings.manage`) decides; others get no row                                        |
+| `list_audit_log`       | `authenticated`         | SECURITY INVOKER: RLS (`audit.read`) decides; others get no rows                                            |
+
+`service_role` can execute none of them, and has no privilege on `site_settings` or (since this
+stage) `profiles`.
 
 ### Content functions (Stage 3)
 
@@ -194,7 +217,6 @@ schema is not exposed through the Data API.
 | Turnstile verified only with Cloudflare's test keys; Resend only for failure handling (no real delivery)                                                                                       | Real widget and verified sending domain before launch (VERIFICATION.md L1–L3)                                 |
 | CAPTCHA accepts a response without `action` (test responses have none)                                                                                                                         | Require `action === "inquiry"` in production once a real response is confirmed to carry it (W2)               |
 | Fixed-window rate limits allow up to 2× a limit across a window boundary                                                                                                                       | Sliding windows in the hardening stage (W1); CAPTCHA and shared limits still apply                            |
-| `service_role` keeps Supabase's default table privileges on `profiles` (revoked on all content tables in Stage 3)                                                                              | Revoke with the staff-management work (Stage 4), once nothing server-side needs it                            |
 | Storage policies verified against a reduced `storage.objects` (PGlite, PG17) and a test double, not the Storage API; on hosted projects their creation depends on the platform's policy grants | MEDIA.md hosted checklist on the dev project before media is used                                             |
 | Unpublished images may be served from browser, CDN or image-optimiser caches for up to 5 minutes                                                                                               | Documented; replace or delete the file for immediate removal (MEDIA.md)                                       |
 | Amharic review is a staff attestation; no Amharic content or interface text has been reviewed yet                                                                                              | Native-speaker review before launch (LOCALIZATION.md)                                                         |

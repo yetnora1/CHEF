@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/brand/wordmark";
 import { Link } from "@/i18n/navigation";
 import { siteNavigation } from "@/features/cms/navigation";
+import { getPublicSiteSettings } from "@/features/settings/public-data";
 
 async function currentYear() {
   "use cache";
@@ -11,14 +12,19 @@ async function currentYear() {
   return new Date().getFullYear();
 }
 
-/** A compact floating glass footer: brand and links on one row, the copyright on another. */
+/**
+ * A compact floating glass footer: brand and links on one row; the copyright
+ * and the social links set in Admin → Settings on another.
+ */
 export async function SiteFooter() {
-  const [t, tNav, tBrand, year] = await Promise.all([
+  const [t, tNav, tBrand, year, settings] = await Promise.all([
     getTranslations("Footer"),
     getTranslations("Navigation"),
     getTranslations("Brand"),
     currentYear(),
+    getPublicSiteSettings(),
   ]);
+  const social = settings?.social ?? [];
 
   const links: { key: string; href: ComponentProps<typeof Link>["href"]; label: string }[] = [
     ...(await siteNavigation(await getLocale())).map((link) => ({ ...link, label: tNav(link.key) })),
@@ -47,9 +53,26 @@ export async function SiteFooter() {
             </ul>
           </nav>
         </div>
-        <p className="border-t border-border px-5 py-3 text-xs text-muted-foreground">
-          {t("copyright", { year })}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-border px-5 py-3 text-xs text-muted-foreground">
+          <p>{t("copyright", { year })}</p>
+          {social.length > 0 && (
+            <nav aria-label={t("socialLabel")}>
+              <ul className="flex flex-wrap gap-x-4 gap-y-1">
+                {social.map(({ platform, url }) => (
+                  <li key={platform}>
+                    <a
+                      href={url}
+                      rel="me"
+                      className="underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                    >
+                      {t(`social.${platform}`)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </div>
       </div>
     </footer>
   );

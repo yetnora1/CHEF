@@ -46,7 +46,9 @@ version can be published only after a staff member ticks "Reviewed by a fluent A
 for that exact text; the database records who confirmed it and when, clears the confirmation when
 the text changes, and refuses publication without it. The same applies to Amharic alt text, which
 visitors see only once confirmed. This is an attestation by staff: nothing checks the language
-itself. See [CMS.md](CMS.md#amharic-review-gate).
+itself. See [CMS.md](CMS.md#amharic-review-gate). The Amharic location in Admin → Settings follows
+the same rule: visitors see it only once its review is confirmed, and the English location is shown
+(marked `lang="en"`) until then.
 
 The admin marks content with its own language (`lang="en"` / `lang="am"` on titles, fields and
 previews), while its interface labels follow the admin's interface language.

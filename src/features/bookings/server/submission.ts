@@ -35,7 +35,8 @@ export type PublicFormState<FieldErrors> =
   | { status: "unavailable" }
   | { status: "error" };
 
-export type InquiryFormState = PublicFormState<InquiryFieldErrors>;
+/** "paused": staff have paused new inquiries in Admin → Settings. */
+export type InquiryFormState = PublicFormState<InquiryFieldErrors> | { status: "paused" };
 
 /** What the shared pipeline needs, regardless of which form: whether it is open,
  *  the server secret (for hashing rate-limit identifiers) and whether to run a

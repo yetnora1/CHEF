@@ -348,8 +348,8 @@ creates policies through the platform's policy grants; on Real PG17 it is a memb
 | F19 | Informational       | Signed-in accounts without content permissions read published entries through the staff list function, with their timestamps and versions (the public read policy applies to `authenticated`; same class as the `updated_by` gap in SECURITY_MODEL.md)     | Acceptable while sign-up is disabled                                                   |
 | F20 | Test infrastructure | The message-parity test read plural-branch text such as `{Used in # places}` as a placeholder                                                                                                                                                              | Test now parses ICU messages (stricter: nested arguments, malformed messages)          |
 
-F5 (`service_role` table privileges) is resolved for every content table; `profiles` remains (work
-item W10).
+F5 (`service_role` table privileges) is resolved for every content table, and for `profiles` since
+Stage 4 (work item W10, migration `20261028100000`).
 
 ### What the owner must do (Stage 3)
 
@@ -368,7 +368,7 @@ item W10).
 | ID  | Item                                                                                                    | When           |
 | --- | ------------------------------------------------------------------------------------------------------- | -------------- |
 | W9  | Run the CMS e2e specs against a real Supabase environment (Auth and Storage) instead of the test double | After S1       |
-| W10 | Revoke `service_role` on `profiles` once nothing server-side needs it                                   | Stage 4        |
+| W10 | Revoke `service_role` on `profiles` once nothing server-side needs it                                   | Done (Stage 4) |
 | W11 | Optional: a proxy-level slug check if first-request soft 404s matter for analytics (F16)                | Only if needed |
 
 ## Reproducing the local verification

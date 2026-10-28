@@ -18,8 +18,16 @@ function flatten(tree: Tree, prefix = ""): Map<string, string> {
 const enMessages = flatten(en);
 const amMessages = flatten(am);
 
-// Strings that are intentionally identical in both languages.
-const SAME_IN_BOTH = new Set(["Metadata.siteName"]);
+// Strings that are intentionally identical in both languages (names).
+const SAME_IN_BOTH = new Set([
+  "Metadata.siteName",
+  "Contact.whatsapp",
+  "Contact.telegram",
+  "Footer.social.instagram",
+  "Footer.social.facebook",
+  "Footer.social.tiktok",
+  "Footer.social.youtube",
+]);
 
 // Unicode blocks covered by Noto Sans/Serif Ethiopic plus the Latin, digits and
 // punctuation the Amharic catalogue legitimately contains (brand name, env vars).

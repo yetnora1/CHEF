@@ -968,6 +968,9 @@ function ServerMessage({
     case "unavailable":
       message = t("unavailableBody");
       break;
+    case "paused":
+      message = t("pausedBody");
+      break;
     case "error":
       message = t("error");
       break;

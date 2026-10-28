@@ -34,7 +34,17 @@ export default defineConfig({
     },
     {
       name: "admin",
-      testMatch: /admin-auth\.spec\.ts|inquiries\.spec\.ts|contact\.spec\.ts|cms\.spec\.ts/,
+      testMatch: /admin-auth\.spec\.ts|inquiries\.spec\.ts|contact\.spec\.ts|cms\.spec\.ts|staff\.spec\.ts/,
+      timeout: 90_000,
+      use: { ...devices["Desktop Chrome"], baseURL: `http://localhost:${ADMIN_PORT}` },
+    },
+    {
+      // Site settings are global (they can pause the inquiry form), so these
+      // run on their own, after every other admin test.
+      name: "admin-settings",
+      testMatch: /settings\.spec\.ts/,
+      dependencies: ["admin"],
+      fullyParallel: false,
       timeout: 90_000,
       use: { ...devices["Desktop Chrome"], baseURL: `http://localhost:${ADMIN_PORT}` },
     },

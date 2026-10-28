@@ -46,9 +46,9 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     permissions: ["translations.write"],
     status: "available",
   },
-  { key: "users", href: "/admin/users", permissions: ["users.read"], status: "planned" },
-  { key: "settings", href: "/admin/settings", permissions: ["settings.manage"], status: "planned" },
-  { key: "auditLog", href: "/admin/audit-log", permissions: ["audit.read"], status: "planned" },
+  { key: "users", href: "/admin/users", permissions: ["users.read"], status: "available" },
+  { key: "settings", href: "/admin/settings", permissions: ["settings.manage"], status: "available" },
+  { key: "auditLog", href: "/admin/audit-log", permissions: ["audit.read"], status: "available" },
 ];
 
 export function modulesFor(permissions: readonly AppPermission[]): AdminModule[] {

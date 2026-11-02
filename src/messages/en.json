@@ -76,6 +76,21 @@
     "dishesNonFasting": "Non-fasting",
     "dishesShowing": "{count, plural, one {# dish shown} other {# dishes shown}}"
   },
+  "Photos": {
+    "eyebrow": "Our work",
+    "title": "Buffets, platters and plated dishes",
+    "lede": "Photographs from CHEF SIS's kitchen and the events it has catered.",
+    "seeAll": "See all photos",
+    "open": "View larger",
+    "close": "Close",
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "filter": "Show photos",
+    "all": "All",
+    "events": "Events",
+    "dishes": "Dishes",
+    "showing": "{count, plural, one {# photo shown} other {# photos shown}}"
+  },
   "Footer": {
     "navigationLabel": "Footer",
     "copyright": "© {year} CHEF SIS. All rights reserved.",
@@ -736,9 +751,7 @@
     "gallery": {
       "eyebrow": "Gallery",
       "title": "Gallery",
-      "intro": "Food and events by CHEF SIS.",
-      "emptyTitle": "Photographs are on their way",
-      "emptyBody": "In the meantime, you can tell us about your event."
+      "intro": "Food and events by CHEF SIS."
     },
     "journal": {
       "eyebrow": "Journal",
@@ -1178,7 +1191,7 @@
     "metaDescription": "Who made the openly licensed sample photographs and videos on this website, and under which licence.",
     "eyebrow": "Credits",
     "title": "Photo and video credits",
-    "intro": "The photographs and videos on this website are openly licensed samples, shown until CHEF SIS's own are ready. They are not CHEF SIS's work.",
+    "intro": "The photographs and videos listed here are openly licensed samples, shown until CHEF SIS's own are ready. They are not CHEF SIS's work.",
     "changes": "Photographs were resized for the web; videos were shortened, cropped, resized and silenced. Nothing else was changed.",
     "photos": "Photographs",
     "videos": "Videos",

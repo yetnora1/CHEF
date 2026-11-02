@@ -4,7 +4,7 @@ import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-i
 import { Markup } from "@/features/cms/markup";
 import { Link } from "@/i18n/navigation";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
-import { samplePhotos } from "@/features/content/sample-photos";
+import { chefPhotoFor } from "@/features/content/chef-photos";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { PhotoSlot } from "./photo-slot";
 
@@ -44,7 +44,7 @@ export async function AboutSection({
         ) : (
           <PhotoSlot
             subject={photoSubject}
-            sample={samplePhotos.about}
+            photo={chefPhotoFor("about")}
             sizes={ABOUT_IMAGE_SIZES}
             className="aspect-[4/5] w-full max-w-sm md:max-w-none"
           />

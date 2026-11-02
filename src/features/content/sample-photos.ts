@@ -1,6 +1,3 @@
-import type { StaticImageData } from "next/image";
-import type { Localized } from "@/lib/localization/translations";
-import aboutCoffeeCeremony from "@/assets/samples/about-coffee-ceremony.jpg";
 import dishAyibGomen from "@/assets/samples/dish-ayib-gomen.jpg";
 import dishBeyaynetu from "@/assets/samples/dish-beyaynetu.jpg";
 import dishDoroWat from "@/assets/samples/dish-doro-wat.jpg";
@@ -9,21 +6,19 @@ import dishKikAlicha from "@/assets/samples/dish-kik-alicha.jpg";
 import dishKitfo from "@/assets/samples/dish-kitfo.jpg";
 import dishShiro from "@/assets/samples/dish-shiro.jpg";
 import dishTibs from "@/assets/samples/dish-tibs.jpg";
-import heroFeast from "@/assets/samples/hero-feast.jpg";
-import serviceCorporateEvents from "@/assets/samples/service-corporate-events.jpg";
 import serviceCulinaryExperiences from "@/assets/samples/service-culinary-experiences.jpg";
-import serviceSummits from "@/assets/samples/service-summits.jpg";
-import serviceWeddings from "@/assets/samples/service-weddings.jpg";
 import storyFasting from "@/assets/samples/story-fasting.jpg";
 import storyInjera from "@/assets/samples/story-injera.jpg";
 import storyWat from "@/assets/samples/story-wat.jpg";
+import type { SitePhoto } from "./site-photo";
 
 /*
  * SAMPLE PHOTOGRAPHY — not CHEF SIS's work
  * ---------------------------------------------------------------------------
- * Openly licensed photographs from Wikimedia Commons that fill the photo slots
- * until CHEF SIS's own photography is published through the media library
- * (a published image always takes precedence). The images carry no caption: the
+ * Openly licensed photographs from Wikimedia Commons for the photo slots that
+ * CHEF SIS's own photographs (chef-photos.ts) do not cover: the food stories,
+ * the dishes and the culinary experiences card. A photo published through the
+ * media library always takes precedence. The images carry no caption: the
  * credits page (/credits, linked from every page's footer) names each
  * photographer, licence and source, and says plainly that these are samples, not
  * the chef's food or events. None shows an identifiable face.
@@ -35,64 +30,11 @@ import storyWat from "@/assets/samples/story-wat.jpg";
  * fluent speaker writes the Amharic ones (docs/DESIGN_SYSTEM.md → Images).
  */
 
-export type SamplePhoto = {
-  src: StaticImageData;
-  /** What the photograph shows, for the image's alt text. */
-  alt: Localized;
+export type SamplePhoto = SitePhoto & {
   credit: { author: string; license: string; source: string };
 };
 
 export const samplePhotos = {
-  hero: {
-    src: heroFeast,
-    alt: { en: "A table laid with rolled injera, bread, fresh cheese and bowls of stews and meat." },
-    credit: {
-      author: "FrogsLegs71",
-      license: "CC BY-SA 3.0",
-      source: "https://commons.wikimedia.org/wiki/File:Injera_and_traditional_platter_in_Ethopia.jpg",
-    },
-  },
-  about: {
-    src: aboutCoffeeCeremony,
-    alt: {
-      en: "A clay jebena of coffee above a brazier of smouldering incense, ready for a coffee ceremony.",
-    },
-    credit: {
-      author: "ProtoplasmaKid",
-      license: "CC BY-SA 4.0",
-      source: "https://commons.wikimedia.org/wiki/File:Coffee_ceremony_of_Ethiopia_and_Eritrea_5.jpg",
-    },
-  },
-  weddings: {
-    src: serviceWeddings,
-    alt: { en: "A large platter of injera topped with stews, greens, fresh cheese and boiled eggs." },
-    credit: {
-      author: "Miguel Discart",
-      license: "CC BY-SA 2.0",
-      source:
-        "https://commons.wikimedia.org/wiki/File:A_formal_serving_of_wat_atop_injera_in_Brussels,_Belgium.jpg",
-    },
-  },
-  "corporate-events": {
-    src: serviceCorporateEvents,
-    alt: {
-      en: "Coffee ceremony sets laid out on fresh grass: clay jebenas, trays of small cups and roasted coffee.",
-    },
-    credit: {
-      author: "Khajitdadddy",
-      license: "CC BY-SA 4.0",
-      source: "https://commons.wikimedia.org/wiki/File:Ethiopian_Coffee_Ceremony_Set.jpg",
-    },
-  },
-  "summits-and-conferences": {
-    src: serviceSummits,
-    alt: { en: "A shared platter of injera with an assortment of meat and vegetable stews." },
-    credit: {
-      author: "Jean Rebiffé",
-      license: "CC BY-SA 4.0",
-      source: "https://commons.wikimedia.org/wiki/File:Non-fasting_Beyaynetu_in_Yod_Abyssinia_1.jpg",
-    },
-  },
   "culinary-experiences": {
     src: serviceCulinaryExperiences,
     alt: { en: "A jebena on a charcoal stove beside a pan of freshly roasted coffee beans." },

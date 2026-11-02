@@ -105,6 +105,8 @@ every page `h1` and `display-md` for section headings, so operational screens st
 | Homepage hero                              | 4:5           | `preload`; same 16px corners as every photo          |
 | Homepage and About portrait / story images | 4:5           | About sections alternate image sides                 |
 | Service, journal and list cards; gallery   | 4:3           | Gallery captions and credits sit in the `figcaption` |
+| Homepage photo mosaic                      | Tile shapes   | One 2×2 tile, one tall tile, six single tiles        |
+| Gallery of CHEF SIS's own photographs      | Own shape     | Masonry columns (2, 3, 4); nothing is cropped        |
 | Service and journal article image          | 16:9          | Wider than the text column (`max-w-4xl`)             |
 | Menu dish thumbnail                        | 1:1 (80–96px) | Optional                                             |
 
@@ -152,8 +154,8 @@ Owner's request (2026-10-28), after a "glassy sidebar" reference: the whole site
 ## Headers
 
 The public header and the admin top bar are sticky, floating `glass-thick` bars. Each header button
-is a `tint` button with its own `hue-*` colour: the navigation links (The chef, Services, Contact,
-and menu, gallery, journal once published) light green in both themes, language flag teal, theme
+is a `tint` button with its own `hue-*` colour: the navigation links (The chef, Services, Gallery,
+Contact, and menu, journal once published) light green in both themes, language flag teal, theme
 toggle indigo, phone menu amber, admin account menu violet. The current page carries a ring in its
 hue. There is no "Plan an event" button in the header bar (removed at the owner's request,
 2026-10-28); the event form is reached from the homepage call to action, the phone menu and the
@@ -215,7 +217,7 @@ keeps the tile's edge visible on dark backgrounds. Each instance gets unique gra
 | `ui/button`                                             | Glass buttons. Variants by role: `primary` (book or contact, spice orange), `action` (save, create, upload, sign in; royal blue), `positive` (publish, mark done; saffron gold), `danger` (confirmed delete, archive or decline; berbere red), `neutral` (utilities such as Apply and Search, selected tabs, the default; black or white), plus `outline` and `ghost`. Role colours are `--cta-*`, `--action-*`, `--positive-*`, `--destructive-*` tokens, each checked for 4.5:1; sizes `sm/md/lg/icon`; `asChild` for links. 8px corners. Shaded: a soft top-to-bottom gradient (the role tokens, `--primary-top/bottom` for neutral) under a glass sheen (`inset-shadow-sheen`: a line of light on top and a soft glow below it) and a faint light rim, with a small shadow; `outline` is raised glass (`bg-glass-raised`, blurred) instead. Hover: the gradient brightens (dims in dark), the border darkens, and the button rises 1px with a deeper shadow (`motion-safe` only); pressed, it flattens and settles. `ghost` is flat until hovered, then takes the raised-glass face and a hairline ring. `tint` (paired with a `hue-*` utility) gives each header control its own pastel colour (deep in dark). Every button-like control reuses these variants: tabs, pagination, flag toggles, the sheet close button; file pickers copy the outline look; icons can react through `group-hover/button:` (arrows nudge forward) |
 | `ui/dropdown-menu`                                      | Radix, `glass-thick`; used by the account menu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `ui/sheet`                                              | Radix Dialog side panel (focus trap, Escape, scroll lock) for mobile navigation; floating `glass-thick`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `public/photo-slot`                                     | Until a real image is published: an uncaptioned sample photo (credited on `/credits`), or (no sample) a labelled placeholder naming the photograph to supply                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `public/photo-slot`                                     | Until a real image is published: one of CHEF SIS's own photographs or an uncaptioned sample photo (credited on `/credits`), or (neither) a labelled placeholder naming the photograph to supply                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `layout/locale-switcher`, `admin/admin-locale-switcher` | One flag toggle (US flag = English, Ethiopian flag = Amharic; the current one raised like a switch knob). Each click switches language; the public one keeps the scroll position (`scroll={false}`). Accessible name: the target language's native name, with `lang`/`hreflang`. Flag colours are fixed `flag-*` tokens                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `theme/theme-toggle`                                    | One icon button: each click switches light ↔ dark (a toggle button, `aria-pressed` = dark), remembered per browser; state from `useSyncExternalStore`, syncs across tabs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `layout/nav-link`                                       | Public navigation link with `aria-current` (`page`, or `true` inside a section); styled with `aria-[current]:` variants                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -292,30 +294,55 @@ filling the window otherwise (iPhone). Previous/next buttons, the arrow keys and
 between clips ("2 / 6"); a play/pause button; minimize or Escape leaves full screen and closes it,
 returning focus to the tile. The tiles pause while it is open. Radix Dialog provides the focus trap.
 
+## Photo mosaic, gallery and photo viewer
+
+After "Meet CHEF SIS", `components/public/photos-section` shows eight of CHEF SIS's own photographs
+as a mosaic (`PhotoMosaic` in `photo-gallery.tsx`): a 2×2 tile, a tall tile and six single tiles,
+`grid-flow-dense` so whole rows fill at two, three and four columns, then "See all photos" to
+`/gallery`. The gallery page (`PhotoGallery`) shows all twenty in masonry columns, each photo in its
+own shape, with an All / Events / Dishes filter (toggle buttons and a polite count, like the dishes
+section). Tiles are buttons named "View larger: <description>"; on hover or focus the photo zooms
+slightly and an expand mark appears (always shown on touch screens).
+
+A tile opens `components/public/photo-viewer`: the photo on the same black stage as the video
+viewer, at up to 1.5 times its own size (the photos are phone pictures) and always clear of the
+controls. Previous/next buttons, the arrow keys and a swipe move between the photos shown ("2 / 8");
+the close button or Escape closes it and focus returns to the tile.
+
 ## Photography
 
-A published image from the media library always wins. Until one exists, a slot shows an openly
-licensed **sample photo** from Wikimedia Commons (`src/features/content/sample-photos.ts`, files in
-`src/assets/samples`), so the preview reads as a real site rather than a wireframe. Rules:
+A published image from the media library always wins. Until one exists, a slot shows one of
+**CHEF SIS's own photographs** (`src/features/content/chef-photos.ts`, files in `src/assets/chef`),
+or, where none fits, an openly licensed **sample photo** from Wikimedia Commons
+(`src/features/content/sample-photos.ts`, files in `src/assets/samples`).
+
+CHEF SIS's own photographs (the owner's phone pictures, supplied 2026-11-02):
+
+- Twenty of them: buffets, banquet halls, trays, platters, plated dishes and the chef at work. They
+  carry no caption and need no credit. Each has a kind (`event` or `dish`) for the gallery filter.
+- Kept as supplied (at most 1280px, no camera metadata); four lost their bottom 8% to remove a
+  camera-model stamp. No text on any photo.
+- Left out at the owner's request: photos showing guests' faces (no consent on record), and recipe
+  cards and stock-style pictures that are not the chef's work. Staff appear; guests do not.
+- Slots: the homepage hero (the chef at a buffet), "Meet CHEF SIS" (the chef beside a line of
+  chafing dishes) and three service cards (weddings: a banquet room; corporate events: finger food;
+  summits & conferences: a long buffet hall). The homepage photo mosaic shows eight others; the
+  gallery shows all twenty.
+
+Sample photos:
 
 - Samples carry no caption on the image (owner's request, 2026-10-27). The credits page
   (`/credits`, "Photo credits" in the footer) names each photographer and licence (linked to its
-  Creative Commons deed), links the Commons original, notes the resize, and says the photos are
-  samples, not CHEF SIS's work, which keeps the CC BY / CC BY-SA attribution terms.
-- No sample shows an identifiable face, so no stranger stands in for the chef or a client. The
-  "chef" slot uses a coffee-ceremony still life, not a portrait.
+  Creative Commons deed), links the Commons original, notes the resize, and says the listed photos
+  are samples, not CHEF SIS's work, which keeps the CC BY / CC BY-SA attribution terms.
+- No sample shows an identifiable face, so no stranger stands in for the chef or a client.
 - Only CC BY / CC BY-SA (or more permissive) images; copies are resized to 1600px and keep the
   original licence.
 
-| Slot                           | Sample                                  | Credit                       |
-| ------------------------------ | --------------------------------------- | ---------------------------- |
-| Homepage hero                  | Injera, bread, cheese, stews and meat   | FrogsLegs71, CC BY-SA 3.0    |
-| About / the chef               | Jebena over a brazier of incense        | ProtoplasmaKid, CC BY-SA 4.0 |
-| Service: weddings              | Platter of injera with stews and eggs   | Miguel Discart, CC BY-SA 2.0 |
-| Service: corporate events      | Coffee ceremony sets laid out on grass  | Khajitdadddy, CC BY-SA 4.0   |
-| Service: summits & conferences | Shared beyaynetu platter                | Jean Rebiffé, CC BY-SA 4.0   |
-| Service: culinary experiences  | Jebena on a stove beside roasted coffee | Radosław Botev, CC BY 3.0 PL |
+| Slot                          | Sample                                  | Credit                       |
+| ----------------------------- | --------------------------------------- | ---------------------------- |
+| Service: culinary experiences | Jebena on a stove beside roasted coffee | Radosław Botev, CC BY 3.0 PL |
+| Food stories and dishes       | See `/credits`                          | Various, CC BY / CC BY-SA    |
 
-A slot with no sample keeps the labelled placeholder, which names the intended shot (for example
-"a portrait of CHEF SIS") so the chef can supply or commission it. Replacing the samples with
-CHEF SIS's own photography is the single biggest step toward a site that feels personal.
+A slot with neither keeps the labelled placeholder, which names the intended shot so the chef can
+supply or commission it.

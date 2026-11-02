@@ -12,7 +12,8 @@ export type SiteNavKey = "about" | "services" | "menu" | "gallery" | "journal" |
  * Public navigation links. A section's own page is linked only once it has
  * published content (in this language or English); until then About and
  * Services keep pointing at the homepage sections, and the others are hidden.
- * Contact is a static page and always linked.
+ * Contact is a static page and Gallery has CHEF SIS's own photographs until
+ * gallery items are published, so both are always linked.
  */
 export async function siteNavigation(locale: AppLocale): Promise<{ key: SiteNavKey; href: Href }[]> {
   const available = (await getPublicNavigation().catch(() => null))?.[locale];
@@ -23,7 +24,7 @@ export async function siteNavigation(locale: AppLocale): Promise<{ key: SiteNavK
       href: available?.services ? "/services" : { pathname: "/", hash: HOME_SECTIONS.services },
     },
     ...(available?.menu ? [{ key: "menu" as const, href: "/menu" }] : []),
-    ...(available?.gallery ? [{ key: "gallery" as const, href: "/gallery" }] : []),
+    { key: "gallery", href: "/gallery" },
     ...(available?.journal ? [{ key: "journal" as const, href: "/journal" }] : []),
     { key: "contact", href: "/contact" },
   ];

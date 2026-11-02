@@ -275,8 +275,67 @@ test.describe("food videos", () => {
     await page.goto("/en/credits");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Photo and video credits");
     await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(6);
-    // Nine page and story photos and eight dish photos.
-    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(17);
+    // Three story photos, the culinary experiences card and eight dish photos; CHEF SIS's own
+    // photographs need no credit.
+    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(12);
+  });
+});
+
+test.describe("CHEF SIS's photos", () => {
+  const mosaic = (page: Page) =>
+    page.getByRole("region", { name: "Buffets, platters and plated dishes" }).getByRole("list");
+
+  test("fill the hero and a mosaic on the homepage; a photo opens larger", async ({ page }) => {
+    await page.goto("/en");
+    await expect(
+      page.getByRole("img", { name: /^A chef in a white coat and toque points along/ }),
+    ).toBeVisible();
+
+    const tiles = mosaic(page).getByRole("button", { name: /^View larger: / });
+    await expect(tiles).toHaveCount(8);
+    await tiles.nth(1).click();
+    // The dialog is named by the photo on screen.
+    const viewer = page.getByRole("dialog");
+    await expect(viewer).toHaveAccessibleName("Rows of sushi rolls laid out on a banana leaf.");
+    await expect(viewer.getByText("2 / 8")).toBeVisible();
+
+    await viewer.getByRole("button", { name: "Next photo" }).click();
+    await expect(viewer.getByText("3 / 8")).toBeVisible();
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("ArrowLeft");
+    await expect(viewer.getByText("1 / 8")).toBeVisible();
+    await viewer.getByRole("button", { name: "Previous photo" }).click();
+    await expect(viewer.getByText("8 / 8")).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(viewer).toBeHidden();
+    await expect(tiles.nth(1)).toBeFocused();
+
+    await page.getByRole("link", { name: "See all photos" }).click();
+    await expect(page).toHaveURL(/\/en\/gallery$/);
+  });
+
+  test("are all on the gallery page, filtered by events and dishes", async ({ page }) => {
+    await page.goto("/en/gallery");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Gallery");
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+    const photos = page.getByRole("main").getByRole("listitem");
+    await expect(photos).toHaveCount(20);
+    const filter = page.getByRole("group", { name: "Show photos" });
+
+    await filter.getByRole("button", { name: "Events" }).click();
+    await expect(filter.getByRole("button", { name: "Events" })).toHaveAttribute("aria-pressed", "true");
+    await expect(photos).toHaveCount(7);
+    await expect(page.getByRole("main").getByRole("status")).toHaveText("7 photos shown");
+    // The viewer steps through the photos shown.
+    await photos.first().getByRole("button").click();
+    await expect(page.getByRole("dialog").getByText("1 / 7")).toBeVisible();
+    await page.getByRole("button", { name: "Close" }).click();
+
+    await filter.getByRole("button", { name: "Dishes" }).click();
+    await expect(photos).toHaveCount(13);
+    await filter.getByRole("button", { name: "All" }).click();
+    await expect(photos).toHaveCount(20);
   });
 });
 
@@ -420,7 +479,6 @@ test.describe("content pages without a content database", () => {
     for (const [path, heading] of [
       ["/en/services", "Culinary services"],
       ["/en/menu", "The menu"],
-      ["/en/gallery", "Gallery"],
       ["/en/journal", "Journal"],
       ["/am/services", "የምግብ አገልግሎቶች"],
     ] as const) {
@@ -458,7 +516,9 @@ test.describe("content pages without a content database", () => {
     const nav = page.getByRole("navigation", { name: "Primary" });
     await expect(nav.getByRole("link", { name: "The chef" })).toHaveAttribute("href", "/en#about");
     await expect(nav.getByRole("link", { name: "Services" })).toHaveAttribute("href", "/en#services");
-    for (const hidden of ["Menu", "Gallery", "Journal"]) {
+    // The gallery has CHEF SIS's own photographs until gallery items are published.
+    await expect(nav.getByRole("link", { name: "Gallery" })).toHaveAttribute("href", "/en/gallery");
+    for (const hidden of ["Menu", "Journal"]) {
       await expect(nav.getByRole("link", { name: hidden, exact: true })).toHaveCount(0);
     }
   });

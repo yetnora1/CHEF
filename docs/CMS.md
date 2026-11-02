@@ -117,7 +117,7 @@ checks that nothing executes in the admin or on the website.
 | `/[locale]/about`                        | Published `about` page                                  | 404; navigation links the homepage section instead  |
 | `/[locale]/services`, `/services/[slug]` | Published services                                      | Empty state (`noindex`); unknown slug → not found   |
 | `/[locale]/menu`                         | Published categories with published dishes              | Empty state (`noindex`), not in navigation          |
-| `/[locale]/gallery`                      | Published photos                                        | Empty state (`noindex`), not in navigation          |
+| `/[locale]/gallery`                      | Published photos                                        | CHEF SIS's own photographs (`chef-photos.ts`)       |
 | `/[locale]/journal`, `/journal/[slug]`   | Published posts, newest first (50 per page for now)     | Empty state (`noindex`), not in navigation          |
 | `/media/assets/<id>/<file>`              | Images used by published content ([MEDIA.md](MEDIA.md)) | 404                                                 |
 

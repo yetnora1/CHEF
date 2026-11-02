@@ -4,6 +4,7 @@ import { DishesSection } from "@/components/public/dishes-section";
 import { FoodReel } from "@/components/public/food-reel";
 import { Hero } from "@/components/public/hero";
 import { KitchenScene } from "@/components/public/kitchen-scene";
+import { PhotosSection } from "@/components/public/photos-section";
 import { ServicesSection, type ServiceCard } from "@/components/public/services-section";
 import { StorySection } from "@/components/public/story-section";
 import { getPublicNavigation, getPublicPage, getPublicServices } from "@/features/cms/public-data";
@@ -122,6 +123,7 @@ export default async function HomePage() {
           moreHref={navigation?.[locale].about ? "/about" : null}
         />
       )}
+      <PhotosSection />
       {foodStories.map((story, index) => (
         <StorySection
           key={story.key}

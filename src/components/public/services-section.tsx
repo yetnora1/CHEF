@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-image";
 import { Link } from "@/i18n/navigation";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
+import { chefPhotoFor } from "@/features/content/chef-photos";
 import { samplePhotoFor } from "@/features/content/sample-photos";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { cn } from "@/lib/utils";
@@ -75,7 +76,7 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
               ) : (
                 <PhotoSlot
                   subject={service.photoSubject}
-                  sample={samplePhotoFor(service.slug)}
+                  photo={chefPhotoFor(service.slug) ?? samplePhotoFor(service.slug)}
                   sizes={SERVICE_IMAGE_SIZES}
                   className="aspect-[4/3] w-full rounded-xl"
                   imageClassName={CARD_IMAGE_HOVER}

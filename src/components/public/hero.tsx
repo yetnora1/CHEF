@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
 import { Button } from "@/components/ui/button";
 import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-image";
-import { samplePhotos } from "@/features/content/sample-photos";
+import { chefPhotoFor } from "@/features/content/chef-photos";
 import { Link } from "@/i18n/navigation";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { PhotoSlot } from "./photo-slot";
@@ -63,7 +63,7 @@ export async function Hero({ eyebrow, headline, lede, photoSubject, image }: Her
           ) : (
             <PhotoSlot
               subject={photoSubject}
-              sample={samplePhotos.hero}
+              photo={chefPhotoFor("hero")}
               sizes={HERO_IMAGE_SIZES}
               preload
               className="aspect-[4/5] w-full"

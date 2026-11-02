@@ -1,4 +1,4 @@
-import type { SamplePhoto } from "@/features/content/sample-photos";
+import type { SitePhoto } from "@/features/content/site-photo";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { cn } from "@/lib/utils";
 import { PhotoSlot } from "./photo-slot";
@@ -10,7 +10,7 @@ type StorySectionProps = {
   eyebrow: ResolvedText;
   title: ResolvedText;
   body: ResolvedText;
-  photo: SamplePhoto;
+  photo: SitePhoto;
   /** Image on the right from md up (rows alternate down the page). */
   imageRight?: boolean;
 };
@@ -27,7 +27,7 @@ export function StorySection({ id, eyebrow, title, body, photo, imageRight }: St
       >
         <PhotoSlot
           subject={title}
-          sample={photo}
+          photo={photo}
           sizes={STORY_IMAGE_SIZES}
           className={cn("aspect-[4/5] w-full max-w-sm md:max-w-none", imageRight && "md:order-2")}
         />

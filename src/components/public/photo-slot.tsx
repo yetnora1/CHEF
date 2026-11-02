@@ -1,33 +1,33 @@
 import { Camera } from "lucide-react";
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
-import type { SamplePhoto } from "@/features/content/sample-photos";
+import type { SitePhoto } from "@/features/content/site-photo";
 import { resolveLocalized, type ResolvedText } from "@/lib/localization/translations";
 import { cn } from "@/lib/utils";
 
 type PhotoSlotProps = {
   /** Describes the photograph this slot is waiting for. */
   subject: ResolvedText;
-  /** An openly licensed stand-in, shown labelled and credited. */
-  sample?: SamplePhoto | null;
-  /** `sizes` for the sample photo (see docs/DESIGN_SYSTEM.md → Images). */
+  /** CHEF SIS's own photograph or an openly licensed sample (credited on /credits). */
+  photo?: SitePhoto | null;
+  /** `sizes` for the photo (see docs/DESIGN_SYSTEM.md → Images). */
   sizes?: string;
   preload?: boolean;
   className?: string;
-  /** Extra classes for the sample photo itself, e.g. a hover zoom. */
+  /** Extra classes for the photo itself, e.g. a hover zoom. */
   imageClassName?: string;
 };
 
 /**
- * Fills a photo slot until CHEF SIS's own photography is published: an
- * openly licensed sample photograph, or, where there is no sample, a labelled
- * placeholder naming the photograph to supply. Samples carry no caption; their
- * photographers, licences and the note that they are not the chef's work are
- * on the credits page (/credits, linked from the footer).
+ * Fills a photo slot until a photo is published through the media library: one
+ * of CHEF SIS's own photographs or an openly licensed sample, or, where there is
+ * neither, a labelled placeholder naming the photograph to supply. Photos carry
+ * no caption; the samples' photographers, licences and the note that they are
+ * not the chef's work are on the credits page (/credits, linked from the footer).
  */
 export async function PhotoSlot({
   subject,
-  sample,
+  photo,
   sizes = "100vw",
   preload,
   className,
@@ -35,12 +35,12 @@ export async function PhotoSlot({
 }: PhotoSlotProps) {
   const t = await getTranslations("Common");
 
-  if (sample) {
-    const alt = resolveLocalized(sample.alt, await getLocale());
+  if (photo) {
+    const alt = resolveLocalized(photo.alt, await getLocale());
     return (
       <figure className={cn("relative overflow-hidden rounded-2xl bg-surface-muted", className)}>
         <Image
-          src={sample.src}
+          src={photo.src}
           alt={alt?.text ?? ""}
           lang={alt?.lang}
           sizes={sizes}

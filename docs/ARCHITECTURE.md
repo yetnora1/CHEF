@@ -81,7 +81,7 @@ placeholder pages; unknown paths return a localized 404.
 
 Navigation only links to destinations that have something to show (`src/features/cms/navigation.ts`):
 About and Services link to their pages once published content exists, otherwise to the homepage
-sections; Menu, Gallery and Journal appear only once something is published; Contact is always linked. Empty list pages show
+sections; Menu and Journal appear only once something is published; Gallery (CHEF SIS's own photographs until gallery items are published) and Contact are always linked. Empty list pages show
 an empty state and are `noindex`.
 
 ### Admin (`/admin`, no locale prefix)

@@ -1,7 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const WHITE = "rgb(255, 255, 255)";
-const BLACK = "rgb(10, 10, 10)";
+// The dark page: warm charcoal.
+const CHARCOAL = "rgb(18, 17, 16)";
 
 // The page colour is on <html> (it paints the canvas); <body> stays transparent so the glass backdrop shows.
 const pageBackground = (page: Page) =>
@@ -360,11 +361,11 @@ test.describe("theme", () => {
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
     // A direct switch: no menu of choices opens.
     await expect(page.getByRole("menu")).toHaveCount(0);
-    expect(await pageBackground(page)).toBe(BLACK);
+    expect(await pageBackground(page)).toBe(CHARCOAL);
 
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    expect(await pageBackground(page)).toBe(BLACK);
+    expect(await pageBackground(page)).toBe(CHARCOAL);
 
     await page.goto("/am");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");

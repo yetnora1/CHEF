@@ -7,17 +7,23 @@ themes change in one place.
 ## Colour
 
 **Neutral black and white text and actions on frosted glass** (owner's choices, 2026-10-27 and
-2026-10-28): cards, bars and the admin sidebar are translucent panels over a soft watercolour
-backdrop of sky and deeper blue (see [Glass](#glass)). No green, ivory or gold tint in the interface:
+2026-10-28): cards, bars and the admin sidebar are translucent panels over a soft backdrop: a
+watercolour of sky and deeper blue in light, warm charcoal in dark (see [Glass](#glass)). No green,
+ivory or gold tint in the interface.
 
-|                 | Light                                    | Dark                                         |
-| --------------- | ---------------------------------------- | -------------------------------------------- |
-| Background      | `#FFFFFF`                                | `#0A0A0A`                                    |
-| Backdrop        | sky `#E0F2FE` washes, blue `#DBE7FF` arc | sky `#081F38` washes, blue `#0C1A40` arc     |
-| Glass           | white at 55% (cards), 85% (bars, menus)  | white at 5% (cards), `#101016` at 85% (bars) |
-| Text            | `#0A0A0A`; secondary `#525252`           | `#F5F5F5`; secondary `#A3A3A3`               |
-| Primary buttons | black, white text                        | white, black text                            |
-| Kept hues       | feedback colours, terracotta status dot  | feedback colours, terracotta status dot      |
+Dark mode (2026-11-02, owner: "the dark mode seems a little AI generated, make it natural"): the
+navy glow on pure black is gone. The page is a warm charcoal, lit faintly from the top left like a
+lamp-lit room, with soft white text and warm grey secondary text. Avoid glows, neon accents and
+cold blue washes in dark.
+
+|                 | Light                                    | Dark                                             |
+| --------------- | ---------------------------------------- | ------------------------------------------------ |
+| Background      | `#FFFFFF`                                | `#121110` warm charcoal                          |
+| Backdrop        | sky `#E0F2FE` washes, blue `#DBE7FF` arc | `#1D1A16` light from the top left, `#161412` arc |
+| Glass           | white at 55% (cards), 85% (bars, menus)  | white at 5% (cards), `#181614` at 90% (bars)     |
+| Text            | `#0A0A0A`; secondary `#525252`           | `#EEEBE7`; secondary `#A9A39C`                   |
+| Primary buttons | black, white text                        | soft white, charcoal text                        |
+| Kept hues       | feedback colours, terracotta status dot  | feedback colours, terracotta status dot          |
 
 The original brand palette stays defined in `@theme` (`globals.css`), but the interface and the
 logo no longer use forest, gold or ivory:
@@ -134,7 +140,8 @@ Owner's request (2026-10-28), after a "glassy sidebar" reference: the whole site
 - **Backdrop.** `body::before` is fixed to the viewport (the body has no background of its own):
   soft watercolour washes, sky blue from the top left and across the middle (2026-10-28: the
   first violet glow read as magenta in dark mode), and a deeper blue arc from the bottom right.
-  In dark mode the washes are as light as text contrast allows. Glass blurs it as it
+  In dark mode the same washes are warm charcoal a shade above the page (2026-11-02: the navy
+  washes read as generated), so only a faint light from the top left shows. Glass blurs it as it
   scrolls past, so the arc's edge shows softly through cards. Text also sits straight on it.
 - **`glass`** (`globals.css`): translucent fill, 24px backdrop blur with extra saturation, a line of
   light on the top edge (`inset-shadow-glass`) and a soft shadow (`shadow-glass`). Pair it with

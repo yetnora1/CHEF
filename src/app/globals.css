@@ -256,9 +256,12 @@
 }
 
 /*
- * Neutral text and actions (black in light, white in dark) on frosted glass:
+ * Neutral text and actions (black in light, soft white in dark) on frosted glass:
  * cards, bars and the admin sidebar are translucent panels over a soft
- * watercolour backdrop of sky and deeper blue. Only the feedback colours (and terracotta status
+ * backdrop: a watercolour of sky and deeper blue in light, and in dark a warm
+ * charcoal lit faintly from the top left, like a lamp-lit room rather than a
+ * glowing screen (owner, 2026-11-02: the navy glow on black looked generated).
+ * Only the feedback colours (and terracotta status
  * accents) keep a hue of their own, because they carry meaning. The brand
  * palette above is the logo's.
  *
@@ -269,27 +272,28 @@
   color-scheme: light;
 
   /* Surfaces */
-  --background: light-dark(#ffffff, #0a0a0a);
-  --foreground: light-dark(#0a0a0a, #f5f5f5);
-  --surface: light-dark(#fafafa, #141414);
-  --surface-foreground: light-dark(#0a0a0a, #f5f5f5);
+  --background: light-dark(#ffffff, #121110);
+  --foreground: light-dark(#0a0a0a, #eeebe7);
+  --surface: light-dark(#fafafa, #1a1816);
+  --surface-foreground: light-dark(#0a0a0a, #eeebe7);
   /* A faint well inside glass (hover fills, image frames, skeletons, quiet badges). */
   --surface-muted: light-dark(#0f172a0d, #ffffff0f);
-  --muted-foreground: light-dark(#525252, #a3a3a3);
+  --muted-foreground: light-dark(#525252, #a9a39c);
   /* Hairlines: translucent, so a rim on glass and a divider on the page look alike. */
-  --border: light-dark(#0f172a17, #ffffff1f);
-  --border-strong: light-dark(#8a8a8a, #737373);
+  --border: light-dark(#0f172a17, #ffffff1a);
+  --border-strong: light-dark(#8a8a8a, #79726b);
 
-  /* Page backdrop (body::before): watercolour washes of sky blue from the top left
-   * and across the middle, and a deeper blue arc from the bottom right. Text sits
-   * directly on it too, which caps how light the dark-theme washes can be. */
-  --backdrop-sky: light-dark(#e0f2fe, #081f38);
-  --backdrop-blue: light-dark(#dbe7ff, #0c1a40);
+  /* Page backdrop (body::before): in light, watercolour washes of sky blue from the
+   * top left and across the middle, and a deeper blue arc from the bottom right; in
+   * dark, the same washes in warm charcoal a shade above the page, so only a faint
+   * light from the top left remains. Text sits directly on it too. */
+  --backdrop-sky: light-dark(#e0f2fe, #1d1a16);
+  --backdrop-blue: light-dark(#dbe7ff, #161412);
 
   /* Glass (`glass` and `glass-thick` utilities below). */
   --glass: light-dark(#ffffff8c, #ffffff0d);
-  --glass-thick: light-dark(#ffffffd9, #101016d9);
-  --glass-shine: light-dark(#ffffffcc, #ffffff1f);
+  --glass-thick: light-dark(#ffffffd9, #181614e6);
+  --glass-shine: light-dark(#ffffffcc, #ffffff14);
   --glass-shadow: light-dark(#1e1b4b1a, #00000073);
   /* Raised glass: outline buttons and the selected sidebar item. */
   --glass-raised: light-dark(#ffffffcc, #ffffff14);
@@ -302,13 +306,13 @@
   --stage-foreground: light-dark(#ffffff, #ffffff);
 
   /* Actions and accents */
-  --primary: light-dark(#0a0a0a, #f5f5f5);
-  --primary-hover: light-dark(#333333, #d4d4d4);
-  --primary-foreground: light-dark(#fafafa, #0a0a0a);
-  --accent: light-dark(#737373, #d4d4d4);
-  --accent-ink: light-dark(#404040, #d4d4d4);
+  --primary: light-dark(#0a0a0a, #eeebe7);
+  --primary-hover: light-dark(#333333, #d6d1cb);
+  --primary-foreground: light-dark(#fafafa, #121110);
+  --accent: light-dark(#737373, #d6d1cb);
+  --accent-ink: light-dark(#404040, #d6d1cb);
   --terracotta: light-dark(#9d4135, #e3907f);
-  --ring: light-dark(#0a0a0a, #f5f5f5);
+  --ring: light-dark(#0a0a0a, #eeebe7);
 
   /* Dark band (hero pattern strip, inquiry call to action), the same in both themes */
   --band: light-dark(#171717, #171717);
@@ -324,10 +328,10 @@
   /* Button shading (src/components/ui/button.tsx): soft top-to-bottom gradients.
    * Primary is lit from above; hover lightens it in light and dims it in dark.
    * Outline and ghost buttons are raised glass instead. */
-  --primary-top: light-dark(#333333, #ffffff);
-  --primary-bottom: light-dark(#0a0a0a, #dedede);
-  --primary-hover-top: light-dark(#4a4a4a, #f0f0f0);
-  --primary-hover-bottom: light-dark(#1f1f1f, #cccccc);
+  --primary-top: light-dark(#333333, #f7f5f2);
+  --primary-bottom: light-dark(#0a0a0a, #dcd7d0);
+  --primary-hover-top: light-dark(#4a4a4a, #ece8e3);
+  --primary-hover-bottom: light-dark(#1f1f1f, #cbc5bd);
 
   /* Button colours by role, the same in both themes (each passes 4.5:1 with its text):
    * cta = book or contact (spice orange), action = save or create (royal blue),

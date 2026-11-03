@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
  * Visiting a locale route stores the choice in the NEXT_LOCALE cookie (set by
  * the proxy), which also drives the admin language.
  */
-export function LocaleSwitcher({ className }: { className?: string }) {
+export function LocaleSwitcher({ className, hue }: { className?: string; hue?: string }) {
   const locale = useLocale();
   const pathname = usePathname();
   const t = useTranslations("Language");
@@ -27,7 +27,7 @@ export function LocaleSwitcher({ className }: { className?: string }) {
         hrefLang={target}
         scroll={false}
         title={LOCALE_NATIVE_NAMES[target]}
-        className={languageToggleClassName}
+        className={languageToggleClassName(hue)}
       >
         <LanguageFlag locale={locale} />
         <span className="sr-only" lang={target}>

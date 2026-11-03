@@ -2,22 +2,15 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/brand/wordmark";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
-import { siteNavigation, type SiteNavKey } from "@/features/cms/navigation";
+import { siteNavigation } from "@/features/cms/navigation";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { LocaleSwitcher } from "./locale-switcher";
 import { MobileNav, type NavItem } from "./mobile-nav";
 import { NavLink } from "./nav-link";
 
-// The header links are all light green (owner's request); the flag and theme toggle keep their own hues.
-const NAV_HUES: Record<string, string> = {
-  about: "hue-green",
-  services: "hue-green",
-  menu: "hue-green",
-  gallery: "hue-green",
-  journal: "hue-green",
-  contact: "hue-green",
-} satisfies Record<SiteNavKey, string>;
+// Every header button is dark green, like the phone menu button (owner's request, 2026-11-03).
+const HEADER_HUE = "hue-dark-green";
 
 export async function SiteHeader() {
   const t = await getTranslations("Navigation");
@@ -39,7 +32,8 @@ export async function SiteHeader() {
 
           {/* Inline from lg: with every section published, five links do not fit beside the actions on tablets. */}
           <nav aria-label={t("primaryLabel")} className="hidden lg:block">
-            {/* Each link is a tinted button in its own colour; the current page carries a ring. */}
+            {/* Each link is a tinted button; the current page carries a ring (its hue's own ring
+                colour where it has one, which dark green needs to show on the dark header). */}
             <ul className="flex items-center gap-2">
               {links.map((link) => (
                 <li key={link.key}>
@@ -47,8 +41,8 @@ export async function SiteHeader() {
                     href={link.href}
                     className={cn(
                       buttonVariants({ variant: "tint", size: "sm" }),
-                      NAV_HUES[link.key] ?? "hue-sky",
-                      "aria-[current]:ring-2 aria-[current]:ring-(--tint-border) aria-[current]:ring-offset-2 aria-[current]:ring-offset-transparent",
+                      HEADER_HUE,
+                      "aria-[current]:ring-2 aria-[current]:ring-[var(--tint-ring,var(--tint-border))] aria-[current]:ring-offset-2 aria-[current]:ring-offset-transparent",
                     )}
                   >
                     {link.label}
@@ -60,8 +54,8 @@ export async function SiteHeader() {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Desktop only: below lg both toggles sit in the menu instead (owner's request, 2026-11-03). */}
-            <LocaleSwitcher className="hidden lg:inline-flex" />
-            <ThemeToggle className="hidden lg:inline-flex" />
+            <LocaleSwitcher className="hidden lg:inline-flex" hue={HEADER_HUE} />
+            <ThemeToggle className="hidden lg:inline-flex" hue={HEADER_HUE} />
             {/* No "Plan an event" button here (owner's request, 2026-10-28): the event form is
                 reached from the homepage's call to action, this phone menu and the footer. */}
             <MobileNav

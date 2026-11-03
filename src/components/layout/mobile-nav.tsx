@@ -54,8 +54,8 @@ export function MobileNav({ links, labels }: MobileNavProps) {
         </nav>
         {/* The header shows these only from lg, where this menu is hidden. */}
         <div className="flex items-center gap-2">
-          <LocaleSwitcher />
-          <ThemeToggle />
+          <LocaleSwitcher hue="hue-dark-green" />
+          <ThemeToggle hue="hue-dark-green" />
         </div>
       </SheetContent>
     </Sheet>

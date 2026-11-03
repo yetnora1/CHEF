@@ -186,11 +186,14 @@ Owner's request (2026-10-28), after a "glassy sidebar" reference: the whole site
 
 ## Headers
 
-The public header and the admin top bar are sticky, floating `glass-thick` bars. Each header button
-is a `tint` button with its own `hue-*` colour: the navigation links (The chef, Services, Gallery,
-Contact, and menu, journal once published) light green in both themes, language flag teal, theme
-toggle indigo, menu button dark green (both themes), admin account menu violet. The current page
-carries a ring in its hue. Below `lg` the public header bar is only the wordmark and the menu
+The public header and the admin top bar are sticky, floating `glass-thick` bars. Header buttons are
+`tint` buttons with a `hue-*` colour. On the public site every one is dark green in both themes
+(owner's request, 2026-11-03): the navigation links (The chef, Services, Gallery, Contact, and
+menu, journal once published), the language flag and the theme toggle, in the header and in the
+phone menu, and the menu button. The admin top bar keeps its own: language flag teal, theme toggle
+indigo, account menu violet, menu button dark green. The current page carries a ring in its hue
+(`--tint-ring`; dark green's is light green in dark mode, where its rim would not show). Below `lg`
+the public header bar is only the wordmark and the menu
 button; the language flag and theme toggle sit inside the menu. There is no "Plan an event" button
 in the header bar (removed at the owner's request, 2026-10-28); the event form is reached from the
 homepage call to action, the phone menu and the footer.

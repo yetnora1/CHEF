@@ -84,6 +84,9 @@ const PAIRS: [string, string, number][] = [
   ["stage-foreground", "stage", 4.5],
   ["ring", "background", 3],
   ["ring", "surface", 3],
+  // The current page's ring around a dark green header link.
+  ["dark-green-ring", "background", 3],
+  ["dark-green-ring", "surface", 3],
   ["border-strong", "background", 3],
   ["border-strong", "surface", 3],
 ];

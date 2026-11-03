@@ -39,8 +39,8 @@ function subscribe(onChange: () => void) {
   };
 }
 
-/** One button: each click switches between the light and dark theme. */
-export function ThemeToggle({ className }: { className?: string }) {
+/** One button: each click switches between the light and dark theme. Indigo unless given another `hue-*`. */
+export function ThemeToggle({ className, hue = "hue-indigo" }: { className?: string; hue?: string }) {
   const t = useTranslations("Theme");
   // null during server rendering and hydration: the applied theme is unknown there.
   const theme = useSyncExternalStore(subscribe, readTheme, () => null);
@@ -49,7 +49,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     <Button
       variant="tint"
       size="icon"
-      className={cn("hue-indigo", className)}
+      className={cn(hue, className)}
       aria-label={t("dark")}
       aria-pressed={theme ? theme === "dark" : undefined}
       onClick={() => setTheme(readTheme() === "dark" ? "light" : "dark")}

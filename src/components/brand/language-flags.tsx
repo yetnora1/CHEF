@@ -50,8 +50,13 @@ function EthiopiaFlag(props: FlagProps) {
 
 const LOCALE_FLAGS: Record<AppLocale, ComponentType<FlagProps>> = { en: UsFlag, am: EthiopiaFlag };
 
-/** The language toggle: an icon-sized button around one flag, like the theme toggle beside it. */
-export const languageToggleClassName = cn(buttonVariants({ variant: "tint", size: "icon" }), "hue-teal");
+/**
+ * The language toggle: an icon-sized button around one flag, like the theme toggle beside it.
+ * Teal unless given another `hue-*` (the public site's is dark green).
+ */
+export function languageToggleClassName(hue = "hue-teal") {
+  return cn(buttonVariants({ variant: "tint", size: "icon" }), hue);
+}
 
 /**
  * The current language's flag. Decorative: the toggle around it names the

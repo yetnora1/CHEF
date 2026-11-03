@@ -397,16 +397,19 @@
   --sky-bottom: light-dark(#bae6fd, #062538);
   --sky-border: light-dark(#7dd3fc, #0369a1);
   --sky-text: light-dark(#075985, #bae6fd);
-  /* Light green for the header navigation links: light in both themes (owner's request). */
+  /* Light green, light in both themes: the fasting badges and chips. */
   --green-top: light-dark(#dcfce7, #dcfce7);
   --green-bottom: light-dark(#bbf7d0, #bbf7d0);
   --green-border: light-dark(#86efac, #86efac);
   --green-text: light-dark(#166534, #166534);
-  /* Dark green for the menu button: deep face, pale icon, the same in both themes (owner's request). */
+  /* Dark green for every public header button and both menu buttons: deep face, pale text,
+   * the same in both themes (owner's request). Its rim is too dark to mark the current page
+   * on the dark header, so the ring has its own colour: light green in dark. */
   --dark-green-top: light-dark(#166534, #166534);
   --dark-green-bottom: light-dark(#14532d, #14532d);
   --dark-green-border: light-dark(#052e16, #052e16);
   --dark-green-text: light-dark(#f0fdf4, #f0fdf4);
+  --dark-green-ring: light-dark(#166534, #86efac);
 }
 
 :root[data-theme="dark"] {
@@ -768,6 +771,7 @@
   --tint-bottom: var(--dark-green-bottom);
   --tint-border: var(--dark-green-border);
   --tint-text: var(--dark-green-text);
+  --tint-ring: var(--dark-green-ring);
 }
 
 /* Small tinted surfaces in a `hue-*` colour (role badges, avatars, icon tiles):

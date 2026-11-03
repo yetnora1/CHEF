@@ -26,7 +26,7 @@ export function AdminLocaleSwitcher({ className }: { className?: string }) {
         disabled={pending}
         onClick={() => startTransition(() => setAdminLocale(target))}
         title={LOCALE_NATIVE_NAMES[target]}
-        className={cn(languageToggleClassName, "disabled:cursor-wait")}
+        className={cn(languageToggleClassName(), "disabled:cursor-wait")}
       >
         <LanguageFlag locale={locale} />
         <span className="sr-only" lang={target}>

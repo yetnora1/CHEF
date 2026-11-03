@@ -27,13 +27,14 @@ type Entry = {
 
 const SITES: Record<string, string> = {
   "commons.wikimedia.org": "Wikimedia Commons",
+  "www.flickr.com": "Flickr",
   "www.pexels.com": "Pexels",
 };
 
 /**
  * Credits for the sample photographs and videos: the media carry no caption, so
  * this page gives each one's author, licence and source (CC BY and CC BY-SA
- * require it; Pexels does not, but is credited too) and says that they are not
+ * require it; CC0 and Pexels do not, but are credited too) and says that they are not
  * CHEF SIS's work.
  */
 export default async function CreditsPage() {

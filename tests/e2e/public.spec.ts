@@ -196,7 +196,7 @@ test.describe("fasting and non-fasting dishes", () => {
     await page.goto("/en");
     const section = page.getByRole("region", { name: "Fasting and non-fasting dishes" });
     const cards = section.getByRole("listitem");
-    await expect(cards).toHaveCount(8);
+    await expect(cards).toHaveCount(12);
     const filter = section.getByRole("group", { name: "Show dishes" });
 
     await filter.getByRole("button", { name: "Fasting", exact: true }).click();
@@ -210,11 +210,14 @@ test.describe("fasting and non-fasting dishes", () => {
     await expect(section.getByRole("status")).toHaveText("4 dishes shown");
 
     await filter.getByRole("button", { name: "Non-fasting" }).click();
-    await expect(cards).toHaveCount(4);
-    await expect(section.getByRole("heading", { name: /^Kitfo/ })).toBeVisible();
+    await expect(cards).toHaveCount(8);
+    for (const dish of [/^Kitfo/, /^Kurt \(tere siga\)/, /^Shekla tibs/, /^Gored gored/, /^Zilzil tibs/]) {
+      await expect(section.getByRole("heading", { name: dish })).toBeVisible();
+    }
+    await expect(section.getByRole("status")).toHaveText("8 dishes shown");
 
     await filter.getByRole("button", { name: "All" }).click();
-    await expect(cards).toHaveCount(8);
+    await expect(cards).toHaveCount(12);
   });
 });
 
@@ -281,9 +284,14 @@ test.describe("food videos", () => {
     await page.goto("/en/credits");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Photo and video credits");
     await expect(page.getByRole("link", { name: "Original on Pexels" })).toHaveCount(6);
-    // Three story photos, the culinary experiences card and eight dish photos; CHEF SIS's own
-    // photographs need no credit.
-    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(12);
+    // Three story photos, the culinary experiences card and twelve dish photos (one from Flickr);
+    // CHEF SIS's own photographs need no credit.
+    await expect(page.getByRole("link", { name: "Original on Wikimedia Commons" })).toHaveCount(15);
+    await expect(page.getByRole("link", { name: "Original on Flickr" })).toHaveCount(1);
+    await expect(page.getByRole("link", { name: "CC0 1.0" })).toHaveAttribute(
+      "href",
+      "https://creativecommons.org/publicdomain/zero/1.0/",
+    );
   });
 });
 

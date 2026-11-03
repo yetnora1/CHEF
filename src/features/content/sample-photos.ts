@@ -2,10 +2,14 @@ import dishAyibGomen from "@/assets/samples/dish-ayib-gomen.jpg";
 import dishBeyaynetu from "@/assets/samples/dish-beyaynetu.jpg";
 import dishDoroWat from "@/assets/samples/dish-doro-wat.jpg";
 import dishGomen from "@/assets/samples/dish-gomen.jpg";
+import dishGoredGored from "@/assets/samples/dish-gored-gored.jpg";
 import dishKikAlicha from "@/assets/samples/dish-kik-alicha.jpg";
 import dishKitfo from "@/assets/samples/dish-kitfo.jpg";
+import dishKurt from "@/assets/samples/dish-kurt.jpg";
+import dishSheklaTibs from "@/assets/samples/dish-shekla-tibs.jpg";
 import dishShiro from "@/assets/samples/dish-shiro.jpg";
 import dishTibs from "@/assets/samples/dish-tibs.jpg";
+import dishZilzilTibs from "@/assets/samples/dish-zilzil-tibs.jpg";
 import serviceCulinaryExperiences from "@/assets/samples/service-culinary-experiences.jpg";
 import storyFasting from "@/assets/samples/story-fasting.jpg";
 import storyInjera from "@/assets/samples/story-injera.jpg";
@@ -15,7 +19,7 @@ import type { SitePhoto } from "./site-photo";
 /*
  * SAMPLE PHOTOGRAPHY — not CHEF SIS's work
  * ---------------------------------------------------------------------------
- * Openly licensed photographs from Wikimedia Commons for the photo slots that
+ * Openly licensed photographs from Wikimedia Commons (and one from Flickr) for the photo slots that
  * CHEF SIS's own photographs (chef-photos.ts) do not cover: the food stories,
  * the dishes and the culinary experiences card. A photo published through the
  * media library always takes precedence. The images carry no caption: the
@@ -24,9 +28,10 @@ import type { SitePhoto } from "./site-photo";
  * the chef's food or events. None shows an identifiable face.
  *
  * Files in src/assets/samples are resized to 1600px on the long edge (the
- * dish-* photos, shown smaller, to 1200x900 4:3 crops); the
- * licences (CC BY / CC BY-SA) allow this with attribution, and the resized
- * copies keep the original licence. Descriptions are English only until a
+ * dish-* photos, shown smaller, to 1200x900 4:3 crops, or kept at their own
+ * size where the original is smaller: never upscaled); the licences (CC BY /
+ * CC BY-SA, one CC0) allow this, with attribution where required, and the
+ * resized copies keep the original licence. Descriptions are English only until a
  * fluent speaker writes the Amharic ones (docs/DESIGN_SYSTEM.md → Images).
  */
 
@@ -129,11 +134,53 @@ export const samplePhotos = {
   },
   "dish-tibs": {
     src: dishTibs,
-    alt: { en: "Tibs topped with green chilli in a clay pot over embers, with rolls of injera on a tray." },
+    alt: {
+      en: "Tibs: pieces of beef sautéed with onion, tomato and green chilli on a plate, with red chilli powder.",
+    },
+    credit: {
+      author: "Sofia.jahn",
+      license: "CC BY-SA 4.0",
+      source: "https://commons.wikimedia.org/wiki/File:Tibs_1.jpg",
+    },
+  },
+  "dish-shekla-tibs": {
+    src: dishSheklaTibs,
+    alt: {
+      en: "Shekla tibs topped with green chilli in a clay pot over glowing embers, with rolls of injera on a tray.",
+    },
     credit: {
       author: "Jean Rebiffé",
       license: "CC BY-SA 4.0",
       source: "https://commons.wikimedia.org/wiki/File:Tibs_in_Yod_Abyssinia.jpg",
+    },
+  },
+  "dish-zilzil-tibs": {
+    src: dishZilzilTibs,
+    alt: { en: "Strips of zilzil tibs on injera, with gomen and two vegetable stews." },
+    credit: {
+      author: "Edsel Little",
+      license: "CC BY-SA 2.0",
+      source: "https://www.flickr.com/photos/27119975@N00/15296841313",
+    },
+  },
+  "dish-gored-gored": {
+    src: dishGoredGored,
+    alt: { en: "Cubes of gored gored in red awaze, topped with chopped green chilli, on injera." },
+    credit: {
+      author: "Thomson200",
+      license: "CC0 1.0",
+      source: "https://commons.wikimedia.org/wiki/File:Gored_gored_plate,_July_2019.jpg",
+    },
+  },
+  "dish-kurt": {
+    src: dishKurt,
+    alt: {
+      en: "A platter of raw beef with knives for cutting it at the table, rolls of injera and a clay bowl of awaze.",
+    },
+    credit: {
+      author: "Tesfaye",
+      license: "CC BY-SA 4.0",
+      source: "https://commons.wikimedia.org/wiki/File:Tire_siga_Ethiopia.jpg",
     },
   },
   "dish-ayib-gomen": {

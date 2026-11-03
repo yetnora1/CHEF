@@ -72,6 +72,36 @@ export const dishes: Dish[] = [
     },
   },
   {
+    key: "tibs",
+    kind: "non-fasting",
+    photo: "dish-tibs",
+    name: { en: "Tibs", am: "ጥብስ" },
+    description: {
+      en: "Pieces of beef or lamb sautéed with onion, tomato, rosemary and green chilli, from mild to fiery. Once served to honour a guest, it is still made for holidays and special days.",
+      am: "የበሬ ወይም የበግ ሥጋ ቁርጥራጭ በሽንኩርት፣ በቲማቲም፣ በሮዝመሪና በቃሪያ ይጠበሳል፤ ከለዘብተኛ እስከ ብርቱ ቅመም ይሠራል። ቀድሞ ለእንግዳ ክብር ይቀርብ ነበር፤ ዛሬም በበዓላትና በልዩ ቀናት ይዘጋጃል።",
+    },
+  },
+  {
+    key: "shekla-tibs",
+    kind: "non-fasting",
+    photo: "dish-shekla-tibs",
+    name: { en: "Shekla tibs", am: "ሸክላ ጥብስ" },
+    description: {
+      en: "Tibs brought to the table in a shekla, a clay pot with glowing coals beneath it, so the meat keeps sizzling while everyone shares it with injera.",
+      am: "ጥብሱ ሥሩ ፍም ባለው የሸክላ ማቅረቢያ ውስጥ ይቀርባል፤ ስለዚህ ሁሉም ከእንጀራ ጋር ሲካፈሉት እየተንጣጣ ይቆያል።",
+    },
+  },
+  {
+    key: "zilzil-tibs",
+    kind: "non-fasting",
+    photo: "dish-zilzil-tibs",
+    name: { en: "Zilzil tibs", am: "ዝልዝል ጥብስ" },
+    description: {
+      en: "Zilzil means strips: beef cut into long strips and fried the tibs way with onion, garlic and green chilli, then served on injera.",
+      am: "ዝልዝል ማለት ረጃጅም ቁርጥራጭ ማለት ነው፦ ሥጋ በረጃጅሙ ተቆርጦ በሽንኩርት፣ በነጭ ሽንኩርትና በቃሪያ እንደ ጥብስ ይጠበሳል፤ ከዚያም በእንጀራ ላይ ይቀርባል።",
+    },
+  },
+  {
     key: "kitfo",
     kind: "non-fasting",
     photo: "dish-kitfo",
@@ -82,13 +112,23 @@ export const dishes: Dish[] = [
     },
   },
   {
-    key: "tibs",
+    key: "gored-gored",
     kind: "non-fasting",
-    photo: "dish-tibs",
-    name: { en: "Tibs", am: "ጥብስ" },
+    photo: "dish-gored-gored",
+    name: { en: "Gored gored", am: "ጎረድ ጎረድ" },
     description: {
-      en: "Pieces of beef or lamb seared with onion, rosemary and green chilli, often brought sizzling in a clay pot over embers to share.",
-      am: "የበሬ ወይም የበግ ሥጋ ቁርጥራጭ በሽንኩርት፣ በሮዝመሪና በቃሪያ ይጠበሳል፤ ብዙ ጊዜ በፍም ላይ ባለ የሸክላ ማቅረቢያ እየተንጣጣ ለጋራ ይቀርባል።",
+      en: "Cubes of raw beef, cut rather than minced as for kitfo, served with mitmita and awaze. Like kitfo, it is widely loved and counted among the national dishes.",
+      am: "ጥሬ የበሬ ሥጋ እንደ ክትፎ ሳይከተፍ በኩብ ቅርጽ ይቆረጣል፤ ከሚጥሚጣና ከአዋዜ ጋር ይቀርባል። እንደ ክትፎ ሁሉ በጣም ተወዳጅ ሲሆን ከብሔራዊ ምግቦች አንዱ ተደርጎ ይቆጠራል።",
+    },
+  },
+  {
+    key: "kurt",
+    kind: "non-fasting",
+    photo: "dish-kurt",
+    name: { en: "Kurt (tere siga)", am: "ቁርጥ (ጥሬ ሥጋ)" },
+    description: {
+      en: "Tere siga means raw meat: fresh beef brought to the table in large pieces, which each guest cuts into bites with a knife (kurt), dips in mitmita, awaze or senafich mustard and eats with injera.",
+      am: "ትኩስ የበሬ ሥጋ በትልልቅ ቁራጭ ይቀርባል፤ እያንዳንዱ ሰው በቢላ እየቆረጠ (ቁርጥ) በሚጥሚጣ፣ በአዋዜ ወይም በሰናፍጭ እያጠቀሰ ከእንጀራ ጋር ይበላል።",
     },
   },
   {

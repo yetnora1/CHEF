@@ -89,7 +89,7 @@ export function FoodReel({ clips, labels }: FoodReelProps) {
             <button
               type="button"
               onClick={() => setViewing(index)}
-              className="group/clip relative block aspect-[16/10] w-full cursor-pointer overflow-hidden rounded-2xl bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring"
+              className="group/clip media-frame block aspect-[16/10] w-full cursor-pointer rounded-2xl transition-[translate,box-shadow] duration-300 ease-out hover:shadow-media-lift focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring motion-safe:hover:-translate-y-0.5"
             >
               <video
                 ref={(element) => {
@@ -102,7 +102,7 @@ export function FoodReel({ clips, labels }: FoodReelProps) {
                 playsInline
                 preload="none"
                 aria-hidden
-                className="pointer-events-none h-full w-full object-cover transition-transform duration-260 ease-out motion-safe:group-hover/clip:scale-[1.03]"
+                className="pointer-events-none h-full w-full object-cover transition-transform duration-700 ease-out motion-safe:group-hover/clip:scale-[1.04]"
               />
               {/* Full-screen hint: on hover or focus, always on touch screens (no hover there). */}
               <span

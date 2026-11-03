@@ -96,7 +96,7 @@ export function PhotoViewer({ photos, index, onIndexChange, labels }: PhotoViewe
                 style={{
                   width: `min(${Math.round(photo.src.width * MAX_SCALE)}px, calc(100vw - 2rem), calc((100dvh - ${RESERVED_HEIGHT}) * ${photo.src.width / photo.src.height}))`,
                 }}
-                className="h-auto rounded-xl shadow-2xl select-none motion-safe:animate-fade-in"
+                className="h-auto rounded-2xl shadow-2xl ring-1 ring-stage-foreground/10 select-none motion-safe:animate-fade-in"
               />
 
               {/* Top bar: position and close, over a soft shade so they read on any photo. */}

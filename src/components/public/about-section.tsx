@@ -37,18 +37,20 @@ export async function AboutSection({
   return (
     <section id={HOME_SECTIONS.about} aria-labelledby="about-heading" className="py-14 md:py-20">
       <div className="page-container grid items-center gap-12 md:grid-cols-[0.8fr_1fr] lg:gap-20">
-        {image ? (
-          <div className="aspect-[4/5] w-full max-w-sm overflow-hidden rounded-2xl bg-surface-muted md:max-w-none">
-            <CmsImage image={image} sizes={ABOUT_IMAGE_SIZES} />
-          </div>
-        ) : (
-          <PhotoSlot
-            subject={photoSubject}
-            photo={chefPhotoFor("about")}
-            sizes={ABOUT_IMAGE_SIZES}
-            className="aspect-[4/5] w-full max-w-sm md:max-w-none"
-          />
-        )}
+        <div className="w-full max-w-sm media-mat md:max-w-none">
+          {image ? (
+            <div className="media-frame aspect-[4/5] w-full rounded-2xl">
+              <CmsImage image={image} sizes={ABOUT_IMAGE_SIZES} />
+            </div>
+          ) : (
+            <PhotoSlot
+              subject={photoSubject}
+              photo={chefPhotoFor("about")}
+              sizes={ABOUT_IMAGE_SIZES}
+              className="aspect-[4/5] w-full"
+            />
+          )}
+        </div>
 
         <div className="max-w-xl">
           <p className="eyebrow text-accent-ink">{t("aboutEyebrow")}</p>

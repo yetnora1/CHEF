@@ -22,14 +22,14 @@ type TileProps = {
   onOpen: () => void;
 };
 
-/** A photo as a button that opens the viewer; it zooms slightly and shows an expand mark on hover. */
+/** A photo as a button that opens the viewer; on hover it lifts, zooms slowly and shows an expand mark. */
 function Tile({ photo, label, sizes, fill, onOpen }: TileProps) {
   return (
     <button
       type="button"
       onClick={onOpen}
       className={cn(
-        "group/photo relative block w-full cursor-pointer overflow-hidden rounded-2xl bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring",
+        "group/photo media-frame block w-full cursor-pointer rounded-2xl transition-[translate,box-shadow] duration-300 ease-out hover:shadow-media-lift focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring motion-safe:hover:-translate-y-0.5",
         fill && "h-full",
       )}
     >
@@ -42,7 +42,7 @@ function Tile({ photo, label, sizes, fill, onOpen }: TileProps) {
         placeholder="blur"
         fill={fill}
         className={cn(
-          "transition-transform duration-500 ease-out motion-safe:group-hover/photo:scale-[1.04]",
+          "transition-transform duration-700 ease-out motion-safe:group-hover/photo:scale-[1.04]",
           fill ? "object-cover" : "block h-auto w-full",
         )}
       />

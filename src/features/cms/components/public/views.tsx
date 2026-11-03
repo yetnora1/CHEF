@@ -108,9 +108,10 @@ export async function ArticleView({
           image={image}
           sizes="(min-width: 64rem) 56rem, 100vw"
           className="mx-auto mt-10 max-w-4xl"
-          frameClassName="aspect-[16/9] rounded-2xl"
+          frameClassName="aspect-[16/9]"
           creditLabel={t("credit")}
           preload
+          matted
         />
       )}
       {body && <Markup text={body.text} lang={body.lang} className="mx-auto mt-10 max-w-3xl" />}
@@ -137,12 +138,12 @@ export async function CardGrid({ items, cta }: { items: CardItem[]; cta: string 
             href={item.href}
             className="group flex flex-col rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >
-            <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-surface-muted">
+            <div className="media-frame aspect-[4/3] rounded-2xl transition-[translate,box-shadow] duration-300 ease-out group-hover:shadow-media-lift motion-safe:group-hover:-translate-y-0.5">
               {item.image ? (
                 <CmsImage
                   image={item.image}
                   sizes="(min-width: 64rem) 24rem, (min-width: 40rem) 50vw, 100vw"
-                  className="transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.04]"
                 />
               ) : (
                 <span aria-hidden className="block h-full w-full dot-texture" />
@@ -194,7 +195,7 @@ export async function MenuView({ categories }: { categories: MenuCategoryView[] 
             {category.items.map((item) => (
               <li key={item.key} className="flex gap-5 py-5">
                 {item.image && (
-                  <div className="size-20 shrink-0 overflow-hidden rounded-2xl bg-surface-muted sm:size-24">
+                  <div className="media-frame size-20 shrink-0 rounded-2xl sm:size-24">
                     <CmsImage image={item.image} sizes="6rem" />
                   </div>
                 )}
@@ -239,7 +240,7 @@ export async function GalleryView({ items }: { items: GalleryItemView[] }) {
         <li key={item.key}>
           {/* One figure: the occasion and caption describe the image; the credit comes last. */}
           <figure>
-            <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-surface-muted">
+            <div className="media-frame aspect-[4/3] rounded-2xl">
               <CmsImage image={item.image} sizes="(min-width: 64rem) 24rem, (min-width: 40rem) 50vw, 100vw" />
             </div>
             {(item.caption || item.event || item.image.credit) && (
@@ -285,10 +286,11 @@ export async function AboutView({ sections }: { sections: AboutSectionView[] }) 
             <CmsFigure
               image={section.image}
               sizes="(min-width: 48rem) 40vw, 100vw"
-              frameClassName="aspect-[4/5] rounded-2xl"
+              frameClassName="aspect-[4/5]"
               creditLabel={t("credit")}
               className={index % 2 === 1 ? "md:order-2" : undefined}
               preload={index === 0}
+              matted
             />
           )}
           <div className="max-w-2xl">

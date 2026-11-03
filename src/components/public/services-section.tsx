@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 import { PhotoSlot } from "./photo-slot";
 
 const SERVICE_IMAGE_SIZES = "(min-width: 64rem) 18rem, (min-width: 40rem) 50vw, 100vw";
-// A linked card's photo zooms slightly while the card is hovered.
+// A linked card's photo zooms slowly while the card is hovered.
 const CARD_IMAGE_HOVER =
-  "transition-transform duration-260 ease-out motion-safe:group-hover/card:scale-[1.03]";
+  "transition-transform duration-700 ease-out motion-safe:group-hover/card:scale-[1.04]";
 
 export type ServiceCard = {
   slug: string;
@@ -60,17 +60,18 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
           </p>
         </div>
 
-        {/* Every card asks about its service on the contact form (subject prefilled). Without
+        {/* Each card holds its photo like a mat (rounded-3xl around the photo's rounded-2xl).
+            Every card asks about its service on the contact form (subject prefilled). Without
             a page of its own, that link covers the whole card; a published service's title
             covers the card and links to its page instead, with the contact link above it. */}
         <ul className={cn("mt-10 grid gap-5 sm:grid-cols-2", desktopColumns(services.length))}>
           {services.map((service) => (
             <li
               key={service.slug}
-              className="group/card relative flex flex-col rounded-2xl border border-border glass p-3 pb-5"
+              className="group/card relative flex flex-col rounded-3xl border border-border glass p-2 pb-5"
             >
               {service.image ? (
-                <div className="aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-muted">
+                <div className="media-frame aspect-[4/3] w-full rounded-2xl">
                   <CmsImage image={service.image} sizes={SERVICE_IMAGE_SIZES} className={CARD_IMAGE_HOVER} />
                 </div>
               ) : (
@@ -78,11 +79,11 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
                   subject={service.photoSubject}
                   photo={chefPhotoFor(service.slug) ?? samplePhotoFor(service.slug)}
                   sizes={SERVICE_IMAGE_SIZES}
-                  className="aspect-[4/3] w-full rounded-xl"
+                  className="aspect-[4/3] w-full"
                   imageClassName={CARD_IMAGE_HOVER}
                 />
               )}
-              <h3 className="mt-5 px-2 display-md" lang={service.title.lang}>
+              <h3 className="mt-5 px-3 display-md" lang={service.title.lang}>
                 {service.href ? (
                   <Link
                     href={service.href}
@@ -94,13 +95,13 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
                   service.title.text
                 )}
               </h3>
-              <p className="mt-3 px-2 text-sm text-muted-foreground" lang={service.summary.lang}>
+              <p className="mt-3 px-3 text-sm text-muted-foreground" lang={service.summary.lang}>
                 {service.summary.text}
               </p>
               <Link
                 href={service.contactHref}
                 className={cn(
-                  "mt-auto inline-flex w-fit items-center gap-1.5 px-2 pt-5 text-sm font-semibold underline-offset-4",
+                  "mt-auto inline-flex w-fit items-center gap-1.5 px-3 pt-5 text-sm font-semibold underline-offset-4",
                   service.href
                     ? "relative z-10 hover:underline"
                     : "group-hover/card:underline after:absolute after:inset-0",

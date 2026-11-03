@@ -63,18 +63,16 @@ export function DishGrid({ dishes, labels }: DishGridProps) {
 
       <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {shown.map((dish) => (
-          <li
-            key={dish.key}
-            className="group flex flex-col overflow-hidden rounded-2xl border border-border glass"
-          >
-            <div className="relative aspect-[4/3] overflow-hidden bg-surface-muted">
+          // The photo sits inset in the card like a mat, as on the service cards.
+          <li key={dish.key} className="group flex flex-col rounded-3xl border border-border glass p-2">
+            <div className="media-frame aspect-[4/3] rounded-2xl">
               <Image
                 src={dish.image.src}
                 alt={dish.image.alt}
                 lang={dish.image.lang}
                 fill
                 sizes={IMAGE_SIZES}
-                className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+                className="object-cover transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.04]"
               />
               <span
                 className={cn(
@@ -85,7 +83,7 @@ export function DishGrid({ dishes, labels }: DishGridProps) {
                 {dish.kind === "fasting" ? labels.fasting : labels.nonFasting}
               </span>
             </div>
-            <div className="flex flex-1 flex-col p-5">
+            <div className="flex flex-1 flex-col px-3 pt-4 pb-3">
               <h3 className="flex flex-wrap items-baseline gap-x-2 text-lg font-semibold">
                 <span lang={dish.name.lang}>{dish.name.text}</span>
                 {dish.otherName && (

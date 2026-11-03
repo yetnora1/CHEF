@@ -25,12 +25,14 @@ export function StorySection({ id, eyebrow, title, body, photo, imageRight }: St
           imageRight ? "md:grid-cols-[1fr_0.8fr]" : "md:grid-cols-[0.8fr_1fr]",
         )}
       >
-        <PhotoSlot
-          subject={title}
-          photo={photo}
-          sizes={STORY_IMAGE_SIZES}
-          className={cn("aspect-[4/5] w-full max-w-sm md:max-w-none", imageRight && "md:order-2")}
-        />
+        <div className={cn("w-full max-w-sm media-mat md:max-w-none", imageRight && "md:order-2")}>
+          <PhotoSlot
+            subject={title}
+            photo={photo}
+            sizes={STORY_IMAGE_SIZES}
+            className="aspect-[4/5] w-full"
+          />
+        </div>
         <div className={cn("max-w-xl", imageRight && "md:order-1 md:justify-self-end")}>
           <p className="eyebrow text-accent-ink" lang={eyebrow.lang}>
             {eyebrow.text}

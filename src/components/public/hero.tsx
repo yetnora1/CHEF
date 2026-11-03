@@ -55,9 +55,9 @@ export async function Hero({ eyebrow, headline, lede, photoSubject, image }: Her
           </div>
         </div>
 
-        <div className="mx-auto w-full max-w-sm lg:max-w-none">
+        <div className="mx-auto w-full max-w-sm media-mat lg:max-w-none">
           {image ? (
-            <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-muted">
+            <div className="media-frame aspect-[4/5] w-full rounded-2xl">
               <CmsImage image={image} sizes={HERO_IMAGE_SIZES} preload />
             </div>
           ) : (

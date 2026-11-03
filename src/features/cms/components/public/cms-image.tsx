@@ -60,7 +60,7 @@ export function CmsImage({
   );
 }
 
-/** An image with its credit, when one is recorded. */
+/** An image with its credit, when one is recorded; a feature image sits in a glass mat. */
 export function CmsFigure({
   image,
   sizes,
@@ -68,6 +68,7 @@ export function CmsFigure({
   frameClassName,
   creditLabel,
   preload,
+  matted,
 }: {
   image: ImageView;
   sizes: string;
@@ -75,12 +76,16 @@ export function CmsFigure({
   frameClassName?: string;
   creditLabel: string;
   preload?: boolean;
+  matted?: boolean;
 }) {
+  const frame = (
+    <div className={cn("media-frame rounded-2xl", frameClassName)}>
+      <CmsImage image={image} sizes={sizes} preload={preload} />
+    </div>
+  );
   return (
     <figure className={className}>
-      <div className={cn("overflow-hidden bg-surface-muted", frameClassName)}>
-        <CmsImage image={image} sizes={sizes} preload={preload} />
-      </div>
+      {matted ? <div className="media-mat">{frame}</div> : frame}
       {image.credit && (
         <figcaption className="mt-2 text-xs text-muted-foreground">
           {creditLabel}: {image.credit}

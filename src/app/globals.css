@@ -307,6 +307,11 @@
   --glass-sheet-rim-soft: light-dark(#ffffff59, #ffffff0f);
   --glass-sheet-shadow: light-dark(#0f172a38, #000000a6);
   --scrim: light-dark(#0f172a26, #00000066);
+  /* Photos and videos (`media-frame`): a fine rim drawn over the picture's edge, a line of
+   * light along its top, and a soft shadow lifting it off the page. */
+  --media-rim: light-dark(#0f172a1f, #ffffff1f);
+  --media-shine: light-dark(#ffffff40, #ffffff1a);
+  --media-shadow: light-dark(#0f172a29, #00000080);
   /* Form inputs: lighter than the card in light, darker in dark. */
   --field: light-dark(#ffffffb3, #00000033);
 
@@ -480,6 +485,9 @@
   /* Menu sheets: a bright edge on the top and left, a faint one on the bottom and right. */
   --shadow-sheet: 0 2px 6px -1px var(--glass-sheet-shadow), 0 28px 64px -20px var(--glass-sheet-shadow);
   --inset-shadow-rim: inset 1px 1px 0 var(--glass-sheet-rim), inset -1px -1px 0 var(--glass-sheet-rim-soft);
+  /* Photos and videos at rest, and a tile lifted on hover. */
+  --shadow-media: 0 1px 2px var(--media-shadow), 0 16px 32px -16px var(--media-shadow);
+  --shadow-media-lift: 0 2px 4px var(--media-shadow), 0 26px 48px -18px var(--media-shadow);
 
   /* The device's own UI font for Latin (Segoe UI, San Francisco, Roboto…); the
    * browser falls through to Noto Sans Ethiopic for each Ethiopic glyph.
@@ -683,6 +691,33 @@
 @utility glass-sheet {
   @apply bg-glass-sheet shadow-sheet inset-shadow-rim backdrop-blur-2xl backdrop-saturate-180;
   background-image: linear-gradient(150deg, var(--glass-sheet-sheen), transparent 45%);
+}
+
+/*
+ * Photos and videos share one finish:
+ *   media-frame – the picture's box: clipped to its corners, a fine rim and a line of light
+ *                 drawn over the picture's edge (so it stays crisp on any ground), a soft shadow
+ *   media-mat   – a frosted glass mat around a feature photo; with its 0.5rem padding, the
+ *                 photo's rounded-2xl corners sit concentric inside the mat's rounded-3xl
+ */
+@utility media-frame {
+  @apply relative isolate overflow-hidden bg-surface-muted shadow-media;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      inset 0 0 0 1px var(--media-rim),
+      inset 0 1px 0 var(--media-shine);
+  }
+}
+
+@utility media-mat {
+  @apply rounded-3xl border border-border glass p-2;
 }
 
 /* Hues for `tint` buttons: each sets the face, border and text the variant reads. */

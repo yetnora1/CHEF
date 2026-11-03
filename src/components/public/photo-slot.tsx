@@ -38,7 +38,7 @@ export async function PhotoSlot({
   if (photo) {
     const alt = resolveLocalized(photo.alt, await getLocale());
     return (
-      <figure className={cn("relative overflow-hidden rounded-2xl bg-surface-muted", className)}>
+      <figure className={cn("media-frame rounded-2xl", className)}>
         <Image
           src={photo.src}
           alt={alt?.text ?? ""}

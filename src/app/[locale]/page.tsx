@@ -16,6 +16,9 @@ import { samplePhotos } from "@/features/content/sample-photos";
 import { sampleVideos } from "@/features/content/sample-videos";
 import { resolveLocalized, type Localized, type ResolvedText } from "@/lib/localization/translations";
 
+// Each food story's chip has its own colour: golden injera, red wat, green for fasting (as on the dish badges).
+const STORY_HUES: Record<string, string> = { injera: "hue-amber", wat: "hue-rose", fasting: "hue-green" };
+
 /*
  * Homepage: published CMS content where it exists (the "home" page sections
  * and published services), section by section; otherwise the labelled
@@ -132,6 +135,7 @@ export default async function HomePage() {
           title={placeholder(story.title)}
           body={placeholder(story.body)}
           photo={samplePhotos[story.photo]}
+          hue={STORY_HUES[story.key] ?? "hue-sky"}
           // "Meet CHEF SIS" has its image on the left, so these start on the right.
           imageRight={index % 2 === 0}
         />

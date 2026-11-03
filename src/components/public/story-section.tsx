@@ -1,13 +1,15 @@
 import type { SitePhoto } from "@/features/content/site-photo";
 import type { ResolvedText } from "@/lib/localization/translations";
-import { cn } from "@/lib/utils";
+import { FEATURE_MEDIA, FeatureRow } from "./feature-row";
 import { PhotoSlot } from "./photo-slot";
 
-const STORY_IMAGE_SIZES = "(min-width: 48rem) 40vw, 24rem";
+const STORY_IMAGE_SIZES = "(min-width: 48rem) 40vw, 92vw";
 
 type StorySectionProps = {
   id: string;
   eyebrow: ResolvedText;
+  /** The eyebrow chip's colour: a `hue-*` utility. */
+  hue: string;
   title: ResolvedText;
   body: ResolvedText;
   photo: SitePhoto;
@@ -15,36 +17,20 @@ type StorySectionProps = {
   imageRight?: boolean;
 };
 
-/** An image-and-text row in the style of "Meet CHEF SIS"; phones stack image first. */
-export function StorySection({ id, eyebrow, title, body, photo, imageRight }: StorySectionProps) {
+/** An image-and-text card in the style of "Meet CHEF SIS"; phones stack image first. */
+export function StorySection({ id, eyebrow, hue, title, body, photo, imageRight }: StorySectionProps) {
   return (
-    <section aria-labelledby={`${id}-heading`} className="py-14 md:py-20">
-      <div
-        className={cn(
-          "page-container grid items-center gap-12 lg:gap-20",
-          imageRight ? "md:grid-cols-[1fr_0.8fr]" : "md:grid-cols-[0.8fr_1fr]",
-        )}
-      >
-        <div className={cn("w-full max-w-sm media-mat md:max-w-none", imageRight && "md:order-2")}>
-          <PhotoSlot
-            subject={title}
-            photo={photo}
-            sizes={STORY_IMAGE_SIZES}
-            className="aspect-[4/5] w-full"
-          />
-        </div>
-        <div className={cn("max-w-xl", imageRight && "md:order-1 md:justify-self-end")}>
-          <p className="eyebrow text-accent-ink" lang={eyebrow.lang}>
-            {eyebrow.text}
-          </p>
-          <h2 id={`${id}-heading`} className="mt-5 display-lg" lang={title.lang}>
-            {title.text}
-          </h2>
-          <p className="mt-7 text-lg text-muted-foreground" lang={body.lang}>
-            {body.text}
-          </p>
-        </div>
-      </div>
-    </section>
+    <FeatureRow
+      headingId={`${id}-heading`}
+      eyebrow={eyebrow}
+      hue={hue}
+      title={title}
+      mediaRight={imageRight}
+      media={<PhotoSlot subject={title} photo={photo} sizes={STORY_IMAGE_SIZES} className={FEATURE_MEDIA} />}
+    >
+      <p className="mt-5 text-lg text-muted-foreground" lang={body.lang}>
+        {body.text}
+      </p>
+    </FeatureRow>
   );
 }

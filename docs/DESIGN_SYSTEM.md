@@ -108,26 +108,32 @@ every page `h1` and `display-md` for section headings, so operational screens st
 
 ## Images: ratios, cropping and descriptions
 
-| Slot                                       | Ratio         | Notes                                                |
-| ------------------------------------------ | ------------- | ---------------------------------------------------- |
-| Homepage hero                              | 4:5           | `preload`; in a glass mat                            |
-| Homepage and About portrait / story images | 4:5           | In a glass mat; About sections alternate sides       |
-| Service, journal and list cards; gallery   | 4:3           | Gallery captions and credits sit in the `figcaption` |
-| Homepage photo mosaic                      | Tile shapes   | One 2×2 tile, one tall tile, six single tiles        |
-| Gallery of CHEF SIS's own photographs      | Own shape     | Masonry columns (2, 3, 4); nothing is cropped        |
-| Service and journal article image          | 16:9          | In a glass mat, wider than the text (`max-w-4xl`)    |
-| Menu dish thumbnail                        | 1:1 (80–96px) | Optional                                             |
+| Slot                                     | Ratio         | Notes                                                |
+| ---------------------------------------- | ------------- | ---------------------------------------------------- |
+| Homepage hero                            | 4:5           | `preload`; in a glass mat                            |
+| Meet CHEF SIS and the food story cards   | 1:1, 4:5 (md) | Square except on tablets (`FEATURE_MEDIA`)           |
+| About page portrait images               | 4:5           | In a glass mat; About sections alternate sides       |
+| Service, journal and list cards; gallery | 4:3           | Gallery captions and credits sit in the `figcaption` |
+| Homepage photo mosaic                    | Tile shapes   | One 2×2 tile, one tall tile, six single tiles        |
+| Gallery of CHEF SIS's own photographs    | Own shape     | Masonry columns (2, 3, 4); nothing is cropped        |
+| Service and journal article image        | 16:9          | In a glass mat, wider than the text (`max-w-4xl`)    |
+| Menu dish thumbnail                      | 1:1 (80–96px) | Optional                                             |
 
 - **One finish for photos and videos** (owner's request, 2026-11-03: "modern and beautiful").
   Every photo and video sits in a `media-frame` (`globals.css`): 16px corners (`rounded-2xl`),
   a fine rim drawn over the picture's edge so it stays crisp on light and dark grounds
   (`--media-rim`), a line of light along the top (`--media-shine`) and a soft shadow
-  (`shadow-media`). Feature photos (hero, Meet CHEF SIS, the story rows, CMS article and About
-  images) sit in a `media-mat`: frosted glass, 0.5rem padding, `rounded-3xl`, so the corners
-  are concentric. Service and dish cards hold their photo the same way. Clickable tiles
+  (`shadow-media`). Feature photos (hero, CMS article and About page images) sit in a
+  `media-mat`: frosted glass, 0.5rem padding, `rounded-3xl`, so the corners are concentric.
+  Service and dish cards hold their photo the same way. Clickable tiles
   (gallery, mosaic, video reel, list cards) lift 2px with a deeper shadow (`shadow-media-lift`)
   on hover, and every hover zoom is the same slow 700ms, 4% zoom (none for reduced motion).
   Pictures carry no text; the only overlays are the expand mark and the dish badge.
+- **Image-and-text cards** (owner's request, 2026-11-03: "modern and clean"). Meet CHEF SIS
+  and the food stories (injera, wat, fasting) are one glass card each (`public/feature-row`):
+  the photo fills one side, inset like a mat, and the text sits centred on the other under a
+  coloured chip: the chef teal, injera amber, wat rose, fasting green (as on the dish badges).
+  Sides alternate down the page; phones stack the photo first.
 - Every image fills its frame with `object-cover`, centred. There is no focal-point control yet,
   so supply photographs with the subject near the centre and at least 1600px on the long edge
   (uploads are resized to ≤ 2560px, see [MEDIA.md](MEDIA.md)).

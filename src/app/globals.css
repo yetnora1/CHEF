@@ -298,6 +298,15 @@
   /* Raised glass: outline buttons and the selected sidebar item. */
   --glass-raised: light-dark(#ffffffcc, #ffffff14);
   --glass-raised-hover: light-dark(#fffffff2, #ffffff1f);
+  /* Phone menu sheets (`glass-sheet`): clearer than glass-thick, so the page's colours show
+   * through the frost, with a diagonal sheen and a rim lit from the top left. The scrim
+   * behind them only dims the page lightly. */
+  --glass-sheet: light-dark(#ffffffc8, #181614d1);
+  --glass-sheet-sheen: light-dark(#ffffff59, #ffffff08);
+  --glass-sheet-rim: light-dark(#ffffffe6, #ffffff33);
+  --glass-sheet-rim-soft: light-dark(#ffffff59, #ffffff0f);
+  --glass-sheet-shadow: light-dark(#0f172a38, #000000a6);
+  --scrim: light-dark(#0f172a26, #00000066);
   /* Form inputs: lighter than the card in light, darker in dark. */
   --field: light-dark(#ffffffb3, #00000033);
 
@@ -404,6 +413,7 @@
   :root {
     --glass: var(--surface);
     --glass-thick: var(--surface);
+    --glass-sheet: var(--surface);
   }
 }
 
@@ -438,6 +448,8 @@
   --color-glass-thick: var(--glass-thick);
   --color-glass-raised: var(--glass-raised);
   --color-glass-raised-hover: var(--glass-raised-hover);
+  --color-glass-sheet: var(--glass-sheet);
+  --color-scrim: var(--scrim);
   --color-field: var(--field);
   --color-stage: var(--stage);
   --color-stage-foreground: var(--stage-foreground);
@@ -465,6 +477,9 @@
   /* Glass panels: light along the top edge and a soft shadow underneath. */
   --shadow-glass: 0 1px 2px var(--glass-shadow), 0 12px 32px -12px var(--glass-shadow);
   --inset-shadow-glass: inset 0 1px 0 var(--glass-shine);
+  /* Menu sheets: a bright edge on the top and left, a faint one on the bottom and right. */
+  --shadow-sheet: 0 2px 6px -1px var(--glass-sheet-shadow), 0 28px 64px -20px var(--glass-sheet-shadow);
+  --inset-shadow-rim: inset 1px 1px 0 var(--glass-sheet-rim), inset -1px -1px 0 var(--glass-sheet-rim-soft);
 
   /* The device's own UI font for Latin (Segoe UI, San Francisco, Roboto…); the
    * browser falls through to Noto Sans Ethiopic for each Ethiopic glyph.
@@ -654,7 +669,8 @@
  * along its top edge and a soft shadow. Pair it with `border border-border` for
  * the hairline rim; an explicit `shadow-*` replaces the outer shadow only.
  *   glass       – cards and the admin sidebar, over the page backdrop
- *   glass-thick – sticky bars, menus, dialogs and sheets, which content moves behind
+ *   glass-thick – sticky bars, menus and dialogs, which content moves behind
+ *   glass-sheet – the phone menu sheets: clearer frost, more saturated, a sheen and a lit rim
  */
 @utility glass {
   @apply bg-glass shadow-glass inset-shadow-glass backdrop-blur-xl backdrop-saturate-150;
@@ -662,6 +678,11 @@
 
 @utility glass-thick {
   @apply bg-glass-thick shadow-glass inset-shadow-glass backdrop-blur-2xl backdrop-saturate-150;
+}
+
+@utility glass-sheet {
+  @apply bg-glass-sheet shadow-sheet inset-shadow-rim backdrop-blur-2xl backdrop-saturate-180;
+  background-image: linear-gradient(150deg, var(--glass-sheet-sheen), transparent 45%);
 }
 
 /* Hues for `tint` buttons: each sets the face, border and text the variant reads. */

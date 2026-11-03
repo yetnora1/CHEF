@@ -17,7 +17,10 @@ type SheetContentProps = ComponentProps<typeof DialogPrimitive.Content> & {
   closeLabel: string;
 };
 
-/** A modal glass side panel floating in from an edge, built on Radix Dialog (focus trap, Escape, scroll lock). */
+/**
+ * A modal glass side panel floating in from an edge, built on Radix Dialog (focus trap, Escape,
+ * scroll lock). The scrim only dims the page lightly, so its colours show through the frost.
+ */
 export function SheetContent({
   className,
   children,
@@ -27,10 +30,10 @@ export function SheetContent({
 }: SheetContentProps) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-coffee-charcoal/40 backdrop-blur-sm data-[state=open]:animate-fade-in" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-scrim backdrop-blur-xs data-[state=open]:animate-fade-in" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed inset-y-3 z-50 flex w-[min(22rem,calc(100vw-1.5rem))] flex-col gap-6 overflow-y-auto rounded-2xl border border-border glass-thick p-6 text-foreground shadow-2xl outline-none",
+          "fixed inset-y-3 z-50 flex w-[min(22rem,calc(100vw-1.5rem))] flex-col gap-6 overflow-y-auto rounded-2xl border border-border glass-sheet p-6 text-foreground outline-none",
           side === "right"
             ? "right-3 data-[state=open]:animate-slide-in-right"
             : "left-3 data-[state=open]:animate-slide-in-left",
@@ -40,10 +43,7 @@ export function SheetContent({
       >
         {children}
         <DialogPrimitive.Close
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "icon" }),
-            "absolute top-5 right-5 text-muted-foreground hover:text-foreground",
-          )}
+          className={cn(buttonVariants({ variant: "outline", size: "icon" }), "absolute top-5 right-5")}
           aria-label={closeLabel}
         >
           <X aria-hidden className="size-5" />

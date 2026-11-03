@@ -95,6 +95,8 @@ const PAIRS: [string, string, number][] = [
  */
 const BACKDROPS = ["background", "backdrop-sky", "backdrop-blue"];
 const TEXT = ["foreground", "muted-foreground", "accent-ink", "terracotta", "danger", "success", "warning"];
+// A phone menu sheet, top layer first: its sheen over its glass over the scrim.
+const SHEET = ["glass-sheet-sheen", "glass-sheet", "scrim"];
 
 // [text tokens, translucent layers from the top down, minimum ratio, extra grounds]
 const GLASS_STACKS: [string[], string[], number, string[]?][] = [
@@ -109,8 +111,18 @@ const GLASS_STACKS: [string[], string[], number, string[]?][] = [
   // Inputs on a card: text, placeholder, and the 3:1 border.
   [["foreground", "muted-foreground"], ["field", "glass"], 4.5],
   [["border-strong"], ["field", "glass"], 3],
-  // Bars, menus, dialogs and sheets: photos may scroll behind them, so black and white too.
+  // Bars, menus and dialogs: photos may scroll behind them, so black and white too.
   [TEXT, ["glass-thick"], 4.5, ["#000000", "#ffffff"]],
+  // Phone menu sheets over their scrim, with and without the sheen (it lightens dark glass),
+  // then what sits on them: link buttons at rest, hovered or current, and admin item hover.
+  [["foreground", "muted-foreground"], ["glass-sheet", "scrim"], 4.5, ["#000000", "#ffffff"]],
+  [["foreground", "muted-foreground"], SHEET, 4.5, ["#000000", "#ffffff"]],
+  ...["glass", "glass-raised", "surface-muted"].map((layer): [string[], string[], number, string[]] => [
+    ["foreground"],
+    [layer, ...SHEET],
+    4.5,
+    ["#000000", "#ffffff"],
+  ]),
 ];
 
 const GLASS_CASES = (["light", "dark"] as const).flatMap((theme) =>

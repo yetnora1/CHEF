@@ -86,13 +86,13 @@ every page `h1` and `display-md` for section headings, so operational screens st
 
 ## Layout and breakpoints
 
-| Breakpoint | Width   | What changes                                                                               |
-| ---------- | ------- | ------------------------------------------------------------------------------------------ |
-| base       | 320px + | One column; header: wordmark, theme, menu button                                           |
-| `xs`       | 26rem   | Custom, for small two-up arrangements                                                      |
-| `sm`       | 40rem   | Header language switcher appears; admin filters always shown                               |
-| `md`       | 48rem   | Two-column editorial sections (about, services intro)                                      |
-| `lg`       | 64rem   | **Inline public navigation** (below it, the menu sheet); admin sidebar; multi-column grids |
+| Breakpoint | Width   | What changes                                                                                                  |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------------------- |
+| base       | 320px + | One column; header: wordmark and menu button (language and theme toggles in the menu)                         |
+| `xs`       | 26rem   | Custom, for small two-up arrangements                                                                         |
+| `sm`       | 40rem   | Admin filters always shown                                                                                    |
+| `md`       | 48rem   | Two-column editorial sections (about, services intro)                                                         |
+| `lg`       | 64rem   | **Inline public navigation** and header toggles (below it, the menu sheet); admin sidebar; multi-column grids |
 
 - `page-container`: up to 80rem with 1 / 1.5 / 2rem gutters. Text measures: `max-w-3xl` for
   articles, the About page, the privacy notice and the menu; `max-w-xl`/`max-w-2xl` for ledes.
@@ -163,10 +163,11 @@ Owner's request (2026-10-28), after a "glassy sidebar" reference: the whole site
 The public header and the admin top bar are sticky, floating `glass-thick` bars. Each header button
 is a `tint` button with its own `hue-*` colour: the navigation links (The chef, Services, Gallery,
 Contact, and menu, journal once published) light green in both themes, language flag teal, theme
-toggle indigo, phone menu amber, admin account menu violet. The current page carries a ring in its
-hue. There is no "Plan an event" button in the header bar (removed at the owner's request,
-2026-10-28); the event form is reached from the homepage call to action, the phone menu and the
-footer.
+toggle indigo, menu button dark green (both themes), admin account menu violet. The current page
+carries a ring in its hue. Below `lg` the public header bar is only the wordmark and the menu
+button; the language flag and theme toggle sit inside the menu. There is no "Plan an event" button
+in the header bar (removed at the owner's request, 2026-10-28); the event form is reached from the
+homepage call to action, the phone menu and the footer.
 
 ## Colour-coded chips
 

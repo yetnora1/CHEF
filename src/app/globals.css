@@ -388,6 +388,11 @@
   --green-bottom: light-dark(#bbf7d0, #bbf7d0);
   --green-border: light-dark(#86efac, #86efac);
   --green-text: light-dark(#166534, #166534);
+  /* Dark green for the menu button: deep face, pale icon, the same in both themes (owner's request). */
+  --dark-green-top: light-dark(#166534, #166534);
+  --dark-green-bottom: light-dark(#14532d, #14532d);
+  --dark-green-border: light-dark(#052e16, #052e16);
+  --dark-green-text: light-dark(#f0fdf4, #f0fdf4);
 }
 
 :root[data-theme="dark"] {
@@ -701,6 +706,12 @@
   --tint-bottom: var(--green-bottom);
   --tint-border: var(--green-border);
   --tint-text: var(--green-text);
+}
+@utility hue-dark-green {
+  --tint-top: var(--dark-green-top);
+  --tint-bottom: var(--dark-green-bottom);
+  --tint-border: var(--dark-green-border);
+  --tint-text: var(--dark-green-text);
 }
 
 /* Small tinted surfaces in a `hue-*` colour (role badges, avatars, icon tiles):

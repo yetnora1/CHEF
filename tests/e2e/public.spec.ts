@@ -83,19 +83,24 @@ test.describe("locale routing", () => {
     await expect(page).toHaveURL(/\/am$/);
   });
 
-  test("phones have the language switch in the header bar, beside the menu", async ({ page }) => {
+  test("phones keep the language and theme toggles in the menu, not the header bar", async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 780 });
     await page.goto("/en");
     const header = page.getByRole("banner");
-    const toggle = header
-      .getByRole("group", { name: "Language" })
-      .first()
-      .getByRole("link", { name: "አማርኛ" });
-    await expect(toggle).toBeVisible();
+    await expect(header.getByRole("group", { name: "Language" })).toBeHidden();
+    await expect(header.getByRole("button", { name: "Dark theme" })).toBeHidden();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
     ).toBeLessThanOrEqual(0);
-    await toggle.click();
+
+    await header.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("dialog", { name: "Menu" });
+    const theme = menu.getByRole("button", { name: "Dark theme" });
+    await expect(theme).toHaveAttribute("aria-pressed", "false");
+    await theme.click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    // The menu stays open after a theme switch, so the language is one tap away.
+    await menu.getByRole("group", { name: "Language" }).getByRole("link", { name: "አማርኛ" }).click();
     await expect(page).toHaveURL(/\/am$/);
   });
 

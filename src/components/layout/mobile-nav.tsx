@@ -2,6 +2,7 @@
 
 import { Menu } from "lucide-react";
 import type { ComponentProps } from "react";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { Link } from "@/i18n/navigation";
@@ -45,7 +46,11 @@ export function MobileNav({ links, labels }: MobileNavProps) {
             ))}
           </ul>
         </nav>
-        <LocaleSwitcher className="self-start" />
+        {/* The header shows these only from lg, where this menu is hidden. */}
+        <div className="flex items-center gap-2">
+          <LocaleSwitcher />
+          <ThemeToggle />
+        </div>
       </SheetContent>
     </Sheet>
   );

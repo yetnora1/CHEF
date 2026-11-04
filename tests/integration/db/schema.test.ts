@@ -89,7 +89,7 @@ describe("table privileges for API roles", () => {
         and grantee = 'authenticated' and privilege_type = 'UPDATE'
       order by column_name
     `);
-    expect(rows.map((r) => r.column_name)).toEqual(["display_name", "preferred_locale"]);
+    expect(rows.map((r) => r.column_name)).toEqual(["display_name", "preferred_locale", "username"]);
   });
 });
 
@@ -138,6 +138,7 @@ describe("function privileges", () => {
       { fn: "public.contact_message_counts", role: "authenticated" },
       { fn: "public.get_booking_detail", role: "authenticated" },
       { fn: "public.get_my_access", role: "authenticated" },
+      { fn: "public.get_my_username", role: "authenticated" },
       { fn: "public.get_site_settings", role: "authenticated" },
       { fn: "public.list_assignable_staff", role: "authenticated" },
       { fn: "public.list_audit_log", role: "authenticated" },
@@ -157,9 +158,11 @@ describe("function privileges", () => {
       ...visitorAndStaff("public.public_services"),
       ...visitorAndStaff("public.public_site_media"),
       ...visitorAndStaff("public.public_site_settings"),
+      { fn: "public.record_account_change", role: "authenticated" },
       { fn: "public.revoke_role", role: "authenticated" },
       { fn: "public.set_contact_message_status", role: "authenticated" },
       { fn: "public.set_user_roles", role: "authenticated" },
+      { fn: "public.staff_login_email", role: "service_role" },
       { fn: "public.submit_contact_message", role: "service_role" },
       { fn: "public.submit_inquiry", role: "service_role" },
     ]);

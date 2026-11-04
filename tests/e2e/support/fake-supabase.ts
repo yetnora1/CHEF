@@ -4,8 +4,8 @@
  * Supabase stack) is unavailable in this environment, and by the local demo
  * (`npm run dev:demo`, scripts/dev-demo.mjs) with sample content added.
  *
- *  - Auth (GoTrue): password sign-in, refresh, user lookup and sign-out for a
- *    fixed set of test accounts.
+ *  - Auth (GoTrue): password sign-in, refresh, user lookup, sign-out, and changing
+ *    a password or email (with a confirmation link) for a fixed set of test accounts.
  *  - Data API (PostgREST): RPC calls, and inserts, updates and deletes on
  *    tables filtered by equality (all the CMS uses), executed against PGlite
  *    (real Postgres) with every migration and the seed applied. Each call runs,
@@ -43,9 +43,20 @@ export const TEST_USERS = {
   noRole: { email: "visitor@example.test", role: null, name: "Visitor Test" },
   // Only tests/e2e/staff.spec.ts changes this account's roles.
   newcomer: { email: "newcomer@example.test", role: null, name: "Newcomer Test" },
+  // Only tests/e2e/account.spec.ts changes these accounts' sign-in details.
+  usernameUser: { email: "username-user@example.test", role: "content_editor", name: "Username Test" },
+  passwordUser: { email: "password-user@example.test", role: "content_editor", name: "Password Test" },
+  emailUser: { email: "email-user@example.test", role: "content_editor", name: "Email Test" },
 } as const;
 
-export type TestUser = { id: string; email: string };
+export type TestUser = {
+  id: string;
+  email: string;
+  /** Set once changed from TEST_PASSWORD. */
+  password?: string;
+  /** An email change waiting for its link to be opened. */
+  newEmail?: string;
+};
 
 const root = process.cwd();
 const sql = (...parts: string[]) => readFileSync(path.join(root, ...parts), "utf8");
@@ -113,6 +124,7 @@ function userJson(user: TestUser) {
     aud: "authenticated",
     role: "authenticated",
     email: user.email,
+    ...(user.newEmail ? { new_email: user.newEmail } : {}),
     email_confirmed_at: "2026-01-01T00:00:00Z",
     app_metadata: { provider: "email", providers: ["email"] },
     user_metadata: {},
@@ -461,6 +473,10 @@ export async function startFakeSupabase(options: { seed?: FakeSupabaseSeed } = {
   const files = new Map<string, StoredFile>();
   // Signed link token → object, as a signed link is a capability of its own.
   const signedLinks = new Map<string, string>();
+  // Email-change links by token, the latest link per address, and codes for the session.
+  const emailChanges = new Map<string, { user: TestUser; email: string; redirectTo: string | null }>();
+  const emailLinks = new Map<string, string>();
+  const authCodes = new Map<string, TestUser>();
   await options.seed?.({ db, files, users });
 
   async function handle(req: IncomingMessage, res: ServerResponse) {
@@ -471,13 +487,19 @@ export async function startFakeSupabase(options: { seed?: FakeSupabaseSeed } = {
       const body = await readJson(req);
       if (url.searchParams.get("grant_type") === "password") {
         const user = users.get(String(body.email));
-        if (!user || body.password !== TEST_PASSWORD) {
+        if (!user || body.password !== (user.password ?? TEST_PASSWORD)) {
           return send(res, 400, {
             code: "invalid_credentials",
             error_code: "invalid_credentials",
             msg: "Invalid login credentials",
           });
         }
+        return send(res, 200, issueSession(user));
+      }
+      if (url.searchParams.get("grant_type") === "pkce") {
+        const user = authCodes.get(String(body.auth_code));
+        if (!user) return send(res, 400, { code: "flow_state_not_found", msg: "invalid flow state" });
+        authCodes.delete(String(body.auth_code));
         return send(res, 200, issueSession(user));
       }
       if (url.searchParams.get("grant_type") === "refresh_token") {
@@ -493,6 +515,58 @@ export async function startFakeSupabase(options: { seed?: FakeSupabaseSeed } = {
       return caller.role === "authenticated"
         ? send(res, 200, userJson(caller.user))
         : send(res, 403, { code: "bad_jwt", msg: "invalid JWT" });
+    }
+
+    if (req.method === "PUT" && url.pathname === "/auth/v1/user") {
+      const caller = callerFor(req);
+      if (caller.role !== "authenticated") return send(res, 401, { code: "bad_jwt", msg: "invalid JWT" });
+      const { user } = caller;
+      const body = await readJson(req);
+      if (typeof body.password === "string") {
+        if (body.password === (user.password ?? TEST_PASSWORD)) {
+          return send(res, 422, { code: "same_password", msg: "New password should be different" });
+        }
+        user.password = body.password;
+        // Like Auth, ends the account's other sessions; the caller's stays.
+        const current = req.headers.authorization?.replace(/^Bearer\s+/i, "");
+        for (const [token, holder] of accessTokens) {
+          if (holder.id === user.id && token !== current) accessTokens.delete(token);
+        }
+        for (const [token, holder] of refreshTokens) {
+          if (holder.id === user.id) refreshTokens.delete(token);
+        }
+      }
+      if (typeof body.email === "string") {
+        if (users.has(body.email)) {
+          return send(res, 422, { code: "email_exists", msg: "Email address already registered" });
+        }
+        const token = randomBytes(16).toString("hex");
+        emailChanges.set(token, { user, email: body.email, redirectTo: url.searchParams.get("redirect_to") });
+        emailLinks.set(body.email, `${FAKE_SUPABASE_URL}/auth/v1/verify?token=${token}&type=email_change`);
+        user.newEmail = body.email;
+      }
+      return send(res, 200, userJson(user));
+    }
+
+    if (req.method === "GET" && url.pathname === "/auth/v1/verify") {
+      const change = emailChanges.get(url.searchParams.get("token") ?? "");
+      if (!change) return send(res, 403, { code: "otp_expired", msg: "Email link is invalid or has expired" });
+      emailChanges.delete(url.searchParams.get("token") ?? "");
+      const { user, email, redirectTo } = change;
+      await db.query("update auth.users set email = $1 where id = $2", [email, user.id]);
+      users.delete(user.email);
+      user.email = email;
+      delete user.newEmail;
+      users.set(email, user);
+      const code = randomBytes(16).toString("hex");
+      authCodes.set(code, user);
+      res.writeHead(302, { Location: `${redirectTo}?code=${code}` });
+      return res.end();
+    }
+
+    // For the tests: what the mailbox would have received.
+    if (req.method === "GET" && url.pathname === "/__test/email-link") {
+      return send(res, 200, { link: emailLinks.get(url.searchParams.get("to") ?? "") ?? null });
     }
 
     if (req.method === "POST" && url.pathname === "/auth/v1/logout") {

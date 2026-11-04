@@ -6,24 +6,27 @@ import { useTranslations } from "next-intl";
 import { useId, useState, type FormEvent, type InputHTMLAttributes } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
+import { isValidUsername, normaliseUsername } from "@/features/account/rules";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { signInWithUsernameAction } from "./actions";
 
-const credentialsSchema = z.object({
-  email: z.email().max(254),
-  password: z.string().min(1).max(256),
-});
+const email = z.email().max(254);
+const password = z.string().min(1).max(256);
 
-type FieldErrors = Partial<Record<"email" | "password", string>>;
+type FieldErrors = Partial<Record<"identifier" | "password", string>>;
 
 /**
- * Signs in directly against Supabase Auth from the browser, so Auth's per-IP
- * rate limits apply to the visitor rather than to this server's IP. Errors are
- * deliberately generic: the form never reveals whether an email has an account.
+ * With an email address, signs in directly against Supabase Auth from the browser,
+ * so Auth's per-IP rate limits apply to the visitor rather than to this server's IP.
+ * With a username, the server does it (actions.ts), because only the server may turn
+ * a username into an email address. Errors are deliberately generic: the form never
+ * reveals whether an email or username has an account.
  */
 export function LoginForm({ next }: { next: string }) {
   const t = useTranslations("Auth");
   const router = useRouter();
-  const ids = { email: useId(), password: useId(), error: useId() };
+  const ids = { identifier: useId(), password: useId(), error: useId() };
   const [pending, setPending] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -31,16 +34,15 @@ export function LoginForm({ next }: { next: string }) {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const parsed = credentialsSchema.safeParse({
-      email: String(form.get("email") ?? "").trim(),
-      password: String(form.get("password") ?? ""),
-    });
+    const identifier = String(form.get("identifier") ?? "").trim();
+    const secret = password.safeParse(String(form.get("password") ?? ""));
+    const isEmail = identifier.includes("@");
+    const identifierOk = isEmail ? email.safeParse(identifier).success : identifier.length > 0;
 
-    if (!parsed.success) {
-      const issues = new Set(parsed.error.issues.map((issue) => issue.path[0]));
+    if (!identifierOk || !secret.success) {
       setFieldErrors({
-        email: issues.has("email") ? t("emailInvalid") : undefined,
-        password: issues.has("password") ? t("passwordRequired") : undefined,
+        identifier: identifierOk ? undefined : t("identifierInvalid"),
+        password: secret.success ? undefined : t("passwordRequired"),
       });
       setFormError(null);
       return;
@@ -50,22 +52,11 @@ export function LoginForm({ next }: { next: string }) {
     setFormError(null);
     setPending(true);
 
-    const supabase = createSupabaseBrowserClient();
-    if (!supabase) {
-      setFormError(t("configRequiredTitle"));
-      setPending(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
-    if (error) {
-      setFormError(
-        error.code === "invalid_credentials"
-          ? t("invalidCredentials")
-          : error.status === 429 || error.code === "over_request_rate_limit"
-            ? t("rateLimited")
-            : t("genericError"),
-      );
+    const failure = isEmail
+      ? await signInWithEmail(identifier, secret.data)
+      : await signInWithUsername(identifier, secret.data);
+    if (failure) {
+      setFormError(failure);
       setPending(false);
       return;
     }
@@ -73,6 +64,34 @@ export function LoginForm({ next }: { next: string }) {
     // The server re-checks the session and permissions on the next request.
     router.replace(next);
     router.refresh();
+  }
+
+  /** Returns what to tell the visitor if it failed. */
+  async function signInWithEmail(address: string, secret: string): Promise<string | null> {
+    const supabase = createSupabaseBrowserClient();
+    if (!supabase) return t("configRequiredTitle");
+    const { error } = await supabase.auth.signInWithPassword({ email: address, password: secret });
+    if (!error) return null;
+    return error.code === "invalid_credentials"
+      ? t("invalidCredentials")
+      : error.status === 429 || error.code === "over_request_rate_limit"
+        ? t("rateLimited")
+        : t("genericError");
+  }
+
+  async function signInWithUsername(username: string, secret: string): Promise<string | null> {
+    const name = normaliseUsername(username);
+    // A name that could not exist gets the same answer as one that does not.
+    if (!isValidUsername(name)) return t("invalidCredentials");
+    const { status } = await signInWithUsernameAction({ username: name, password: secret }).catch(() => ({
+      status: "error" as const,
+    }));
+    if (status === "ok") return null;
+    return status === "invalid"
+      ? t("invalidCredentials")
+      : status === "rateLimited"
+        ? t("rateLimited")
+        : t("genericError");
   }
 
   return (
@@ -94,16 +113,24 @@ export function LoginForm({ next }: { next: string }) {
       )}
 
       <Field
-        id={ids.email}
-        label={t("email")}
-        error={fieldErrors.email}
-        input={{ name: "email", type: "email", autoComplete: "username", inputMode: "email", required: true }}
+        id={ids.identifier}
+        label={t("identifier")}
+        error={fieldErrors.identifier}
+        input={{
+          name: "identifier",
+          type: "text",
+          autoComplete: "username",
+          autoCapitalize: "none",
+          spellCheck: false,
+          required: true,
+        }}
       />
       <Field
         id={ids.password}
         label={t("password")}
         error={fieldErrors.password}
-        input={{ name: "password", type: "password", autoComplete: "current-password", required: true }}
+        reveal={{ show: t("showPassword"), hide: t("hidePassword") }}
+        input={{ name: "password", autoComplete: "current-password", required: true }}
       />
 
       <Button
@@ -121,30 +148,41 @@ export function LoginForm({ next }: { next: string }) {
   );
 }
 
+const INPUT =
+  "block h-12 w-full rounded-xl border border-border-strong bg-field px-4 text-base text-foreground transition-colors placeholder:text-muted-foreground hover:border-foreground/60 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring aria-invalid:border-danger";
+
 function Field({
   id,
   label,
   error,
   input,
+  reveal,
 }: {
   id: string;
   label: string;
   error?: string;
   input: InputHTMLAttributes<HTMLInputElement>;
+  /** A password field: labels for the button that shows its text. */
+  reveal?: { show: string; hide: string };
 }) {
   const errorId = `${id}-error`;
+  const shared = {
+    id,
+    ...input,
+    "aria-invalid": error ? true : undefined,
+    "aria-describedby": error ? errorId : undefined,
+    className: INPUT,
+  } as const;
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="block text-sm font-semibold">
         {label}
       </label>
-      <input
-        id={id}
-        {...input}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : undefined}
-        className="block h-12 w-full rounded-xl border border-border-strong bg-field px-4 text-base text-foreground transition-colors placeholder:text-muted-foreground hover:border-foreground/60 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring aria-invalid:border-danger"
-      />
+      {reveal ? (
+        <PasswordInput {...shared} showLabel={reveal.show} hideLabel={reveal.hide} />
+      ) : (
+        <input {...shared} />
+      )}
       {error && (
         <p id={errorId} className="text-sm text-danger">
           {error}

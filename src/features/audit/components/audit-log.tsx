@@ -1,15 +1,16 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/ui/intent-link";
 import {
   ArrowRight,
   ArrowUpRight,
   FileText,
   Image as ImageIcon,
   Inbox,
+  KeyRound,
+  type LucideIcon,
   MessagesSquare,
   Settings,
   ShieldCheck,
-  type LucideIcon,
 } from "lucide-react";
 import { FilterDisclosure } from "@/components/admin/filter-disclosure";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -40,6 +41,7 @@ const CATEGORY_ICONS: Record<AuditCategory, LucideIcon> = {
   content: FileText,
   media: ImageIcon,
   settings: Settings,
+  account: KeyRound,
 };
 
 /** Each area's colour (a `hue-*` utility in globals.css), so entries can be told apart at a glance. */
@@ -50,6 +52,7 @@ const CATEGORY_HUES: Record<AuditCategory, string> = {
   content: "hue-teal",
   media: "hue-rose",
   settings: "hue-indigo",
+  account: "hue-green",
 };
 
 function query(filters: AuditFilters, before?: number) {

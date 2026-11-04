@@ -2,6 +2,7 @@
 
 import { CircleUser, ExternalLink, LogOut } from "lucide-react";
 import { useTransition } from "react";
+import { IntentLink } from "@/components/ui/intent-link";
 import { signOut } from "@/features/auth/actions";
 import { cn } from "@/lib/utils";
 import { AdminNav, sidebarItemClassName, type AdminNavProps } from "./admin-nav";
@@ -13,6 +14,7 @@ export type AdminSidebarProps = Omit<AdminNavProps, "collapsible"> & {
   labels: {
     signedInAs: string;
     noRoles: string;
+    account: string;
     viewSite: string;
     opensInNewTab: string;
     signOut: string;
@@ -23,8 +25,8 @@ export type AdminSidebarProps = Omit<AdminNavProps, "collapsible"> & {
 
 /**
  * The sidebar's contents, shared by the desktop glass panel and the phone menu
- * sheet: who is signed in, the module navigation, then the public site and
- * sign-out at the foot.
+ * sheet: who is signed in (a link to their account), the module navigation, then
+ * the public site and sign-out at the foot.
  */
 export function AdminSidebar({
   email,
@@ -40,10 +42,12 @@ export function AdminSidebar({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div
-        title={rail ? [email, roles].filter(Boolean).join(" · ") : undefined}
+      <IntentLink
+        href="/admin/account"
+        onClick={navProps.onNavigate}
+        title={rail ? [labels.account, email, roles].filter(Boolean).join(" · ") : labels.account}
         className={cn(
-          "mx-3 flex items-center gap-3 rounded-xl border border-border bg-glass-raised p-2 inset-shadow-glass",
+          "mx-3 flex items-center gap-3 rounded-xl border border-border bg-glass-raised p-2 inset-shadow-glass transition-[background-color,border-color] duration-200 hover:border-border-strong hover:bg-glass-raised-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
           collapsible &&
             "sidebar-collapsed:justify-center sidebar-collapsed:border-transparent sidebar-collapsed:bg-transparent sidebar-collapsed:p-0 sidebar-collapsed:inset-shadow-none",
         )}
@@ -54,12 +58,14 @@ export function AdminSidebar({
         >
           {email ? email[0] : <CircleUser className="size-5" />}
         </span>
-        <p className={cn("min-w-0 leading-tight", railHidden)}>
-          <span className="sr-only">{labels.signedInAs} </span>
+        <span className={cn("min-w-0 leading-tight", railHidden)}>
+          <span className="sr-only">
+            {labels.account}. {labels.signedInAs}{" "}
+          </span>
           <span className="block truncate text-sm font-semibold">{email}</span>
           <span className="mt-0.5 block truncate text-xs text-muted-foreground">{roles}</span>
-        </p>
-      </div>
+        </span>
+      </IntentLink>
 
       <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-5">
         <AdminNav {...navProps} collapsible={collapsible} />

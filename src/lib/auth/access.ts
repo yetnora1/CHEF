@@ -3,6 +3,8 @@ import type { AppPermission, AppRole } from "@/lib/permissions/matrix";
 export type StaffUser = {
   id: string;
   email: string | null;
+  /** An email change waiting for its confirmation link to be opened. */
+  pendingEmail: string | null;
 };
 
 export type StaffSession =

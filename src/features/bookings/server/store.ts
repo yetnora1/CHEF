@@ -8,10 +8,11 @@ import type { EventType } from "../status";
 
 /*
  * The ONLY module that uses the Supabase secret key (service_role). It exposes
- * five narrow operations, never the client itself. In the database,
+ * six narrow operations, never the client itself. In the database,
  * service_role can execute just these functions and has no direct privileges
  * on any booking or contact-message table (migrations 20261025090100 and
- * 20261027100100).
+ * 20261027100100). Besides inquiries and messages, it turns a staff username into
+ * an email address for signing in, so that no browser can (migration 20261104110000).
  */
 
 export class InquiryKeyConflictError extends Error {
@@ -80,6 +81,13 @@ export function createInquiryStore({ url, secretKey }: { url: string; secretKey:
       if (error) throw new InquiryStoreError("consume_rate_limit", error);
       const row = rateRowSchema.parse(data);
       return { allowed: row.allowed, retryAfterSeconds: row.retry_after_seconds };
+    },
+
+    /** The email address of the account with this username; never sent to a browser. */
+    async staffLoginEmail(username: string): Promise<string | null> {
+      const { data, error } = await db.rpc("staff_login_email", { p_username: username });
+      if (error) throw new InquiryStoreError("staff_login_email", error);
+      return typeof data === "string" && data ? data : null;
     },
 
     async submitInquiry(input: {

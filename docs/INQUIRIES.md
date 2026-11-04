@@ -274,3 +274,5 @@ not affected.
   `npm run test:e2e` (form and admin workflow against the Supabase test double).
 - Real database: `npm run test:db:pg` (the same SQL suites plus concurrency on a disposable
   PostgreSQL server) and the opt-in PostgREST HTTP suite; see [VERIFICATION.md](VERIFICATION.md).
+
+The secret key also turns a staff username into an email address for signing in, through one function (`staff_login_email`, ADR 0005); that gives it no table access.

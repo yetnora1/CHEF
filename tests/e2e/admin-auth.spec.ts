@@ -29,19 +29,19 @@ test.describe("admin authentication", () => {
 
   test("rejects a wrong password with a generic message", async ({ page }) => {
     await signIn(page, TEST_USERS.owner.email, "wrong-password");
-    await expect(page.locator("form").getByRole("alert")).toHaveText("The email or password is incorrect.");
+    await expect(page.locator("form").getByRole("alert")).toHaveText("The email, username or password is incorrect.");
     await expect(page).toHaveURL(/\/admin\/login/);
   });
 
   test("does not reveal whether an account exists", async ({ page }) => {
     await signIn(page, "nobody@example.test", "wrong-password");
-    await expect(page.locator("form").getByRole("alert")).toHaveText("The email or password is incorrect.");
+    await expect(page.locator("form").getByRole("alert")).toHaveText("The email, username or password is incorrect.");
   });
 
   test("validates the form before contacting the server", async ({ page }) => {
     await page.goto("/admin/login");
     await page.getByRole("button", { name: "Sign in" }).click();
-    await expect(page.getByText("Enter a valid email address.")).toBeVisible();
+    await expect(page.getByText("Enter your email or username.")).toBeVisible();
     await expect(page.getByText("Enter your password.")).toBeVisible();
   });
 

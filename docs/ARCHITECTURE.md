@@ -86,21 +86,22 @@ an empty state and are `noindex`.
 
 ### Admin (`/admin`, no locale prefix)
 
-| Route                                                        | Required permission                                             | Status                                            |
-| ------------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------- |
-| `/admin`                                                     | → `/admin/overview`                                             | ✅                                                |
-| `/admin/login`                                               | public                                                          | ✅                                                |
-| `/admin/overview`                                            | `admin.access`                                                  | ✅                                                |
-| `/admin/bookings`, `/admin/bookings/[reference]`             | `bookings.read_all` or `bookings.read_assigned`                 | ✅ Stage 2 (inquiries and bookings in one inbox)  |
-| `/admin/messages`                                            | `messages.read` (mark handled: `messages.write`)                | ✅ Stage 3.7 (contact form messages)              |
-| `/admin/pages`, `/services`, `/menu`, `/gallery`, `/journal` | `content.read` (create: `content.write` + `translations.write`) | ✅ Stage 3 ([CMS.md](CMS.md))                     |
-| `/admin/preview/[type]/[id]`                                 | `content.read`                                                  | ✅ Stage 3 (drafts, never cached or indexed)      |
-| `/admin/media`, `/admin/media/[id]`                          | `media.write`                                                   | ✅ Every photo and video, with Edit and Delete    |
-| `/admin/media/[id]/file` (Route Handler)                     | `content.read` or `media.write`                                 | ✅ Stage 3                                        |
-| `/admin/translations`                                        | `translations.write`                                            | ✅ Stage 3                                        |
-| `/admin/users`                                               | `users.read` (+ `users.manage[_privileged]`)                    | ✅ Stage 4 (roles via `set_user_roles`)           |
-| `/admin/settings`                                            | `settings.manage`                                               | ✅ Stage 4 (contact, social links, inquiry pause) |
-| `/admin/audit-log`                                           | `audit.read`                                                    | ✅ Stage 4 (filters, keyset pages)                |
+| Route                                                        | Required permission                                             | Status                                                                       |
+| ------------------------------------------------------------ | --------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `/admin`                                                     | → `/admin/overview`                                             | ✅                                                                           |
+| `/admin/login`                                               | public                                                          | ✅                                                                           |
+| `/admin/overview`                                            | `admin.access`                                                  | ✅                                                                           |
+| `/admin/bookings`, `/admin/bookings/[reference]`             | `bookings.read_all` or `bookings.read_assigned`                 | ✅ Stage 2 (inquiries and bookings in one inbox)                             |
+| `/admin/messages`                                            | `messages.read` (mark handled: `messages.write`)                | ✅ Stage 3.7 (contact form messages)                                         |
+| `/admin/pages`, `/services`, `/menu`, `/gallery`, `/journal` | `content.read` (create: `content.write` + `translations.write`) | ✅ Stage 3 ([CMS.md](CMS.md))                                                |
+| `/admin/preview/[type]/[id]`                                 | `content.read`                                                  | ✅ Stage 3 (drafts, never cached or indexed)                                 |
+| `/admin/media`, `/admin/media/[id]`                          | `media.write`                                                   | ✅ Every photo and video, with Edit and Delete                               |
+| `/admin/media/[id]/file` (Route Handler)                     | `content.read` or `media.write`                                 | ✅ Stage 3                                                                   |
+| `/admin/translations`                                        | `translations.write`                                            | ✅ Stage 3                                                                   |
+| `/admin/users`                                               | `users.read` (+ `users.manage[_privileged]`)                    | ✅ Stage 4 (roles via `set_user_roles`)                                      |
+| `/admin/settings`                                            | `settings.manage`                                               | ✅ Stage 4 (contact, social links, inquiry pause)                            |
+| `/admin/account`                                             | `admin.access`                                                  | ✅ Own username, email and password ([ADR 0005](adr/0005-staff-accounts.md)) |
+| `/admin/audit-log`                                           | `audit.read`                                                    | ✅ Stage 4 (filters, keyset pages)                                           |
 
 Route Handlers under `/api` (outside the proxy): `POST /api/admin/media` (upload; same-origin check,
 then `media.write`) and `/api/internal/notifications` (email retries, `CRON_SECRET`).
@@ -115,6 +116,9 @@ becomes the default in the next major. Consequences:
 
 - Public pages prerender to static HTML per locale (`generateStaticParams` in the locale layout).
   Request-time APIs (`cookies()`, `headers()`) are not used on public pages.
+- Admin lists and the menu link with `IntentLink`: a page behind a link is prefetched when the pointer,
+  a finger or the keyboard reaches it, not when it scrolls into view, because each prefetch of an admin
+  page is a server request.
 - Published content is read inside `'use cache'` functions (`src/features/cms/public-data.ts`)
   tagged `cms`. Admin server actions call `updateTag('cms')` and the upload route
   `revalidateTag('cms', { expire: 0 })`, so editors' changes appear on the next request without a

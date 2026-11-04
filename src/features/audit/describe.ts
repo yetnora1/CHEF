@@ -23,6 +23,7 @@ export const AUDIT_CATEGORIES = [
   "content",
   "media",
   "settings",
+  "account",
 ] as const;
 export type AuditCategory = (typeof AUDIT_CATEGORIES)[number];
 
@@ -47,6 +48,9 @@ export const KNOWN_ACTIONS = [
   "media.restored",
   "media.reverted",
   "settings.updated",
+  "account.username_changed",
+  "account.password_changed",
+  "account.email_change_requested",
 ] as const;
 export type KnownAction = (typeof KNOWN_ACTIONS)[number];
 

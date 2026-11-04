@@ -19,6 +19,28 @@ function entry(overrides: Partial<AuditEntry>): AuditEntry {
   };
 }
 
+describe("sign-in detail changes in the audit log", () => {
+  it.each(["account.username_changed", "account.password_changed", "account.email_change_requested"])(
+    "%s points at the staff member, with nothing else from the entry",
+    (action) => {
+      const id = "11111111-1111-4111-8111-111111111111";
+      const described = describeAuditEntry({
+        id: 1,
+        occurredAt: "2026-11-04T10:00:00Z",
+        actorId: id,
+        actorName: "Someone",
+        action,
+        targetType: "user",
+        targetId: id,
+        targetName: "Someone",
+        details: {},
+      });
+      expect(described.action).toBe(action);
+      expect(described.target).toEqual({ kind: "user", name: "Someone", href: `/admin/users#staff-${id}` });
+    },
+  );
+});
+
 describe("audit entries in plain language", () => {
   it("describes role changes with the role and a link to the person", () => {
     const described = describeAuditEntry(

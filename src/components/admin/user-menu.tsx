@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronDown, CircleUser, ExternalLink, LogOut } from "lucide-react";
+import { ChevronDown, CircleUser, ExternalLink, LogOut, UserCog } from "lucide-react";
+import Link from "next/link";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ type UserMenuProps = {
     signedInAs: string;
     yourRoles: string;
     noRoles: string;
+    account: string;
     viewSite: string;
     opensInNewTab: string;
     signOut: string;
@@ -50,6 +52,12 @@ export function UserMenu({ email, roleLabels, labels }: UserMenuProps) {
         </p>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href="/admin/account" prefetch={false}>
+              <UserCog aria-hidden />
+              {labels.account}
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <a href="/" target="_blank" rel="noopener">
               <ExternalLink aria-hidden />

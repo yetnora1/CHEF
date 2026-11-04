@@ -42,6 +42,7 @@ export async function AdminShell({
     labels: {
       signedInAs: t("signedInAs"),
       noRoles: t("noRoles"),
+      account: t("account"),
       viewSite: t("viewSite"),
       opensInNewTab: t("opensInNewTab"),
       signOut: tAuth("signOut"),
@@ -93,6 +94,7 @@ export async function AdminShell({
                   signedInAs: t("signedInAs"),
                   yourRoles: t("yourRoles"),
                   noRoles: t("noRoles"),
+                  account: t("account"),
                   viewSite: t("viewSite"),
                   opensInNewTab: t("opensInNewTab"),
                   signOut: tAuth("signOut"),

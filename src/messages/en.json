@@ -168,26 +168,29 @@
       },
       "modulesHeading": "Modules for your role",
       "noModules": "No modules are available for your role yet."
-    }
+    },
+    "account": "Your account"
   },
   "Auth": {
     "loginTitle": "Sign in",
     "loginSubtitle": "Staff access to the CHEF SIS admin.",
-    "email": "Email",
     "password": "Password",
     "submit": "Sign in",
     "submitting": "Signing in…",
-    "invalidCredentials": "The email or password is incorrect.",
+    "invalidCredentials": "The email, username or password is incorrect.",
     "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
     "genericError": "Sign-in failed. Please try again.",
-    "emailInvalid": "Enter a valid email address.",
     "passwordRequired": "Enter your password.",
     "noPublicSignup": "Staff accounts are created by the owner. There is no public registration.",
     "signOut": "Sign out",
     "configRequiredTitle": "Authentication is not configured",
     "configRequiredBody": "Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> in <code>.env.local</code>, then restart the server. The README explains local setup.",
     "accessDeniedTitle": "You don't have access to this area",
-    "accessDeniedBody": "You are signed in, but your account has no staff role that allows this. Ask the owner to grant access."
+    "accessDeniedBody": "You are signed in, but your account has no staff role that allows this. Ask the owner to grant access.",
+    "identifier": "Email or username",
+    "identifierInvalid": "Enter your email or username.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "Roles": {
     "owner": "Owner",
@@ -659,7 +662,8 @@
       "contact_message": "Messages",
       "content": "Content",
       "media": "Images",
-      "settings": "Settings"
+      "settings": "Settings",
+      "account": "Sign-in details"
     },
     "empty": "Nothing has been recorded yet.",
     "emptyFiltered": "No entries match these filters.",
@@ -708,6 +712,11 @@
       },
       "settings": {
         "updated": "Website settings saved"
+      },
+      "account": {
+        "username_changed": "Username changed",
+        "password_changed": "Password changed",
+        "email_change_requested": "Email change requested"
       }
     },
     "targets": {
@@ -1247,5 +1256,68 @@
     "by": "By {author}",
     "license": "Licence",
     "source": "Original on {site}"
+  },
+  "AdminAccount": {
+    "title": "Your account",
+    "intro": "Your own sign-in details. Nobody else can change them here.",
+    "currentPassword": "Current password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "username": {
+      "heading": "Username",
+      "intro": "An optional name to sign in with, instead of your email.",
+      "label": "Username",
+      "hint": "3 to 32 characters: letters, numbers, dots, hyphens and underscores, starting and ending with a letter or number. Leave it empty to remove it.",
+      "create": "Create username",
+      "change": "Save username",
+      "saved": "Saved. You can sign in with this username now.",
+      "removed": "Username removed. Sign in with your email."
+    },
+    "email": {
+      "heading": "Email",
+      "intro": "Where your sign-in and account messages go. You can always sign in with it.",
+      "current": "Current email",
+      "waiting": "Waiting for confirmation: {email}",
+      "new": "New email",
+      "hint": "We send a link to confirm it. Your email changes only once the link is opened.",
+      "submit": "Change email",
+      "sent": "We sent a confirmation link to {email}. Your email changes once you open it.",
+      "changed": "Your email is now {email}.",
+      "outcome": {
+        "done": "Your email change is confirmed.",
+        "partial": "Confirmed. Now open the link sent to your other email address as well.",
+        "failed": "This confirmation link has expired or was already used. Please request a new one."
+      }
+    },
+    "password": {
+      "heading": "Password",
+      "intro": "Changing it signs you out on your other devices.",
+      "new": "New password",
+      "repeat": "Repeat the new password",
+      "hint": "At least 12 characters, with an upper-case letter, a lower-case letter and a number.",
+      "submit": "Change password",
+      "changed": "Password changed. Your other devices are signed out."
+    },
+    "errors": {
+      "usernameInvalid": "Use 3 to 32 letters, numbers, dots, hyphens or underscores, starting and ending with a letter or number.",
+      "usernameTaken": "That username is already taken.",
+      "emailInvalid": "Enter a valid email address.",
+      "sameEmail": "That is already your email.",
+      "emailTaken": "That email cannot be used. Try another one.",
+      "emailNotSent": "The confirmation email could not be sent, because this website's email service reaches only approved addresses. The owner can set up email sending in Supabase, or change the address in the Supabase dashboard.",
+      "emailLimit": "Too many emails were sent just now. Please wait about an hour and try again.",
+      "currentPasswordRequired": "Enter your current password.",
+      "wrongPassword": "Your current password is not correct.",
+      "passwordTooShort": "Use at least 12 characters.",
+      "passwordTooLong": "That password is too long. Use a shorter one.",
+      "passwordNeedsMix": "Use an upper-case letter, a lower-case letter and a number.",
+      "passwordMismatch": "The two new passwords do not match.",
+      "samePassword": "The new password must differ from the current one.",
+      "passwordWeak": "That password is too easy to guess. Choose a stronger one.",
+      "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
+      "forbidden": "Your account cannot make this change.",
+      "notConfigured": "Sign-in is not connected.",
+      "generic": "The change could not be saved. Please reload the page and try again."
+    }
   }
 }

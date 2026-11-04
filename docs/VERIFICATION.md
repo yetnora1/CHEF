@@ -386,6 +386,33 @@ range requests have run only against the test double, because signing in as staf
 needs the owner's password. Follow the video step of the
 [hosted checklist](MEDIA.md#hosted-supabase-checklist) once, as the owner, with a short MP4.
 
+## 13. Speed, and staff usernames (2026-11-04)
+
+Measured on a local production build with the CPU slowed 4×; before and after on the same machine.
+
+| Admin media library          | Before  | After  |
+| ---------------------------- | ------- | ------ |
+| Time to draw a frame         | 31.5 ms | 5.4 ms |
+| Background prefetch requests | 33      | 0      |
+| All requests, to idle        | 94      | 41     |
+| HTML                         | 544 KB  | 326 KB |
+
+| Homepage                                  | Before | After  |
+| ----------------------------------------- | ------ | ------ |
+| Ethiopic web font on English pages        | 194 KB | 0 KB   |
+| Video posters                             | 206 KB | 101 KB |
+| Main thread busy, kitchen scene on screen | 22%    | 15–17% |
+
+Headless Chromium has no graphics card and cannot decode H.264, so the frame times are comparative rather
+than what a phone shows, and limiting how many videos play at once on modest devices is untested on one.
+
+Screenshots before and after, in both themes, differ only by video frames, the Ethiopic labels' font and
+sharper text in cards.
+
+**Not verified against Supabase:** usernames and the password and email forms have run only against the test
+double, which simulates Auth. In particular, the real email-confirmation link depends on hosted settings
+([ADR 0005](adr/0005-staff-accounts.md) §3).
+
 ## Reproducing the local verification
 
 - `npm run test:db:pg` needs `TEST_POSTGRES_URL`: a superuser URL of a disposable local PostgreSQL

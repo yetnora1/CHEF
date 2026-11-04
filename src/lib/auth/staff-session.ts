@@ -63,7 +63,7 @@ export const getStaffSession = cache(async (): Promise<StaffSession> => {
 
   return {
     status: "signed-in",
-    user: { id: user.id, email: user.email ?? null },
+    user: { id: user.id, email: user.email ?? null, pendingEmail: user.new_email ?? null },
     roles: parsed.data.roles,
     permissions: parsed.data.permissions,
   };

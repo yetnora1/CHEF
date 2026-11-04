@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
 import { Button } from "@/components/ui/button";
 import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-image";
-import { chefPhotoFor } from "@/features/content/chef-photos";
+import { getSiteMedia } from "@/features/cms/public-data";
 import { Link } from "@/i18n/navigation";
 import type { ResolvedText } from "@/lib/localization/translations";
+import { cn } from "@/lib/utils";
 import { PhotoSlot } from "./photo-slot";
 
 const HERO_IMAGE_SIZES = "(min-width: 64rem) 30rem, 24rem";
@@ -20,11 +21,18 @@ type HeroProps = {
 };
 
 export async function Hero({ eyebrow, headline, lede, photoSubject, image }: HeroProps) {
-  const t = await getTranslations("Home");
+  const [t, site] = await Promise.all([getTranslations("Home"), getSiteMedia()]);
+  const photo = image ? null : site.slot("hero");
+  const hasPicture = Boolean(image) || photo !== null;
 
   return (
     <section aria-labelledby="hero-heading" className="relative overflow-hidden">
-      <div className="page-container grid items-center gap-10 pt-10 pb-12 md:pt-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pt-16 lg:pb-16">
+      <div
+        className={cn(
+          "page-container grid items-center gap-10 pt-10 pb-12 md:pt-14 lg:gap-16 lg:pt-16 lg:pb-16",
+          hasPicture && "lg:grid-cols-[1.15fr_0.85fr]",
+        )}
+      >
         <div className="max-w-2xl">
           {eyebrow && (
             <p className="eyebrow text-accent-ink" lang={eyebrow.lang}>
@@ -55,21 +63,23 @@ export async function Hero({ eyebrow, headline, lede, photoSubject, image }: Her
           </div>
         </div>
 
-        <div className="mx-auto w-full max-w-sm media-mat lg:max-w-none">
-          {image ? (
-            <div className="media-frame aspect-[4/5] w-full rounded-2xl">
-              <CmsImage image={image} sizes={HERO_IMAGE_SIZES} preload />
-            </div>
-          ) : (
-            <PhotoSlot
-              subject={photoSubject}
-              photo={chefPhotoFor("hero")}
-              sizes={HERO_IMAGE_SIZES}
-              preload
-              className="aspect-[4/5] w-full"
-            />
-          )}
-        </div>
+        {hasPicture && (
+          <div className="mx-auto w-full max-w-sm media-mat lg:max-w-none">
+            {image ? (
+              <div className="media-frame aspect-[4/5] w-full rounded-2xl">
+                <CmsImage image={image} sizes={HERO_IMAGE_SIZES} preload />
+              </div>
+            ) : (
+              <PhotoSlot
+                subject={photoSubject}
+                photo={photo}
+                sizes={HERO_IMAGE_SIZES}
+                preload
+                className="aspect-[4/5] w-full"
+              />
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

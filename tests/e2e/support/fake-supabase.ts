@@ -12,9 +12,10 @@
  *    as PostgREST would, in its own transaction as `anon`, `authenticated`
  *    (with JWT claims) or `service_role` (secret key). RLS, grants, triggers
  *    and the SQL functions are therefore the real ones.
- *  - Storage: upload, download and remove. Like the Storage API, it writes,
- *    reads and deletes storage.objects rows as the caller's role, so the
- *    bucket's RLS policies decide; file bytes are kept in memory.
+ *  - Storage: upload, download, remove and signed links (with range requests).
+ *    Like the Storage API, it writes, reads and deletes storage.objects rows as
+ *    the caller's role, so the bucket's RLS policies decide; file bytes are kept
+ *    in memory.
  *
  * It is NOT GoTrue or PostgREST: token formats, headers and error shapes are
  * simplified. Nothing in src/ knows it exists; the app reaches it only through
@@ -136,7 +137,8 @@ function send(res: ServerResponse, status: number, body?: unknown) {
     "Content-Type": "application/json",
     "X-Supabase-Api-Version": "2024-01-01",
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "*",
+    // The wildcard does not cover Authorization, which a browser's upload to Storage sends.
+    "Access-Control-Allow-Headers": "*, Authorization",
     "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
     // auth-js reads the API version header to interpret error codes.
     "Access-Control-Expose-Headers": "X-Supabase-Api-Version",
@@ -457,6 +459,8 @@ export type FakeSupabaseSeed = (context: {
 export async function startFakeSupabase(options: { seed?: FakeSupabaseSeed } = {}): Promise<Server> {
   const { db, users } = await createDatabase();
   const files = new Map<string, StoredFile>();
+  // Signed link token → object, as a signed link is a capability of its own.
+  const signedLinks = new Map<string, string>();
   await options.seed?.({ db, files, users });
 
   async function handle(req: IncomingMessage, res: ServerResponse) {
@@ -509,6 +513,38 @@ export async function startFakeSupabase(options: { seed?: FakeSupabaseSeed } = {
       const body = req.method === "DELETE" ? {} : JSON.parse((await readBody(req)).toString("utf8") || "{}");
       const result = await callTable(db, req.method!, table[1]!, url, body, callerFor(req), req.headers);
       return send(res, result.status, result.body);
+    }
+
+    const signed = url.pathname.match(/^\/storage\/v1\/object\/sign\/([a-z0-9_-]+)\/(.+)$/);
+    if (signed && req.method === "POST") {
+      const name = decodeURIComponent(signed[2]!);
+      const file = await storageDownload(db, files, signed[1]!, name, callerFor(req));
+      if (!file) {
+        const missing = storageError("404", "not_found", "Object not found");
+        return send(res, missing.status, missing.body);
+      }
+      const token = randomBytes(16).toString("hex");
+      signedLinks.set(token, `${signed[1]}/${name}`);
+      return send(res, 200, { signedURL: `/object/sign/${signed[1]}/${name}?token=${token}` });
+    }
+    if (signed && req.method === "GET") {
+      const key = `${signed[1]}/${decodeURIComponent(signed[2]!)}`;
+      const file = signedLinks.get(url.searchParams.get("token") ?? "") === key ? files.get(key) : undefined;
+      if (!file) {
+        const missing = storageError("404", "not_found", "Object not found");
+        return send(res, missing.status, missing.body);
+      }
+      const total = file.bytes.byteLength;
+      const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range ?? "");
+      const start = range ? Number(range[1]) : 0;
+      const end = range?.[2] ? Math.min(Number(range[2]), total - 1) : total - 1;
+      res.writeHead(range ? 206 : 200, {
+        "Content-Type": file.contentType,
+        "Content-Length": end - start + 1,
+        "Accept-Ranges": "bytes",
+        ...(range ? { "Content-Range": `bytes ${start}-${end}/${total}` } : {}),
+      });
+      return res.end(file.bytes.subarray(start, end + 1));
     }
 
     const object = url.pathname.match(/^\/storage\/v1\/object\/(?:authenticated\/)?([a-z0-9_-]+)\/(.+)$/);

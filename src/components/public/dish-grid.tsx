@@ -13,7 +13,8 @@ export type DishCard = {
   /** The name in the other language, shown smaller (e.g. ሽሮ beside Shiro). */
   otherName: { text: string; lang: string } | null;
   description: { text: string; lang?: string };
-  image: { src: StaticImageData; alt: string; lang?: string };
+  /** Null once the photograph was deleted in the media library. */
+  image: { src: StaticImageData; alt: string; lang?: string } | null;
 };
 
 type Filter = "all" | DishKind;
@@ -24,6 +25,28 @@ type DishGridProps = {
 };
 
 const IMAGE_SIZES = "(min-width: 64rem) 18rem, (min-width: 40rem) 45vw, 92vw";
+
+function DishBadge({
+  kind,
+  labels,
+  className,
+}: {
+  kind: DishKind;
+  labels: DishGridProps["labels"];
+  className: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "rounded-full tint-chip px-2.5 py-0.5 text-xs font-semibold shadow-xs",
+        kind === "fasting" ? "hue-green" : "hue-amber",
+        className,
+      )}
+    >
+      {kind === "fasting" ? labels.fasting : labels.nonFasting}
+    </span>
+  );
+}
 
 /**
  * The dishes as photo cards, with a fasting / non-fasting filter. The filter is
@@ -65,25 +88,21 @@ export function DishGrid({ dishes, labels }: DishGridProps) {
         {shown.map((dish) => (
           // The photo sits inset in the card like a mat, as on the service cards.
           <li key={dish.key} className="group flex flex-col rounded-3xl border border-border glass p-2">
-            <div className="media-frame aspect-[4/3] rounded-2xl">
-              <Image
-                src={dish.image.src}
-                alt={dish.image.alt}
-                lang={dish.image.lang}
-                fill
-                sizes={IMAGE_SIZES}
-                className="object-cover transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.04]"
-              />
-              <span
-                className={cn(
-                  "absolute top-3 left-3 rounded-full tint-chip px-2.5 py-0.5 text-xs font-semibold shadow-xs",
-                  dish.kind === "fasting" ? "hue-green" : "hue-amber",
-                )}
-              >
-                {dish.kind === "fasting" ? labels.fasting : labels.nonFasting}
-              </span>
-            </div>
+            {dish.image && (
+              <div className="media-frame aspect-[4/3] rounded-2xl">
+                <Image
+                  src={dish.image.src}
+                  alt={dish.image.alt}
+                  lang={dish.image.lang}
+                  fill
+                  sizes={IMAGE_SIZES}
+                  className="object-cover transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.04]"
+                />
+                <DishBadge kind={dish.kind} labels={labels} className="absolute top-3 left-3" />
+              </div>
+            )}
             <div className="flex flex-1 flex-col px-3 pt-4 pb-3">
+              {!dish.image && <DishBadge kind={dish.kind} labels={labels} className="mb-3 w-fit" />}
               <h3 className="flex flex-wrap items-baseline gap-x-2 text-lg font-semibold">
                 <span lang={dish.name.lang}>{dish.name.text}</span>
                 {dish.otherName && (

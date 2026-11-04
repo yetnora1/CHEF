@@ -18,7 +18,7 @@ import {
  */
 
 export const CMS_PAGE_SIZE = 20;
-export const MEDIA_PAGE_SIZE = 24;
+export const MEDIA_PAGE_SIZE = 48;
 
 export class CmsDataError extends Error {
   constructor(operation: string, cause: unknown) {
@@ -102,7 +102,7 @@ export async function listEntries(
 const imageSchema = z.object({
   id: z.string(),
   title: z.string(),
-  status: z.enum(["pending", "ready"]),
+  status: z.enum(["pending", "ready", "bundled"]),
   storage_path: z.string().nullable(),
   version: z.number().int(),
   width: z.number().int().nullable(),
@@ -170,7 +170,15 @@ export async function listCategories(): Promise<{ id: string; label: string; sta
   return rows.map((r) => ({ id: r.id, label: r.label_en ?? r.label_am ?? r.slug ?? r.id, status: r.status }));
 }
 
-export const MEDIA_FILTERS = ["ready", "unused", "missing_alt", "incomplete"] as const;
+export const MEDIA_FILTERS = [
+  "images",
+  "videos",
+  "ready",
+  "unused",
+  "missing_alt",
+  "incomplete",
+  "removed",
+] as const;
 export type MediaFilter = (typeof MEDIA_FILTERS)[number];
 
 const mediaFiltersSchema = z.object({
@@ -192,7 +200,10 @@ export function parseMediaFilters(params: Record<string, string | string[] | und
 const mediaRowSchema = z.object({
   id: z.string(),
   title: z.string(),
-  status: z.enum(["pending", "ready"]),
+  status: z.enum(["pending", "ready", "bundled"]),
+  kind: z.enum(["image", "video"]),
+  bundled_key: z.string().nullable(),
+  removed_at: z.string().nullable(),
   storage_path: z.string().nullable(),
   mime_type: z.string().nullable(),
   byte_size: z.number().int().nullable(),
@@ -231,7 +242,10 @@ const mediaDetailSchema = z.object({
     id: z.string(),
     title: z.string(),
     credit: z.string().nullable(),
-    status: z.enum(["pending", "ready"]),
+    status: z.enum(["pending", "ready", "bundled"]),
+    kind: z.enum(["image", "video"]),
+    bundled_key: z.string().nullable(),
+    removed_at: z.string().nullable(),
     storage_path: z.string().nullable(),
     pending_path: z.string().nullable(),
     mime_type: z.string().nullable(),

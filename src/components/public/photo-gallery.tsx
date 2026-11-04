@@ -39,7 +39,7 @@ function Tile({ photo, label, sizes, fill, onOpen }: TileProps) {
         alt={photo.alt}
         lang={photo.lang}
         sizes={sizes}
-        placeholder="blur"
+        placeholder={photo.src.blurDataURL ? "blur" : "empty"}
         fill={fill}
         className={cn(
           "transition-transform duration-700 ease-out motion-safe:group-hover/photo:scale-[1.04]",

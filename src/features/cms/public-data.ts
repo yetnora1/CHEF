@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { AppLocale } from "@/i18n/routing";
 import { createSupabaseAnonClient } from "@/lib/supabase/anon";
 import { CMS_CACHE_TAG } from "./cache-tags";
+import { siteMedia } from "./site-media";
 
 /*
  * Published content for the public website.
@@ -19,6 +20,7 @@ import { CMS_CACHE_TAG } from "./cache-tags";
  */
 
 const MEDIA_PATH = /^assets\/[0-9a-f-]{36}\/[0-9a-f]{32}\.(jpg|png|webp)$/;
+const SITE_MEDIA_PATH = /^assets\/[0-9a-f-]{36}\/[0-9a-f]{32}\.(jpg|png|webp|mp4|webm)$/;
 const locales = z.enum(["en", "am"]);
 
 export const publicImageSchema = z.object({
@@ -137,6 +139,26 @@ const sections = z.object({
 });
 const navigationSchema = z.object({ en: sections, am: sections });
 
+const siteMediaSchema = z.array(
+  z.object({
+    id: z.string(),
+    /** The bundled file this row belongs to; null for an uploaded video. */
+    key: z.string().nullable(),
+    kind: z.enum(["image", "video"]),
+    removed: z.boolean(),
+    credit: z.string().nullable(),
+    alt: z.partialRecord(locales, z.string()),
+    /** The uploaded file in use, when there is one. */
+    file: z
+      .object({
+        path: z.string().regex(SITE_MEDIA_PATH),
+        width: z.number().int().positive(),
+        height: z.number().int().positive(),
+      })
+      .nullable(),
+  }),
+);
+
 export type PublicPage = NonNullable<z.infer<typeof pageSchema>>;
 export type PublicServiceCard = z.infer<typeof servicesSchema>[number];
 export type PublicService = NonNullable<z.infer<typeof serviceSchema>>;
@@ -145,6 +167,7 @@ export type PublicGalleryItem = z.infer<typeof gallerySchema>[number];
 export type PublicJournal = z.infer<typeof journalSchema>;
 export type PublicJournalPost = NonNullable<z.infer<typeof journalPostSchema>>;
 export type PublicNavigation = z.infer<typeof navigationSchema>;
+export type PublicSiteMediaRow = z.infer<typeof siteMediaSchema>[number];
 
 /** Calls a public SQL function inside the caller's cache scope. */
 async function read<T>(fn: string, args: Record<string, unknown>, schema: z.ZodType<T>): Promise<T | null> {
@@ -206,4 +229,14 @@ export async function getPublicJournalPost(slug: string) {
 export async function getPublicNavigation() {
   "use cache";
   return read("public_navigation", {}, navigationSchema);
+}
+
+export async function getPublicSiteMedia() {
+  "use cache";
+  return read("public_site_media", {}, siteMediaSchema);
+}
+
+/** The website's own photographs and videos as they stand (never fails: see siteMedia). */
+export async function getSiteMedia() {
+  return siteMedia(await getPublicSiteMedia().catch(() => null));
 }

@@ -43,6 +43,9 @@ export const KNOWN_ACTIONS = [
   "media.deleted",
   "media.uploaded",
   "media.replaced",
+  "media.removed",
+  "media.restored",
+  "media.reverted",
   "settings.updated",
 ] as const;
 export type KnownAction = (typeof KNOWN_ACTIONS)[number];

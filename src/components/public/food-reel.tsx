@@ -96,7 +96,7 @@ export function FoodReel({ clips, labels }: FoodReelProps) {
                   videos.current[index] = element;
                 }}
                 src={clip.preview}
-                poster={clip.poster}
+                poster={clip.poster ?? undefined}
                 muted
                 loop
                 playsInline

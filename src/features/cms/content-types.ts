@@ -216,7 +216,7 @@ export function labelField(type: ContentType): string {
 export type EntryImage = {
   id: string;
   title: string;
-  status: "pending" | "ready";
+  status: "pending" | "ready" | "bundled";
   storage_path: string | null;
   version: number;
   width: number | null;

@@ -371,6 +371,21 @@ Stage 4 (work item W10, migration `20261028100000`).
 | W10 | Revoke `service_role` on `profiles` once nothing server-side needs it                                   | Done (Stage 4) |
 | W11 | Optional: a proxy-level slug check if first-request soft 404s matter for analytics (F16)                | Only if needed |
 
+## 12. Every photo and video in the media library (2026-11-04)
+
+Migration `20261104100000_site_media_library.sql`; design and limits in [MEDIA.md](MEDIA.md).
+
+| Check                                                 | Result                                                                                                                                                                             |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run verify`                                      | Lint, types, 933 tests (suite `tests/integration/db/site-media.test.ts`: seed equals the code's catalogue, rules per role), bundle scan                                            |
+| `npm run test:db:pg` (Real PG17, non-superuser owner) | 223 passed; the 80 PostgREST HTTP tests were not run                                                                                                                               |
+| `npx playwright test --workers=2`                     | 105/105: library lists the bundled files; edit, delete and restore reach the public pages; replace and go back; video upload, range requests and deletion, against the test double |
+
+**Not verified against Supabase:** the browser's direct upload to the Storage API and signed links with
+range requests have run only against the test double, because signing in as staff on the live project
+needs the owner's password. Follow the video step of the
+[hosted checklist](MEDIA.md#hosted-supabase-checklist) once, as the owner, with a short MP4.
+
 ## Reproducing the local verification
 
 - `npm run test:db:pg` needs `TEST_POSTGRES_URL`: a superuser URL of a disposable local PostgreSQL

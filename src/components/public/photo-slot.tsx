@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 type PhotoSlotProps = {
   /** Describes the photograph this slot is waiting for. */
   subject: ResolvedText;
-  /** CHEF SIS's own photograph or an openly licensed sample (credited on /credits). */
+  /** CHEF SIS's own photograph, an openly licensed sample (credited on /credits) or its replacement. */
   photo?: SitePhoto | null;
   /** `sizes` for the photo (see docs/DESIGN_SYSTEM.md → Images). */
   sizes?: string;
@@ -45,7 +45,7 @@ export async function PhotoSlot({
           lang={alt?.lang}
           sizes={sizes}
           preload={preload}
-          placeholder="blur"
+          placeholder={photo.src.blurDataURL ? "blur" : "empty"}
           className={cn("h-full w-full object-cover", imageClassName)}
         />
       </figure>

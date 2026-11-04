@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { getSiteMedia } from "@/features/cms/public-data";
 import { dishes } from "@/features/content/dishes";
-import { samplePhotos } from "@/features/content/sample-photos";
 import type { AppLocale } from "@/i18n/routing";
 import { resolveLocalized } from "@/lib/localization/translations";
 import { DishGrid, type DishCard } from "./dish-grid";
@@ -12,11 +12,12 @@ import { DishGrid, type DishCard } from "./dish-grid";
  */
 export async function DishesSection() {
   const locale = (await getLocale()) as AppLocale;
-  const t = await getTranslations("Home");
+  const [t, site] = await Promise.all([getTranslations("Home"), getSiteMedia()]);
   const other: AppLocale = locale === "am" ? "en" : "am";
 
   const cards: DishCard[] = dishes.map((dish) => {
-    const photo = samplePhotos[dish.photo];
+    const photo = site.sample(dish.photo);
+    const alt = photo && resolveLocalized(photo.alt, locale);
     const otherName = dish.name[other];
     return {
       key: dish.key,
@@ -24,10 +25,7 @@ export async function DishesSection() {
       name: resolveLocalized(dish.name, locale) ?? { text: dish.key },
       otherName: otherName ? { text: otherName, lang: other } : null,
       description: resolveLocalized(dish.description, locale) ?? { text: "" },
-      image: (() => {
-        const alt = resolveLocalized(photo.alt, locale);
-        return { src: photo.src, alt: alt?.text ?? "", lang: alt?.lang };
-      })(),
+      image: photo && { src: photo.src, alt: alt?.text ?? "", lang: alt?.lang },
     };
   });
 

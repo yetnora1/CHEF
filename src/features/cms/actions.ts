@@ -3,6 +3,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import {
+  completeVideo,
+  releaseVideo,
+  reserveVideo,
+  reserveVideoReplacement,
+  titleFromFileName,
+} from "@/features/media/upload";
+import { isVideoType, VIDEO_MAX_BYTES } from "@/features/media/video";
 import { hasPermission } from "@/lib/auth/access";
 import { authorizeAdmin } from "@/lib/auth/staff-session";
 import { cleanLine } from "@/lib/text";
@@ -348,8 +356,27 @@ export async function setPageImageAction(
 }
 
 // ---------------------------------------------------------------------------
-// Media (uploads go through /api/admin/media)
+// Media (image uploads go through /api/admin/media)
 // ---------------------------------------------------------------------------
+
+// Back to the file bundled with the site: an uploaded replacement is dropped.
+const BACK_TO_BUNDLED = {
+  status: "bundled",
+  storage_path: null,
+  pending_path: null,
+  mime_type: null,
+  byte_size: null,
+  width: null,
+  height: null,
+};
+
+const filesOf = ({
+  storage_path,
+  pending_path,
+}: {
+  storage_path: string | null;
+  pending_path: string | null;
+}) => [storage_path, pending_path].filter((path): path is string => Boolean(path));
 
 export async function saveMediaDetailsAction(
   _previous: CmsActionState,
@@ -439,6 +466,11 @@ export async function saveAltTextAction(
   return done(Number((data[0] as { version: number }).version));
 }
 
+/**
+ * Deletes a file, then returns to the library (or, with `stay`, stays on it). An
+ * upload goes for good. A bundled file stays in the code, so its row keeps it off
+ * the site instead, and it can be restored.
+ */
 export async function deleteMediaAction(
   _previous: CmsActionState,
   formData: FormData,
@@ -455,14 +487,19 @@ export async function deleteMediaAction(
   const supabase = await supabaseOrNull();
   if (!supabase) return fail("notConfigured");
   // Database first: references block deletion (ON DELETE RESTRICT), and once
-  // the row is gone the files are untracked, so Storage lets us remove them.
-  const { data, error } = await supabase.from("media_assets").delete().eq("id", id).select("id");
+  // the row is gone (or no longer points at them) the files are untracked, so
+  // Storage lets us remove them.
+  const { data, error } = asset.asset.bundled_key
+    ? await supabase
+        .from("media_assets")
+        .update({ ...BACK_TO_BUNDLED, removed_at: new Date().toISOString() })
+        .eq("id", id)
+        .select("id")
+    : await supabase.from("media_assets").delete().eq("id", id).select("id");
   if (error) return fail(cmsError(error, "delete"));
   if (!data?.length) return fail("notFound");
 
-  const files = [asset.asset.storage_path, asset.asset.pending_path].filter((path): path is string =>
-    Boolean(path),
-  );
+  const files = filesOf(asset.asset);
   if (files.length) {
     // A failure leaves an untracked, private file that cleanup removes later.
     await supabase.storage
@@ -471,7 +508,171 @@ export async function deleteMediaAction(
       .catch(() => null);
   }
   invalidate();
+  if (read(formData, "stay")) return done(0);
   redirect("/admin/media");
+}
+
+/** Puts a deleted bundled file back on the site. */
+export async function restoreMediaAction(
+  _previous: CmsActionState,
+  formData: FormData,
+): Promise<CmsActionState> {
+  const decision = await authorizeAdmin("media.write");
+  if (decision.kind !== "allow") return fail("forbidden");
+
+  const id = read(formData, "id");
+  if (!isUuid(id)) return fail("generic");
+  const supabase = await supabaseOrNull();
+  if (!supabase) return fail("notConfigured");
+  const { data, error } = await supabase
+    .from("media_assets")
+    .update({ removed_at: null })
+    .eq("id", id)
+    .select("version");
+  if (error) return fail(cmsError(error));
+  if (!data?.length) return fail("notFound");
+  invalidate();
+  return done(Number((data[0] as { version: number }).version));
+}
+
+/** Drops the uploaded replacement of a bundled file, which goes back on the site. */
+export async function revertMediaAction(
+  _previous: CmsActionState,
+  formData: FormData,
+): Promise<CmsActionState> {
+  const decision = await authorizeAdmin("media.write");
+  if (decision.kind !== "allow") return fail("forbidden");
+
+  const id = read(formData, "id");
+  const expected = readVersion(formData);
+  if (!isUuid(id) || expected === null) return fail("generic");
+  const asset = await getMediaAsset(id).catch(() => null);
+  if (!asset?.asset.bundled_key) return fail("notFound");
+
+  const supabase = await supabaseOrNull();
+  if (!supabase) return fail("notConfigured");
+  const { data, error } = await supabase
+    .from("media_assets")
+    .update(BACK_TO_BUNDLED)
+    .eq("id", id)
+    .eq("version", expected)
+    .select("version");
+  if (error) return fail(cmsError(error));
+  if (!data?.length) return fail("conflict");
+
+  // A failure leaves an untracked, private file that cleanup removes later.
+  await supabase.storage
+    .from("media")
+    .remove(filesOf(asset.asset))
+    .catch(() => null);
+  invalidate();
+  return done(Number((data[0] as { version: number }).version));
+}
+
+export type VideoUploadError =
+  CmsError | "uploadFailed" | "typeMismatch" | "videoTooLarge" | "videoUnsupported";
+
+export type VideoTicket =
+  { status: "ok"; id: string; path: string; version: number } | { status: "error"; error: VideoUploadError };
+
+/** Step 1 of a video upload: a name in Storage for this file, on a new or an existing asset. */
+export async function reserveVideoAction(input: {
+  type: string;
+  size: number;
+  name: string;
+  title: string;
+  altEn: string;
+  replace: string | null;
+  version: number | null;
+}): Promise<VideoTicket> {
+  const decision = await authorizeAdmin("media.write");
+  if (decision.kind !== "allow") return { status: "error", error: "forbidden" };
+
+  const { type, size, replace, version } = input;
+  if (!isVideoType(type)) return { status: "error", error: "videoUnsupported" };
+  if (!Number.isInteger(size) || size < 1 || size > VIDEO_MAX_BYTES) {
+    return { status: "error", error: "videoTooLarge" };
+  }
+  const supabase = await supabaseOrNull();
+  if (!supabase) return { status: "error", error: "notConfigured" };
+
+  if (replace !== null) {
+    if (!isUuid(replace) || !Number.isInteger(version)) return { status: "error", error: "invalid" };
+    const asset = await getMediaAsset(replace).catch(() => null);
+    if (!asset) return { status: "error", error: "notFound" };
+    if (asset.asset.kind !== "video" || asset.asset.removed_at) return { status: "error", error: "invalid" };
+    const reserved = await reserveVideoReplacement(supabase, {
+      id: replace,
+      expectedVersion: version!,
+      type,
+    });
+    return reserved.ok ? { status: "ok", ...reserved } : { status: "error", error: reserved.error };
+  }
+
+  const title = cleanLine(String(input.title ?? "")) || titleFromFileName(String(input.name ?? ""), "Video");
+  const altEn = cleanLine(String(input.altEn ?? ""));
+  if ([...title].length > 200 || [...altEn].length > 300) return { status: "error", error: "invalid" };
+  const reserved = await reserveVideo(supabase, { type, title, altEn: altEn || null });
+  return reserved.ok ? { status: "ok", ...reserved } : { status: "error", error: reserved.error };
+}
+
+/** Step 3, once the browser has sent the file to Storage: checks it and makes it the asset's file. */
+export async function completeVideoAction(input: {
+  id: string;
+  path: string;
+  version: number;
+  width: number;
+  height: number;
+}): Promise<{ status: "ok" } | { status: "error"; error: VideoUploadError }> {
+  const decision = await authorizeAdmin("media.write");
+  if (decision.kind !== "allow") return { status: "error", error: "forbidden" };
+
+  const { id, path, version, width, height } = input;
+  const inRange = (value: number) => Number.isInteger(value) && value >= 1 && value <= 8000;
+  if (!isUuid(id) || !Number.isInteger(version) || !inRange(width) || !inRange(height)) {
+    return { status: "error", error: "invalid" };
+  }
+  const supabase = await supabaseOrNull();
+  if (!supabase) return { status: "error", error: "notConfigured" };
+  const asset = await getMediaAsset(id).catch(() => null);
+  if (!asset) return { status: "error", error: "notFound" };
+  if (asset.asset.pending_path !== path) return { status: "error", error: "conflict" };
+
+  const result = await completeVideo(supabase, {
+    id,
+    version,
+    path,
+    previousPath: asset.asset.storage_path,
+    width,
+    height,
+  });
+  if (!result.ok) {
+    if (result.error === "typeMismatch" || result.error === "videoTooLarge") {
+      await releaseVideo(supabase, { id, version, path, isNew: asset.asset.status === "pending" });
+    }
+    return { status: "error", error: result.error };
+  }
+  invalidate();
+  return { status: "ok" };
+}
+
+/** Gives up a video upload whose file did not reach Storage. */
+export async function abandonVideoAction(input: {
+  id: string;
+  path: string;
+  version: number;
+}): Promise<void> {
+  const decision = await authorizeAdmin("media.write");
+  if (decision.kind !== "allow" || !isUuid(input.id) || !Number.isInteger(input.version)) return;
+  const supabase = await supabaseOrNull();
+  const asset = await getMediaAsset(input.id).catch(() => null);
+  if (!supabase || asset?.asset.pending_path !== input.path) return;
+  await releaseVideo(supabase, {
+    id: input.id,
+    version: input.version,
+    path: input.path,
+    isNew: asset.asset.status === "pending",
+  });
 }
 
 /** Removes untracked files and abandoned uploads older than an hour. */

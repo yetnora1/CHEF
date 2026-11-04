@@ -30,7 +30,8 @@ import type { SitePhoto } from "./site-photo";
  * on 2026-11-02 as phone pictures. They fill the homepage hero, "Meet CHEF SIS",
  * three service cards, the homepage photo mosaic and the /gallery page until
  * photography is published through the media library (a published image always
- * takes precedence). Being CHEF SIS's own, they carry no credit.
+ * takes precedence). Being CHEF SIS's own, they carry no credit. Staff can edit,
+ * replace or delete each of them in the media library (bundled-media.ts).
  *
  * The files in src/assets/chef are as supplied (at most 1280px, no camera
  * metadata), except that four lost their bottom 8%, which held a camera-model
@@ -171,18 +172,13 @@ export const chefPhotos = {
 export type ChefPhotoKey = keyof typeof chefPhotos;
 
 /** Page slots with one of these photographs: the homepage hero and "Meet CHEF SIS", and service cards by slug. */
-const SLOTS: Record<string, ChefPhotoKey> = {
+export const SLOTS: Record<string, ChefPhotoKey> = {
   hero: "chef-at-buffet",
   about: "chef-chafing-line",
   weddings: "banquet-hall",
   "corporate-events": "finger-food",
   "summits-and-conferences": "buffet-hall",
 };
-
-/** The photograph for a slot or service slug, if there is one. */
-export function chefPhotoFor(slot: string): ChefPhoto | null {
-  return Object.hasOwn(SLOTS, slot) ? chefPhotos[SLOTS[slot]] : null;
-}
 
 /**
  * The homepage mosaic, in tile order: a large tile, a tall one, then single
@@ -210,10 +206,16 @@ export type GalleryPhoto = {
   kind: ChefPhotoKind;
 };
 
-export function galleryPhotos(keys: ChefPhotoKey[], locale: AppLocale): GalleryPhoto[] {
-  return keys.map((key) => {
-    const { src, alt, kind } = chefPhotos[key];
-    const description = resolveLocalized(alt, locale);
-    return { key, src, alt: description?.text ?? "", lang: description?.lang, kind };
+/** `photoFor` gives each photograph as it stands (features/cms/site-media.ts); null skips it. */
+export function galleryPhotos(
+  keys: ChefPhotoKey[],
+  locale: AppLocale,
+  photoFor: (key: ChefPhotoKey) => ChefPhoto | null,
+): GalleryPhoto[] {
+  return keys.flatMap((key) => {
+    const photo = photoFor(key);
+    if (!photo) return [];
+    const description = resolveLocalized(photo.alt, locale);
+    return [{ key, src: photo.src, alt: description?.text ?? "", lang: description?.lang, kind: photo.kind }];
   });
 }

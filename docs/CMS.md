@@ -19,7 +19,7 @@ Every kind of content has a language-neutral entity row and one translation row 
 | Dishes          | `menu_items` → `menu_item_translations`          | category, display order, dietary tags, image | name, description                                       |
 | Gallery         | `gallery_items` → `gallery_item_translations`    | photo (required), event type, display order  | caption                                                 |
 | Journal         | `journal_posts` → `journal_post_translations`    | slug, cover image, `published_at`            | title, excerpt, body (formatted), SEO title/description |
-| Media library   | `media_assets` → `media_asset_translations`      | file, title, credit                          | alt text                                                |
+| Media library   | `media_assets` → `media_asset_translations`      | file (or bundled file), kind, title, credit  | alt text                                                |
 
 `src/features/cms/content-types.ts` describes the same tables for the admin forms and the server
 actions; `src/features/cms/pages.ts` defines the page sections (fields and limits). Two tests keep
@@ -111,15 +111,15 @@ checks that nothing executes in the admin or on the website.
 
 ## Public website
 
-| Route                                    | Content                                                 | When empty                                          |
-| ---------------------------------------- | ------------------------------------------------------- | --------------------------------------------------- |
-| `/[locale]`                              | Published `home` sections, published services           | Each section keeps its labelled Stage 1 placeholder |
-| `/[locale]/about`                        | Published `about` page                                  | 404; navigation links the homepage section instead  |
-| `/[locale]/services`, `/services/[slug]` | Published services                                      | Empty state (`noindex`); unknown slug → not found   |
-| `/[locale]/menu`                         | Published categories with published dishes              | Empty state (`noindex`), not in navigation          |
-| `/[locale]/gallery`                      | Published photos                                        | CHEF SIS's own photographs (`chef-photos.ts`)       |
-| `/[locale]/journal`, `/journal/[slug]`   | Published posts, newest first (50 per page for now)     | Empty state (`noindex`), not in navigation          |
-| `/media/assets/<id>/<file>`              | Images used by published content ([MEDIA.md](MEDIA.md)) | 404                                                 |
+| Route                                    | Content                                             | When empty                                          |
+| ---------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
+| `/[locale]`                              | Published `home` sections, published services       | Each section keeps its labelled Stage 1 placeholder |
+| `/[locale]/about`                        | Published `about` page                              | 404; navigation links the homepage section instead  |
+| `/[locale]/services`, `/services/[slug]` | Published services                                  | Empty state (`noindex`); unknown slug → not found   |
+| `/[locale]/menu`                         | Published categories with published dishes          | Empty state (`noindex`), not in navigation          |
+| `/[locale]/gallery`                      | Published photos                                    | CHEF SIS's own photographs (`chef-photos.ts`)       |
+| `/[locale]/journal`, `/journal/[slug]`   | Published posts, newest first (50 per page for now) | Empty state (`noindex`), not in navigation          |
+| `/media/assets/<id>/<file>`              | Files the website uses ([MEDIA.md](MEDIA.md))       | 404                                                 |
 
 Languages follow [LOCALIZATION.md](LOCALIZATION.md): the requested language, else English marked
 `lang="en"` with an "Available in English only" note, else nothing. Amharic is never shown on an

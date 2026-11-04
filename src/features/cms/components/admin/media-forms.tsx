@@ -1,15 +1,23 @@
 "use client";
 
-import { CheckCircle2, LoaderCircle, Upload } from "lucide-react";
+import { CheckCircle2, LoaderCircle, RotateCcw, Trash2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { startTransition, useActionState, useState, useTransition, type FormEvent } from "react";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Field, Input, fieldAria } from "@/components/ui/form-controls";
+import { isVideoType, VIDEO_MAX_BYTES } from "@/features/media/video";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import {
+  abandonVideoAction,
   cleanupMediaAction,
+  completeVideoAction,
   deleteMediaAction,
+  reserveVideoAction,
+  restoreMediaAction,
+  revertMediaAction,
   saveAltTextAction,
   saveMediaDetailsAction,
   type CmsActionState,
@@ -18,13 +26,21 @@ import { latestVersion } from "./forms";
 import { useUnsavedGuard } from "./use-unsaved-guard";
 
 /*
- * Media library forms. Uploads go to /api/admin/media, which validates and
- * re-encodes every file on the server; the checks here only give quick feedback.
+ * Media library forms. Image uploads go to /api/admin/media, which validates and
+ * re-encodes every file on the server; videos go from here directly to Storage,
+ * at a name the server reserved, and the server then checks what arrived. The
+ * checks here only give quick feedback.
  */
 
 const IDLE: CmsActionState = { status: "idle" };
-const ACCEPT = "image/jpeg,image/png,image/webp";
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const IMAGE_ACCEPT = IMAGE_TYPES.join(",");
+const VIDEO_ACCEPT = "video/mp4,video/webm";
 const MAX_BYTES = 10 * 1024 * 1024;
+const FILE_INPUT =
+  "block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border file:bg-glass-raised file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground file:shadow-xs file:inset-shadow-sheen file:transition-[border-color,background-color,box-shadow] hover:file:border-border-strong hover:file:bg-glass-raised-hover hover:file:shadow-md";
+
+export type MediaKind = "image" | "video";
 
 function Message({ state, success }: { state: CmsActionState; success: string }) {
   const t = useTranslations("AdminCms.errors");
@@ -45,9 +61,13 @@ const UPLOAD_ERRORS = [
   "empty",
   "tooLarge",
   "unsupportedType",
+  "unsupportedAny",
   "typeMismatch",
   "unreadable",
   "tooManyPixels",
+  "videoTooLarge",
+  "videoUnsupported",
+  "videoUnreadable",
   "forbidden",
   "signedOut",
   "notConfigured",
@@ -55,46 +75,185 @@ const UPLOAD_ERRORS = [
   "conflict",
   "notFound",
   "invalid",
+  "network",
 ] as const;
 
-function useUpload(onSuccess: (id: string) => void) {
+// A Vercel Function refuses a request over 4.5 MB, and phone photos are often
+// bigger. Larger ones are resized here first; the server re-encodes them anyway.
+const REQUEST_LIMIT = 4 * 1024 * 1024;
+const RESIZED_EDGE = 2560;
+
+async function fitForRequest(file: File): Promise<File> {
+  if (file.size <= REQUEST_LIMIT) return file;
+  const bitmap = await createImageBitmap(file).catch(() => null);
+  if (!bitmap) return file;
+  const scale = Math.min(1, RESIZED_EDGE / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+
+  // JPEG for photographs; WebP keeps a PNG's transparency.
+  const type = file.type === "image/jpeg" ? "image/jpeg" : "image/webp";
+  for (const quality of [0.9, 0.75]) {
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, quality));
+    if (blob && blob.size <= REQUEST_LIMIT) {
+      const extension = blob.type === "image/jpeg" ? "jpg" : blob.type === "image/webp" ? "webp" : "png";
+      return new File([blob], `${file.name.replace(/\.[^.]*$/, "")}.${extension}`, { type: blob.type });
+    }
+  }
+  return file;
+}
+
+/** The video's size in pixels, or null if this browser cannot read it (then visitors' may not either). */
+function readVideoSize(file: File): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    const finish = (size: { width: number; height: number } | null) => {
+      URL.revokeObjectURL(url);
+      resolve(size);
+    };
+    video.preload = "metadata";
+    video.muted = true;
+    video.onloadedmetadata = () =>
+      finish(video.videoWidth > 0 ? { width: video.videoWidth, height: video.videoHeight } : null);
+    video.onerror = () => finish(null);
+    video.src = url;
+  });
+}
+
+/** Sends the file to the reserved name in Storage, as the signed-in staff member. */
+async function sendToStorage(path: string, file: File, onProgress: (percent: number) => void) {
+  const config = getSupabasePublicConfig();
+  const session = await createSupabaseBrowserClient()?.auth.getSession();
+  const token = session?.data.session?.access_token;
+  if (!config || !token) throw new Error("signedOut");
+
+  // XMLHttpRequest rather than the Supabase client: only it reports upload progress.
+  await new Promise<void>((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("POST", `${config.url}/storage/v1/object/media/${path}`);
+    request.setRequestHeader("Authorization", `Bearer ${token}`);
+    request.setRequestHeader("apikey", config.publishableKey);
+    request.setRequestHeader("Content-Type", file.type);
+    request.setRequestHeader("Cache-Control", "max-age=31536000");
+    request.setRequestHeader("x-upsert", "false");
+    request.upload.onprogress = (event) => {
+      if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
+    };
+    request.onload = () => {
+      if (request.status >= 200 && request.status < 300) resolve();
+      else reject(new Error(request.responseText.includes('"413"') ? "videoTooLarge" : "uploadFailed"));
+    };
+    request.onerror = () => reject(new Error("network"));
+    request.send(file);
+  });
+}
+
+function useUpload(accepts: MediaKind | "any", onSuccess: (id: string) => void) {
   const t = useTranslations("AdminCms.upload");
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState<number | null>(null);
   const [pending, start] = useTransition();
+
+  const fail = (code: string | undefined) => {
+    const known = (UPLOAD_ERRORS as readonly string[]).includes(code ?? "") ? code! : "uploadFailed";
+    setError(t(`errors.${known as (typeof UPLOAD_ERRORS)[number]}`));
+  };
+
+  const sendImage = async (data: FormData, chosen: File) => {
+    const file = await fitForRequest(chosen);
+    if (file.size > MAX_BYTES) return fail("tooLarge");
+    data.set("file", file);
+    const response = await fetch("/api/admin/media", { method: "POST", body: data });
+    const body = (await response.json().catch(() => ({}))) as { ok?: boolean; id?: string; error?: string };
+    if (response.ok && body.ok && body.id) return onSuccess(body.id);
+    fail(body.error);
+  };
+
+  const sendVideo = async (data: FormData, file: File) => {
+    if (file.size > VIDEO_MAX_BYTES) return fail("videoTooLarge");
+    const size = await readVideoSize(file);
+    if (!size) return fail("videoUnreadable");
+    const replace = data.get("replace");
+    const ticket = await reserveVideoAction({
+      type: file.type,
+      size: file.size,
+      name: file.name,
+      title: String(data.get("title") ?? ""),
+      altEn: String(data.get("alt_en") ?? ""),
+      replace: typeof replace === "string" && replace ? replace : null,
+      version: replace ? Number(data.get("version")) : null,
+    });
+    if (ticket.status === "error") return fail(ticket.error);
+    const { id, path, version } = ticket;
+
+    setProgress(0);
+    try {
+      await sendToStorage(path, file, setProgress);
+    } catch (cause) {
+      await abandonVideoAction({ id, path, version }).catch(() => null);
+      return fail(cause instanceof Error ? cause.message : undefined);
+    } finally {
+      setProgress(null);
+    }
+
+    const result = await completeVideoAction({ id, path, version, ...size });
+    if (result.status === "error") return fail(result.error);
+    onSuccess(id);
+  };
 
   const upload = (form: HTMLFormElement) => {
     const data = new FormData(form);
     const file = data.get("file");
     if (!(file instanceof File) || file.size === 0) return setError(t("errors.empty"));
-    if (file.size > MAX_BYTES) return setError(t("errors.tooLarge"));
-    if (!ACCEPT.split(",").includes(file.type)) return setError(t("errors.unsupportedType"));
+    const video = isVideoType(file.type);
+    if (video ? accepts === "image" : !IMAGE_TYPES.includes(file.type) || accepts === "video") {
+      return fail(
+        accepts === "any" ? "unsupportedAny" : accepts === "video" ? "videoUnsupported" : "unsupportedType",
+      );
+    }
     setError(null);
     start(async () => {
       try {
-        const response = await fetch("/api/admin/media", { method: "POST", body: data });
-        const body = (await response.json().catch(() => ({}))) as {
-          ok?: boolean;
-          id?: string;
-          error?: string;
-        };
-        if (response.ok && body.ok && body.id) return onSuccess(body.id);
-        const code = (UPLOAD_ERRORS as readonly string[]).includes(body.error ?? "")
-          ? body.error!
-          : "uploadFailed";
-        setError(t(`errors.${code as (typeof UPLOAD_ERRORS)[number]}`));
+        await (video ? sendVideo(data, file) : sendImage(data, file));
       } catch {
         setError(t("errors.network"));
       }
     });
   };
-  return { upload, error, pending };
+  return { upload, error, pending, progress };
+}
+
+function UploadProgress({ percent }: { percent: number }) {
+  const t = useTranslations("AdminCms.upload");
+  return (
+    <div className="space-y-1.5 md:col-span-4">
+      <div
+        role="progressbar"
+        aria-label={t("uploading")}
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        className="h-2 overflow-hidden rounded-full bg-surface-muted"
+      >
+        <div
+          className="h-full rounded-full bg-action-top transition-[width] duration-200"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">{t("uploadingPercent", { percent })}</p>
+    </div>
+  );
 }
 
 export function MediaUploadForm() {
   const t = useTranslations("AdminCms.upload");
   const router = useRouter();
   const [fileName, setFileName] = useState<string | null>(null);
-  const { upload, error, pending } = useUpload((id) => router.push(`/admin/media/${id}`));
+  const { upload, error, pending, progress } = useUpload("any", (id) => router.push(`/admin/media/${id}`));
 
   return (
     <form
@@ -112,9 +271,9 @@ export function MediaUploadForm() {
           {...fieldAria("upload-file", { hint: true, error: error ?? undefined })}
           type="file"
           name="file"
-          accept={ACCEPT}
+          accept={`${IMAGE_ACCEPT},${VIDEO_ACCEPT}`}
           required
-          className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border file:bg-glass-raised file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground file:shadow-xs file:inset-shadow-sheen file:transition-[border-color,background-color,box-shadow] hover:file:border-border-strong hover:file:bg-glass-raised-hover hover:file:shadow-md"
+          className={FILE_INPUT}
           onChange={(event) => setFileName(event.target.files?.[0]?.name ?? null)}
         />
       </Field>
@@ -128,6 +287,7 @@ export function MediaUploadForm() {
         {pending ? <LoaderCircle aria-hidden className="animate-spin" /> : <Upload aria-hidden />}
         {pending ? t("uploading") : t("submit")}
       </Button>
+      {progress !== null && <UploadProgress percent={progress} />}
       {error && (
         <p id="upload-file-error" role="alert" className="text-sm font-medium text-danger md:col-span-4">
           {error}
@@ -137,11 +297,11 @@ export function MediaUploadForm() {
   );
 }
 
-export function ReplaceFileForm({ id, version }: { id: string; version: number }) {
+export function ReplaceFileForm({ id, version, kind }: { id: string; version: number; kind: MediaKind }) {
   const t = useTranslations("AdminCms.upload");
   const router = useRouter();
   const [done, setDone] = useState(false);
-  const { upload, error, pending } = useUpload(() => {
+  const { upload, error, pending, progress } = useUpload(kind, () => {
     setDone(true);
     router.refresh();
   });
@@ -159,14 +319,18 @@ export function ReplaceFileForm({ id, version }: { id: string; version: number }
     >
       <input type="hidden" name="replace" value={id} />
       <input type="hidden" name="version" value={version} />
-      <Field id="replace-file" label={t("replaceFile")} hint={t("replaceHint")}>
+      <Field
+        id="replace-file"
+        label={t("replaceFile")}
+        hint={kind === "video" ? t("replaceHintVideo") : t("replaceHint")}
+      >
         <input
           {...fieldAria("replace-file", { hint: true, error: error ?? undefined })}
           type="file"
           name="file"
-          accept={ACCEPT}
+          accept={kind === "video" ? VIDEO_ACCEPT : IMAGE_ACCEPT}
           required
-          className="block w-full text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-border file:bg-glass-raised file:px-4 file:py-2 file:text-sm file:font-semibold file:text-foreground file:shadow-xs file:inset-shadow-sheen file:transition-[border-color,background-color,box-shadow] hover:file:border-border-strong hover:file:bg-glass-raised-hover hover:file:shadow-md"
+          className={FILE_INPUT}
         />
       </Field>
       <div className="flex flex-wrap items-center gap-3">
@@ -181,6 +345,7 @@ export function ReplaceFileForm({ id, version }: { id: string; version: number }
           </p>
         )}
       </div>
+      {progress !== null && <UploadProgress percent={progress} />}
       {error && (
         <p id="replace-file-error" role="alert" className="text-sm font-medium text-danger">
           {error}
@@ -195,11 +360,14 @@ export function MediaDetailsForm({
   version,
   title,
   credit,
+  showCredit,
 }: {
   id: string;
   version: number;
   title: string;
   credit: string | null;
+  /** A sample bundled with the site keeps its credit in the code. */
+  showCredit: boolean;
 }) {
   const t = useTranslations("AdminCms");
   const tErrors = useTranslations("AdminCms.fieldErrors");
@@ -235,20 +403,22 @@ export function MediaDetailsForm({
           required
         />
       </Field>
-      <Field
-        id="media-credit"
-        label={t("media.creditLabel")}
-        optionalLabel={t("optional")}
-        hint={t("media.creditHint")}
-        error={errors?.credit ? tErrors(errors.credit, { max: 200 }) : undefined}
-      >
-        <Input
-          {...fieldAria("media-credit", { hint: true, error: errors?.credit })}
-          name="credit"
-          defaultValue={credit ?? ""}
-          maxLength={200}
-        />
-      </Field>
+      {showCredit && (
+        <Field
+          id="media-credit"
+          label={t("media.creditLabel")}
+          optionalLabel={t("optional")}
+          hint={t("media.creditHint")}
+          error={errors?.credit ? tErrors(errors.credit, { max: 200 }) : undefined}
+        >
+          <Input
+            {...fieldAria("media-credit", { hint: true, error: errors?.credit })}
+            name="credit"
+            defaultValue={credit ?? ""}
+            maxLength={200}
+          />
+        </Field>
+      )}
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" variant="action" disabled={pending}>
           {pending && <LoaderCircle aria-hidden className="animate-spin" />}
@@ -334,11 +504,119 @@ export function AltTextForm({
   );
 }
 
-export function DeleteMediaButton({ id, inUse }: { id: string; inUse: boolean }) {
+/**
+ * Deletes a file after a confirmation. On a card (`compact`) it names the file for
+ * screen readers and stays on the list; a file in use cannot be deleted, which the
+ * card shows on a disabled button and the detail page spells out.
+ */
+export function DeleteMediaButton({
+  id,
+  title,
+  kind,
+  inUse,
+  bundled,
+  replaced,
+  compact,
+}: {
+  id: string;
+  title: string;
+  kind: MediaKind;
+  inUse: boolean;
+  /** It ships with the site, so deleting takes it off the site and it can come back. */
+  bundled: boolean;
+  /** Its bundled file has an uploaded replacement, which goes for good. */
+  replaced: boolean;
+  compact?: boolean;
+}) {
   const t = useTranslations("AdminCms");
   const [state, dispatch, pending] = useActionState(deleteMediaAction, IDLE);
   const [confirming, setConfirming] = useState(false);
-  if (inUse) return <p className="text-sm text-muted-foreground">{t("media.deleteInUse")}</p>;
+  if (inUse && !compact) return <p className="text-sm text-muted-foreground">{t("media.deleteInUse")}</p>;
+
+  const label = kind === "video" ? t("media.deleteVideo") : t("media.delete");
+  const body = bundled
+    ? replaced
+      ? t("media.deleteBodyReplaced")
+      : t("media.deleteBodyBundled")
+    : kind === "video"
+      ? t("media.deleteBodyVideo")
+      : t("media.deleteBody");
+
+  return (
+    <div className={compact ? "flex-1" : "space-y-2"}>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={pending || inUse}
+        title={inUse ? t("media.deleteInUse") : undefined}
+        aria-label={compact ? t("media.deleteNamed", { title }) : undefined}
+        onClick={() => setConfirming(true)}
+        className="w-full border-danger/60 text-danger hover:border-danger"
+      >
+        {pending ? <LoaderCircle aria-hidden className="animate-spin" /> : <Trash2 aria-hidden />}
+        {compact ? t("media.deleteShort") : label}
+      </Button>
+      {compact ? (
+        state.status === "error" && (
+          <p role="alert" className="mt-1.5 text-xs font-medium text-danger">
+            {t(`errors.${state.error}`)}
+          </p>
+        )
+      ) : (
+        <Message state={state} success={t("deleted")} />
+      )}
+      <AlertDialog open={confirming} onOpenChange={setConfirming}>
+        <AlertDialogContent
+          title={compact ? t("media.deleteNamed", { title }) : label}
+          description={body}
+          cancelLabel={t("cancel")}
+          confirmLabel={label}
+          tone="danger"
+          onConfirm={() => {
+            const data = new FormData();
+            data.set("id", id);
+            if (compact) data.set("stay", "1");
+            startTransition(() => dispatch(data));
+          }}
+        />
+      </AlertDialog>
+    </div>
+  );
+}
+
+/** Puts a deleted bundled file back on the website. */
+export function RestoreMediaButton({ id, title, compact }: { id: string; title: string; compact?: boolean }) {
+  const t = useTranslations("AdminCms");
+  const [state, dispatch, pending] = useActionState(restoreMediaAction, IDLE);
+  return (
+    <div className={compact ? "flex-1" : "space-y-2"}>
+      <Button
+        type="button"
+        variant="action"
+        size="sm"
+        disabled={pending}
+        aria-label={t("media.restoreNamed", { title })}
+        className={compact ? "w-full" : undefined}
+        onClick={() => {
+          const data = new FormData();
+          data.set("id", id);
+          startTransition(() => dispatch(data));
+        }}
+      >
+        {pending ? <LoaderCircle aria-hidden className="animate-spin" /> : <RotateCcw aria-hidden />}
+        {t("media.restore")}
+      </Button>
+      {state.status === "error" && <Message state={state} success="" />}
+    </div>
+  );
+}
+
+/** Drops the uploaded replacement of a bundled file, after a confirmation. */
+export function RevertMediaButton({ id, version }: { id: string; version: number }) {
+  const t = useTranslations("AdminCms");
+  const [state, dispatch, pending] = useActionState(revertMediaAction, IDLE);
+  const [confirming, setConfirming] = useState(false);
   return (
     <div className="space-y-2">
       <Button
@@ -347,22 +625,21 @@ export function DeleteMediaButton({ id, inUse }: { id: string; inUse: boolean })
         size="sm"
         disabled={pending}
         onClick={() => setConfirming(true)}
-        className="border-danger/60 text-danger hover:border-danger"
       >
-        {pending && <LoaderCircle aria-hidden className="animate-spin" />}
-        {t("media.delete")}
+        {pending ? <LoaderCircle aria-hidden className="animate-spin" /> : <RotateCcw aria-hidden />}
+        {t("media.revert")}
       </Button>
-      <Message state={state} success={t("deleted")} />
+      <Message state={state} success={t("media.reverted")} />
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
         <AlertDialogContent
-          title={t("media.delete")}
-          description={t("media.deleteBody")}
+          title={t("media.revert")}
+          description={t("media.revertBody")}
           cancelLabel={t("cancel")}
-          confirmLabel={t("media.delete")}
-          tone="danger"
+          confirmLabel={t("media.revert")}
           onConfirm={() => {
             const data = new FormData();
             data.set("id", id);
+            data.set("version", String(version));
             startTransition(() => dispatch(data));
           }}
         />

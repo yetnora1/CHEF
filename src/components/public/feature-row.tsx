@@ -17,7 +17,7 @@ type FeatureRowProps = {
   /** The eyebrow chip's colour: a `hue-*` utility. */
   hue: string;
   title: ResolvedText;
-  /** The picture, shaped with FEATURE_MEDIA, filling its side of the card. */
+  /** The picture, shaped with FEATURE_MEDIA, filling its side of the card; without one the text takes the card. */
   media: ReactNode;
   /** Picture on the right from md up (rows alternate down the page). */
   mediaRight?: boolean;
@@ -46,10 +46,10 @@ export function FeatureRow({
         <div
           className={cn(
             "grid items-center rounded-3xl border border-border glass p-2",
-            mediaRight ? "md:grid-cols-[1.15fr_0.85fr]" : "md:grid-cols-[0.85fr_1.15fr]",
+            media && (mediaRight ? "md:grid-cols-[1.15fr_0.85fr]" : "md:grid-cols-[0.85fr_1.15fr]"),
           )}
         >
-          <div className={cn(mediaRight && "md:order-2")}>{media}</div>
+          {media && <div className={cn(mediaRight && "md:order-2")}>{media}</div>}
           <div
             className={cn("px-4 pt-7 pb-6 sm:px-8 md:px-10 md:py-10 lg:px-16", mediaRight && "md:order-1")}
           >

@@ -9,11 +9,12 @@ import { cn } from "@/lib/utils";
 
 export type ReelClip = {
   key: string;
-  /** 960x600, played here. */
+  /** The full file, played here. */
   src: string;
-  /** 640x400, played in the reel's tiles. */
+  /** A lighter copy for the reel's tiles, when there is one. */
   preview: string;
-  poster: string;
+  /** Bundled clips have one; an uploaded video shows its first frame once it loads. */
+  poster: string | null;
   description: ResolvedText;
 };
 
@@ -162,7 +163,7 @@ function Stage({ clip, position, onStep, onClose, labels }: StageProps) {
         ref={video}
         key={clip.key}
         src={clip.src}
-        poster={clip.poster}
+        poster={clip.poster ?? undefined}
         autoPlay
         muted
         loop

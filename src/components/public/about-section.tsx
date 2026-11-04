@@ -4,7 +4,7 @@ import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-i
 import { Markup } from "@/features/cms/markup";
 import { Link } from "@/i18n/navigation";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
-import { chefPhotoFor } from "@/features/content/chef-photos";
+import { getSiteMedia } from "@/features/cms/public-data";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { cn } from "@/lib/utils";
 import { FEATURE_MEDIA, FeatureRow } from "./feature-row";
@@ -34,7 +34,8 @@ export async function AboutSection({
   pending = true,
   moreHref,
 }: AboutSectionProps) {
-  const t = await getTranslations("Home");
+  const [t, site] = await Promise.all([getTranslations("Home"), getSiteMedia()]);
+  const photo = image ? null : site.slot("about");
 
   return (
     <FeatureRow
@@ -49,12 +50,14 @@ export async function AboutSection({
             <CmsImage image={image} sizes={ABOUT_IMAGE_SIZES} />
           </div>
         ) : (
-          <PhotoSlot
-            subject={photoSubject}
-            photo={chefPhotoFor("about")}
-            sizes={ABOUT_IMAGE_SIZES}
-            className={FEATURE_MEDIA}
-          />
+          photo !== null && (
+            <PhotoSlot
+              subject={photoSubject}
+              photo={photo}
+              sizes={ABOUT_IMAGE_SIZES}
+              className={FEATURE_MEDIA}
+            />
+          )
         )
       }
     >

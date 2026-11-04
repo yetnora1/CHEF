@@ -155,6 +155,7 @@ describe("function privileges", () => {
       ...visitorAndStaff("public.public_page"),
       ...visitorAndStaff("public.public_service"),
       ...visitorAndStaff("public.public_services"),
+      ...visitorAndStaff("public.public_site_media"),
       ...visitorAndStaff("public.public_site_settings"),
       { fn: "public.revoke_role", role: "authenticated" },
       { fn: "public.set_contact_message_status", role: "authenticated" },

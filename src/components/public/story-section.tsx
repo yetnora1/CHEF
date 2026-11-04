@@ -12,7 +12,8 @@ type StorySectionProps = {
   hue: string;
   title: ResolvedText;
   body: ResolvedText;
-  photo: SitePhoto;
+  /** Null once the photograph was deleted in the media library. */
+  photo: SitePhoto | null;
   /** Image on the right from md up (rows alternate down the page). */
   imageRight?: boolean;
 };
@@ -26,7 +27,11 @@ export function StorySection({ id, eyebrow, hue, title, body, photo, imageRight 
       hue={hue}
       title={title}
       mediaRight={imageRight}
-      media={<PhotoSlot subject={title} photo={photo} sizes={STORY_IMAGE_SIZES} className={FEATURE_MEDIA} />}
+      media={
+        photo && (
+          <PhotoSlot subject={title} photo={photo} sizes={STORY_IMAGE_SIZES} className={FEATURE_MEDIA} />
+        )
+      }
     >
       <p className="mt-5 text-lg text-muted-foreground" lang={body.lang}>
         {body.text}

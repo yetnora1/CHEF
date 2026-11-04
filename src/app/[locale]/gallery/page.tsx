@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PhotoGallery } from "@/components/public/photo-gallery";
 import { GalleryView, PageHeader } from "@/features/cms/components/public/views";
-import { getPublicGallery } from "@/features/cms/public-data";
+import { getPublicGallery, getSiteMedia } from "@/features/cms/public-data";
 import { galleryView } from "@/features/cms/public-views";
 import { isEventType } from "@/features/bookings/status";
-import { GALLERY_PHOTOS, galleryPhotos } from "@/features/content/chef-photos";
 import type { AppLocale } from "@/i18n/routing";
 
 async function itemsFor(locale: AppLocale) {
@@ -29,13 +28,14 @@ export async function generateMetadata(): Promise<Metadata> {
  * photographs (features/content/chef-photos.ts), so the page is never empty.
  */
 export default async function GalleryPage() {
-  const [locale, t, tPhotos] = await Promise.all([
+  const [locale, t, tPhotos, site] = await Promise.all([
     getLocale(),
     getTranslations("PublicContent.gallery"),
     getTranslations("Photos"),
+    getSiteMedia(),
   ]);
   const items = await itemsFor(locale);
-  const photos = items.length ? [] : galleryPhotos(GALLERY_PHOTOS, locale);
+  const photos = items.length ? [] : site.gallery(locale);
   return (
     <section className="page-container py-14 md:py-20">
       <PageHeader eyebrow={t("eyebrow")} title={{ text: t("title") }} intro={{ text: t("intro") }} />

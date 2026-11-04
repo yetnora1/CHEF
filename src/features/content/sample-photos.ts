@@ -193,8 +193,3 @@ export const samplePhotos = {
     },
   },
 } satisfies Record<string, SamplePhoto>;
-
-/** The sample for a slot or service slug, if there is one. */
-export function samplePhotoFor(key: string): SamplePhoto | null {
-  return Object.hasOwn(samplePhotos, key) ? samplePhotos[key as keyof typeof samplePhotos] : null;
-}

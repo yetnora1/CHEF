@@ -3,8 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { CmsImage, type ImageView } from "@/features/cms/components/public/cms-image";
 import { Link } from "@/i18n/navigation";
 import { HOME_SECTIONS } from "@/features/content/home-sections";
-import { chefPhotoFor } from "@/features/content/chef-photos";
-import { samplePhotoFor } from "@/features/content/sample-photos";
+import { getSiteMedia } from "@/features/cms/public-data";
 import type { ResolvedText } from "@/lib/localization/translations";
 import { cn } from "@/lib/utils";
 import { PhotoSlot } from "./photo-slot";
@@ -40,9 +39,10 @@ function desktopColumns(count: number): string {
 }
 
 export async function ServicesSection({ title, lede, services }: ServicesSectionProps) {
-  const [t, tServices] = await Promise.all([
+  const [t, tServices, site] = await Promise.all([
     getTranslations("Home"),
     getTranslations("PublicContent.services"),
+    getSiteMedia(),
   ]);
 
   return (
@@ -65,60 +65,69 @@ export async function ServicesSection({ title, lede, services }: ServicesSection
             a page of its own, that link covers the whole card; a published service's title
             covers the card and links to its page instead, with the contact link above it. */}
         <ul className={cn("mt-10 grid gap-5 sm:grid-cols-2", desktopColumns(services.length))}>
-          {services.map((service) => (
-            <li
-              key={service.slug}
-              className="group/card relative flex flex-col rounded-3xl border border-border glass p-2 pb-5"
-            >
-              {service.image ? (
-                <div className="media-frame aspect-[4/3] w-full rounded-2xl">
-                  <CmsImage image={service.image} sizes={SERVICE_IMAGE_SIZES} className={CARD_IMAGE_HOVER} />
-                </div>
-              ) : (
-                <PhotoSlot
-                  subject={service.photoSubject}
-                  photo={chefPhotoFor(service.slug) ?? samplePhotoFor(service.slug)}
-                  sizes={SERVICE_IMAGE_SIZES}
-                  className="aspect-[4/3] w-full"
-                  imageClassName={CARD_IMAGE_HOVER}
-                />
-              )}
-              <h3 className="mt-5 px-3 display-md" lang={service.title.lang}>
-                {service.href ? (
-                  <Link
-                    href={service.href}
-                    className="underline-offset-4 group-hover/card:underline after:absolute after:inset-0"
-                  >
-                    {service.title.text}
-                  </Link>
-                ) : (
-                  service.title.text
-                )}
-              </h3>
-              <p className="mt-3 px-3 text-sm text-muted-foreground" lang={service.summary.lang}>
-                {service.summary.text}
-              </p>
-              <Link
-                href={service.contactHref}
-                className={cn(
-                  "mt-auto inline-flex w-fit items-center gap-1.5 px-3 pt-5 text-sm font-semibold underline-offset-4",
-                  service.href
-                    ? "relative z-10 hover:underline"
-                    : "group-hover/card:underline after:absolute after:inset-0",
-                )}
+          {services.map((service) => {
+            const photo = service.image ? null : site.slot(service.slug);
+            return (
+              <li
+                key={service.slug}
+                className="group/card relative flex flex-col rounded-3xl border border-border glass p-2 pb-5"
               >
-                {tServices("inquire")}
-                {/* Names the service for screen readers: "Ask about this service: Weddings". */}
-                <span className="sr-only" lang={service.title.lang}>
-                  : {service.title.text}
-                </span>
-                <ArrowRight
-                  aria-hidden
-                  className="size-4 transition-transform duration-200 motion-safe:group-hover/card:translate-x-0.5"
-                />
-              </Link>
-            </li>
-          ))}
+                {service.image ? (
+                  <div className="media-frame aspect-[4/3] w-full rounded-2xl">
+                    <CmsImage
+                      image={service.image}
+                      sizes={SERVICE_IMAGE_SIZES}
+                      className={CARD_IMAGE_HOVER}
+                    />
+                  </div>
+                ) : (
+                  photo !== null && (
+                    <PhotoSlot
+                      subject={service.photoSubject}
+                      photo={photo}
+                      sizes={SERVICE_IMAGE_SIZES}
+                      className="aspect-[4/3] w-full"
+                      imageClassName={CARD_IMAGE_HOVER}
+                    />
+                  )
+                )}
+                <h3 className="mt-5 px-3 display-md" lang={service.title.lang}>
+                  {service.href ? (
+                    <Link
+                      href={service.href}
+                      className="underline-offset-4 group-hover/card:underline after:absolute after:inset-0"
+                    >
+                      {service.title.text}
+                    </Link>
+                  ) : (
+                    service.title.text
+                  )}
+                </h3>
+                <p className="mt-3 px-3 text-sm text-muted-foreground" lang={service.summary.lang}>
+                  {service.summary.text}
+                </p>
+                <Link
+                  href={service.contactHref}
+                  className={cn(
+                    "mt-auto inline-flex w-fit items-center gap-1.5 px-3 pt-5 text-sm font-semibold underline-offset-4",
+                    service.href
+                      ? "relative z-10 hover:underline"
+                      : "group-hover/card:underline after:absolute after:inset-0",
+                  )}
+                >
+                  {tServices("inquire")}
+                  {/* Names the service for screen readers: "Ask about this service: Weddings". */}
+                  <span className="sr-only" lang={service.title.lang}>
+                    : {service.title.text}
+                  </span>
+                  <ArrowRight
+                    aria-hidden
+                    className="size-4 transition-transform duration-200 motion-safe:group-hover/card:translate-x-0.5"
+                  />
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>

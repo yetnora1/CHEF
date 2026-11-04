@@ -39,6 +39,7 @@ services ──1:n── service_translations        bookings (private)
 | `20261027100000_contact_message_permissions.sql`      | Adds `messages.read` and `messages.write` to `app_permission` (own migration, like `contacted`)                                                                                                                                                                                                                                                                                                                           |
 | `20261027100100_contact_messages.sql`                 | `contact_message_status` enum, `contact_messages`, `submit_contact_message` (service_role only), `list_contact_messages`, `contact_message_counts`, `set_contact_message_status` (audited); grants both permissions to owner and admin                                                                                                                                                                                    |
 | `20261028100000_staff_settings_audit.sql`             | `list_staff` (DEFINER, `users.read`), `set_user_roles` (INVOKER, one transaction through `assign_role` / `revoke_role`); `site_settings` (one row: contact details, social links, `inquiries_open`; version, editor and Amharic review stamped by trigger; audited), `public_site_settings` (visitors), `get_site_settings` (staff); `list_audit_log` (INVOKER, `audit.read`); revokes `service_role` on `profiles` (W10) |
+| `20261104100000_site_media_library.sql`               | Every photo and video in the library: `media_assets.kind`, `bundled_key`, `removed_at`, status `bundled`, video types and limits (table and bucket), the lifecycle and audit additions, `media_list` filters, `public_site_media` (visitors), one seeded row per bundled file ([MEDIA.md](MEDIA.md))                                                                                                                      |
 
 ## Stage 2 additions
 
@@ -80,7 +81,7 @@ menu_categories ──1:n── menu_category_translations
    └──1:n── menu_items (dietary_tags[], image_id) ──1:n── menu_item_translations
 gallery_items (asset_id, event_type) ──1:n── gallery_item_translations (caption)
 journal_posts (cover_image_id, published_at) ──1:n── journal_post_translations
-media_assets (storage_path, pending_path, status pending|ready, type, size, dimensions, title, credit)
+media_assets (storage_path, pending_path, status pending|ready|bundled, kind image|video, bundled_key, removed_at, type, size, dimensions, title, credit)
    └──1:n── media_asset_translations (alt_text)              storage.objects (bucket "media")
 ```
 

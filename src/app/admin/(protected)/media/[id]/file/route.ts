@@ -4,9 +4,10 @@ import { authorizeAdminRequest } from "@/lib/auth/staff-session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /*
- * An image as staff see it (including drafts), for admin thumbnails and
- * previews. Read with the staff member's own session, so Storage policies
- * decide; never cached or shared.
+ * A file as staff see it (including drafts), for admin thumbnails and previews.
+ * Read with the staff member's own session, so Storage policies decide; never
+ * cached or shared. A video redirects to a short-lived Storage link, as on the
+ * public route.
  */
 
 const PRIVATE_HEADERS = {
@@ -26,6 +27,15 @@ export async function GET(_request: Request, { params }: RouteContext<"/admin/me
   const supabase = await createSupabaseServerClient();
   if (!asset?.asset.storage_path || !asset.asset.mime_type || !supabase) {
     return new Response(null, { status: 404, headers: PRIVATE_HEADERS });
+  }
+
+  if (asset.asset.kind === "video") {
+    const link = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(asset.asset.storage_path, 60 * 60);
+    if (link.error || !link.data) return new Response(null, { status: 404, headers: PRIVATE_HEADERS });
+    return new Response(null, {
+      status: 302,
+      headers: { ...PRIVATE_HEADERS, Location: link.data.signedUrl },
+    });
   }
 
   const { data, error } = await supabase.storage.from(MEDIA_BUCKET).download(asset.asset.storage_path);

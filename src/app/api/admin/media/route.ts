@@ -2,7 +2,7 @@ import { revalidateTag } from "next/cache";
 import { getMediaAsset } from "@/features/cms/admin-data";
 import { CMS_CACHE_TAG } from "@/features/cms/cache-tags";
 import { MEDIA_LIMITS, processImage } from "@/features/media/process-image";
-import { createMediaAsset, replaceMediaFile } from "@/features/media/upload";
+import { createMediaAsset, replaceMediaFile, titleFromFileName } from "@/features/media/upload";
 import { authorizeAdminRequest } from "@/lib/auth/staff-session";
 import { isSameOriginRequest } from "@/lib/http";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -14,18 +14,14 @@ import { cleanLine } from "@/lib/text";
  * 64 KB (next.config.ts) to protect the inquiry form, and files need more.
  * Order: CSRF guard → size cap → permission (media.write) → content
  * validation and re-encoding (process-image.ts) → Storage with the user's own
- * session (upload.ts). Responses carry stable error codes only.
+ * session (upload.ts). Responses carry stable error codes only. Videos do not
+ * come through here: they go straight to Storage (upload.ts).
  */
 
 const MAX_BODY = MEDIA_LIMITS.maxBytes + 64 * 1024;
 
 const json = (status: number, body: Record<string, unknown>) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
-
-function titleFromFileName(name: string): string {
-  const base = cleanLine(name.replace(/\.[^.]*$/, "").replace(/[_-]+/g, " "));
-  return [...base].slice(0, 200).join("") || "Image";
-}
 
 export async function POST(request: Request) {
   if (!isSameOriginRequest(request)) return json(403, { ok: false, error: "forbidden" });
@@ -62,6 +58,7 @@ export async function POST(request: Request) {
   if (typeof replace === "string" && replace) {
     const asset = await getMediaAsset(replace).catch(() => null);
     if (!asset) return json(404, { ok: false, error: "notFound" });
+    if (asset.asset.kind !== "image") return json(400, { ok: false, error: "invalid" });
     const result = await replaceMediaFile(supabase, {
       id: asset.asset.id,
       expectedVersion: Number(form.get("version")),
@@ -74,7 +71,7 @@ export async function POST(request: Request) {
     return json(200, result);
   }
 
-  const title = cleanLine(String(form.get("title") ?? "")) || titleFromFileName(file.name);
+  const title = cleanLine(String(form.get("title") ?? "")) || titleFromFileName(file.name, "Image");
   const altEn = cleanLine(String(form.get("alt_en") ?? ""));
   if ([...title].length > 200 || [...altEn].length > 300) return json(400, { ok: false, error: "invalid" });
 

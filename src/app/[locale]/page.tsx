@@ -7,13 +7,16 @@ import { KitchenScene } from "@/components/public/kitchen-scene";
 import { PhotosSection } from "@/components/public/photos-section";
 import { ServicesSection, type ServiceCard } from "@/components/public/services-section";
 import { StorySection } from "@/components/public/story-section";
-import { getPublicNavigation, getPublicPage, getPublicServices } from "@/features/cms/public-data";
+import {
+  getPublicNavigation,
+  getPublicPage,
+  getPublicServices,
+  getSiteMedia,
+} from "@/features/cms/public-data";
 import { pageContent, serviceCards } from "@/features/cms/public-views";
 import { contactHrefFor } from "@/features/contact/service-subject";
 import { foodStories } from "@/features/content/food-stories";
 import { homeContent } from "@/features/content/home-content";
-import { samplePhotos } from "@/features/content/sample-photos";
-import { sampleVideos } from "@/features/content/sample-videos";
 import { resolveLocalized, type Localized, type ResolvedText } from "@/lib/localization/translations";
 
 // Each food story's chip has its own colour: golden injera, red wat, green for fasting (as on the dish badges).
@@ -26,11 +29,12 @@ const STORY_HUES: Record<string, string> = { injera: "hue-amber", wat: "hue-rose
  */
 export default async function HomePage() {
   const locale = await getLocale();
-  const [page, services, navigation, tHome] = await Promise.all([
+  const [page, services, navigation, tHome, site] = await Promise.all([
     getPublicPage("home").catch(() => null),
     getPublicServices().catch(() => null),
     getPublicNavigation().catch(() => null),
     getTranslations("Home"),
+    getSiteMedia(),
   ]);
 
   // Placeholder content always has English, so the fallback never comes up empty.
@@ -41,6 +45,7 @@ export default async function HomePage() {
     return value ? { text: value, lang: content.lang } : null;
   };
   const { hero, about, services: servicesCopy } = homeContent;
+  const clips = site.videos();
 
   const heroHeadline = field("hero", "headline");
   const aboutBody = field("about", "body");
@@ -87,26 +92,28 @@ export default async function HomePage() {
           photoSubject={placeholder(hero.photoSubject)}
         />
       )}
-      <FoodReel
-        clips={sampleVideos.map(({ key, src, preview, poster, description }) => ({
-          key,
-          src,
-          preview,
-          poster,
-          description: placeholder(description),
-        }))}
-        labels={{
-          region: tHome("videosLabel"),
-          pauseAll: tHome("videosPause"),
-          playAll: tHome("videosPlay"),
-          open: tHome("videosOpen"),
-          exit: tHome("videosExit"),
-          previous: tHome("videosPrevious"),
-          next: tHome("videosNext"),
-          pause: tHome("videoPause"),
-          play: tHome("videoPlay"),
-        }}
-      />
+      {clips.length > 0 && (
+        <FoodReel
+          clips={clips.map(({ key, src, preview, poster, description }) => ({
+            key,
+            src,
+            preview,
+            poster,
+            description: placeholder(description),
+          }))}
+          labels={{
+            region: tHome("videosLabel"),
+            pauseAll: tHome("videosPause"),
+            playAll: tHome("videosPlay"),
+            open: tHome("videosOpen"),
+            exit: tHome("videosExit"),
+            previous: tHome("videosPrevious"),
+            next: tHome("videosNext"),
+            pause: tHome("videoPause"),
+            play: tHome("videoPlay"),
+          }}
+        />
+      )}
       {aboutTitle || aboutBody ? (
         <AboutSection
           title={aboutTitle ?? placeholder(about.title)}
@@ -134,7 +141,7 @@ export default async function HomePage() {
           eyebrow={placeholder(story.eyebrow)}
           title={placeholder(story.title)}
           body={placeholder(story.body)}
-          photo={samplePhotos[story.photo]}
+          photo={site.sample(story.photo)}
           hue={STORY_HUES[story.key] ?? "hue-sky"}
           // "Meet CHEF SIS" has its image on the left, so these start on the right.
           imageRight={index % 2 === 0}

@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import sharp from "sharp";
 import { TEST_PASSWORD, TEST_USERS } from "./support/fake-supabase";
@@ -315,11 +316,195 @@ test.describe("safe rendering", () => {
   });
 });
 
+/** A real, tiny WebM recorded in the browser (the test browser cannot decode H.264). */
+async function recordWebm(page: Page): Promise<Buffer> {
+  const base64 = await page.evaluate(async () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 64;
+    canvas.height = 48;
+    const context = canvas.getContext("2d")!;
+    const recorder = new MediaRecorder(canvas.captureStream(10), { mimeType: "video/webm" });
+    const chunks: Blob[] = [];
+    recorder.ondataavailable = (event) => chunks.push(event.data);
+    const stopped = new Promise((resolve) => (recorder.onstop = resolve));
+    recorder.start();
+    for (let frame = 0; frame < 8; frame += 1) {
+      context.fillStyle = `rgb(${frame * 30}, 90, 60)`;
+      context.fillRect(0, 0, 64, 48);
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    }
+    recorder.stop();
+    await stopped;
+    const bytes = new Uint8Array(await new Blob(chunks, { type: "video/webm" }).arrayBuffer());
+    return btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(""));
+  });
+  return Buffer.from(base64, "base64");
+}
+
+test.describe("every photo and video in the library", () => {
+  const dishImage = (page: Page, name: RegExp) =>
+    page
+      .getByRole("listitem")
+      .filter({ has: page.getByRole("heading", { level: 3, name }) })
+      .getByRole("img");
+
+  test("lists the website's own files, each with Edit and Delete", async ({ page }) => {
+    await signIn(page, TEST_USERS.editor.email);
+    await page.goto("/admin/media");
+    await expect(page.getByRole("link", { name: "Edit Banquet hall" })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: "Delete Banquet hall" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Edit Fresh injera" })).toBeVisible();
+
+    await page.goto("/admin/media?filter=videos");
+    await expect(page.getByRole("link", { name: "Edit Serving stew" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Edit Banquet hall" })).toHaveCount(0);
+
+    await page.getByRole("link", { name: "Edit Serving stew" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Serving stew" })).toBeVisible();
+    await expect(page.getByText("On the website now.")).toBeVisible();
+    await expect(page.getByText("Homepage: video row")).toBeVisible();
+    await expect(page.getByText("Included with the website")).toBeVisible();
+    await expect(page.getByText("It is credited on the Credits page")).toBeVisible();
+    await expect(page.locator("video")).toHaveAttribute("src", "/videos/injera-service.mp4");
+  });
+
+  test("edits a description, deletes a file and restores it, on the live website", async ({
+    page,
+    context,
+  }) => {
+    await signIn(page, TEST_USERS.editor.email);
+    const visitor = await context.newPage();
+    const description = `Gomen as edited ${unique("alt")}`;
+
+    await page.goto("/admin/media?q=Gomen");
+    await page.getByRole("link", { name: "Edit Gomen" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Gomen" })).toBeVisible();
+    // A sample's credit stays with the code while its file is used.
+    await expect(page.getByLabel(/^Photo credit/)).toHaveCount(0);
+    const english = page.locator("form").filter({ has: page.getByLabel("Description (English)") });
+    await page.getByLabel("Description (English)").fill(description);
+    await english.getByRole("button", { name: "Save" }).click();
+    await expect(english.getByRole("status")).toHaveText("Saved.");
+
+    await visitor.goto("/en");
+    await expect(dishImage(visitor, /^Gomen/)).toHaveAccessibleName(description);
+    await visitor.goto("/en/credits");
+    await expect(visitor.getByText(description)).toBeVisible();
+
+    await page.goto("/admin/media?q=Gomen");
+    await page.getByRole("button", { name: "Delete Gomen" }).click();
+    const dialog = page.getByRole("alertdialog");
+    await expect(dialog).toContainText("You can bring it back at any time");
+    await dialog.getByRole("button", { name: "Delete image" }).click();
+    await expect(page.getByRole("button", { name: "Delete Gomen" })).toHaveCount(0);
+
+    // The dish stays, without its photograph, and the sample's credit goes with it.
+    await visitor.goto("/en");
+    await expect(visitor.getByRole("heading", { level: 3, name: /^Gomen/ })).toBeVisible();
+    await expect(dishImage(visitor, /^Gomen/)).toHaveCount(0);
+    await visitor.goto("/en/credits");
+    await expect(visitor.getByText(description)).toHaveCount(0);
+
+    await page.goto("/admin/media?filter=removed");
+    await page.getByRole("button", { name: "Restore Gomen" }).click();
+    await expect(page.getByRole("button", { name: "Restore Gomen" })).toHaveCount(0);
+
+    await visitor.goto("/en");
+    await expect(dishImage(visitor, /^Gomen/)).toHaveAccessibleName(description);
+  });
+
+  test("replaces a file, serving the upload, and goes back to the original", async ({ page, context }) => {
+    await signIn(page, TEST_USERS.editor.email);
+    const visitor = await context.newPage();
+
+    await page.goto("/admin/media?q=Shiro");
+    await page.getByRole("link", { name: "Edit Shiro" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Shiro" })).toBeVisible();
+    const replace = page
+      .locator("form")
+      .filter({ has: page.getByRole("button", { name: "Replace", exact: true }) });
+    await replace.locator("input[type=file]").setInputFiles({
+      name: "shiro.png",
+      mimeType: "image/png",
+      buffer: await png(320, 240),
+    });
+    await replace.getByRole("button", { name: "Replace", exact: true }).click();
+    await expect(replace.getByRole("status")).toHaveText("The file was replaced.");
+    await expect(page.getByText("Uploaded", { exact: true })).toBeVisible();
+
+    await visitor.goto("/en");
+    const src = new URL((await dishImage(visitor, /^Shiro/).getAttribute("src"))!, ADMIN_ORIGIN);
+    const publicPath = src.pathname === "/_next/image" ? src.searchParams.get("url")! : src.pathname;
+    expect(publicPath).toMatch(/^\/media\/assets\/[0-9a-f-]{36}\/[0-9a-f]{32}\.png$/);
+    expect((await visitor.request.get(publicPath)).status()).toBe(200);
+
+    await page.getByRole("button", { name: "Go back to the original" }).click();
+    await page.getByRole("alertdialog").getByRole("button", { name: "Go back to the original" }).click();
+    await expect(page.getByText("Included with the website")).toBeVisible();
+
+    expect((await visitor.request.get(publicPath)).status()).toBe(404);
+    await visitor.goto("/en");
+    await expect(dishImage(visitor, /^Shiro/)).toHaveAttribute("src", /dish-shiro/);
+  });
+
+  test("uploads a video straight to Storage, shows it on the homepage and deletes it", async ({
+    page,
+    context,
+  }) => {
+    await signIn(page, TEST_USERS.editor.email);
+    const visitor = await context.newPage();
+    const title = `Kitchen clip ${unique("video").slice(-8)}`;
+    await page.goto("/admin/media");
+    await waitForHydration(page);
+
+    const file = page.getByLabel("Photo or video file");
+    await file.setInputFiles({ name: "fake.webm", mimeType: "video/webm", buffer: Buffer.from("<html>") });
+    await page.getByRole("button", { name: "Upload" }).click();
+    await expect(page.locator("#upload-file-error")).toContainText("This browser cannot play the video");
+
+    await file.setInputFiles({ name: "clip.webm", mimeType: "video/webm", buffer: await recordWebm(page) });
+    await page.getByLabel(/^Title/).fill(title);
+    await page.getByLabel(/^English description/).fill("A short clip from the kitchen");
+    await page.getByRole("button", { name: "Upload" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText("On the website now.")).toBeVisible();
+    await expect(page.getByText("video/webm")).toBeVisible();
+    const mediaUrl = new URL(page.url()).pathname;
+
+    await visitor.goto("/en");
+    const clip = visitor.locator('section video[src^="/media/assets/"]').first();
+    const publicPath = (await clip.getAttribute("src"))!;
+    expect(publicPath).toMatch(/^\/media\/assets\/[0-9a-f-]{36}\/[0-9a-f]{32}\.webm$/);
+
+    // A short-lived Storage link, which answers the range requests that players make.
+    const redirect = await visitor.request.get(publicPath, { maxRedirects: 0 });
+    expect(redirect.status()).toBe(302);
+    const range = await visitor.request.get(redirect.headers().location!, {
+      headers: { Range: "bytes=0-3" },
+    });
+    expect(range.status()).toBe(206);
+    expect([...(await range.body())]).toEqual([0x1a, 0x45, 0xdf, 0xa3]);
+
+    // Staff preview through the authenticated file route, uncached.
+    const preview = await page.request.get(`${mediaUrl}/file`, { maxRedirects: 0 });
+    expect(preview.status()).toBe(302);
+    expect(preview.headers()["cache-control"]).toContain("no-store");
+
+    await page.getByRole("button", { name: "Delete video" }).click();
+    await page.getByRole("alertdialog").getByRole("button", { name: "Delete video" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Media library" })).toBeVisible();
+
+    expect((await visitor.request.get(publicPath, { maxRedirects: 0 })).status()).toBe(404);
+    await visitor.goto("/en");
+    await expect(visitor.locator(`section video[src="${publicPath}"]`)).toHaveCount(0);
+  });
+});
+
 test.describe("media", () => {
   test("only real images are accepted, and the server says why", async ({ page }) => {
     await signIn(page, TEST_USERS.editor.email);
     await page.goto("/admin/media");
-    const file = page.getByLabel("Image file");
+    const file = page.getByLabel("Photo or video file");
     const upload = page.getByRole("button", { name: "Upload" });
     const error = page.locator("#upload-file-error");
 
@@ -340,7 +525,33 @@ test.describe("media", () => {
 
     await file.setInputFiles({ name: "notes.txt", mimeType: "text/plain", buffer: Buffer.from("hello") });
     await upload.click();
-    await expect(error).toHaveText("Use a JPEG, PNG or WebP image.");
+    await expect(error).toHaveText("Use a JPEG, PNG or WebP image, or an MP4 or WebM video.");
+  });
+
+  test("a photo too big for a server request is resized in the browser first", async ({ page }) => {
+    await signIn(page, TEST_USERS.editor.email);
+    await page.goto("/admin/media");
+    await waitForHydration(page);
+    // Random pixels do not compress: this PNG is over the 4 MB a request can safely carry.
+    const size = 1400;
+    const noise = randomBytes(size * size * 3);
+    const buffer = await sharp(noise, { raw: { width: size, height: size, channels: 3 } })
+      .png()
+      .toBuffer();
+    expect(buffer.byteLength).toBeGreaterThan(4 * 1024 * 1024);
+
+    await page.getByLabel("Photo or video file").setInputFiles({
+      name: "phone-picture.png",
+      mimeType: "image/png",
+      buffer,
+    });
+    await page.getByLabel(/^Title/).fill(`Phone picture ${unique("big").slice(-8)}`);
+    await page.getByRole("button", { name: "Upload" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: /^Phone picture/ })).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.getByText("image/webp")).toBeVisible();
+    await expect(page.getByText(`${size} × ${size}`)).toBeVisible();
   });
 
   test("an image is public only while published content uses it, and cannot be deleted while used", async ({
@@ -350,7 +561,7 @@ test.describe("media", () => {
     const imageTitle = `Injera platter ${unique("img").slice(-8)}`;
     await page.goto("/admin/media");
     await page
-      .getByLabel("Image file")
+      .getByLabel("Photo or video file")
       .setInputFiles({ name: "platter.png", mimeType: "image/png", buffer: await png() });
     await page.getByLabel(/^Title/).fill(imageTitle);
     await page.getByLabel(/^English description/).fill("A platter of injera with stews");

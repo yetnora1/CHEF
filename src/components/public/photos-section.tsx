@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
-import { HOME_PHOTOS, galleryPhotos } from "@/features/content/chef-photos";
+import { getSiteMedia } from "@/features/cms/public-data";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { PhotoMosaic } from "./photo-gallery";
@@ -12,7 +12,9 @@ import { PhotoMosaic } from "./photo-gallery";
  */
 export async function PhotosSection() {
   const locale = (await getLocale()) as AppLocale;
-  const t = await getTranslations("Photos");
+  const [t, site] = await Promise.all([getTranslations("Photos"), getSiteMedia()]);
+  const photos = site.mosaic(locale);
+  if (photos.length === 0) return null;
 
   return (
     <section aria-labelledby="photos-heading" className="py-14 md:py-20">
@@ -27,7 +29,7 @@ export async function PhotosSection() {
           <p className="max-w-lg text-muted-foreground md:justify-self-end">{t("lede")}</p>
         </div>
         <PhotoMosaic
-          photos={galleryPhotos(HOME_PHOTOS, locale)}
+          photos={photos}
           labels={{ open: t("open"), close: t("close"), previous: t("previous"), next: t("next") }}
         />
         <div className="mt-6 flex sm:justify-end">

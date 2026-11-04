@@ -169,7 +169,8 @@
       "modulesHeading": "Modules for your role",
       "noModules": "No modules are available for your role yet."
     },
-    "account": "Your account"
+    "account": "Your account",
+    "emailChangeWaiting": "Your email is still {current}. It changes to {next} once you open the confirmation link we sent."
   },
   "Auth": {
     "loginTitle": "Sign in",
@@ -1281,13 +1282,15 @@
       "new": "New email",
       "hint": "We send a link to confirm it. Your email changes only once the link is opened.",
       "submit": "Change email",
-      "sent": "We sent a confirmation link to {email}. Your email changes once you open it.",
+      "sent": "We sent a confirmation link to {email}. Your email changes once you open it. If one also comes to your current address, open that too.",
       "changed": "Your email is now {email}.",
       "outcome": {
         "done": "Your email change is confirmed.",
         "partial": "Confirmed. Now open the link sent to your other email address as well.",
         "failed": "This confirmation link has expired or was already used. Please request a new one."
-      }
+      },
+      "waitingHelp": "Open the link we sent there. If one also came to your current address, open that too.",
+      "lapsed": "Your change to {email} did not finish, so your email is unchanged: its link expired, or a later password change cancelled it. Submit it again below to get a new link."
     },
     "password": {
       "heading": "Password",
@@ -1296,7 +1299,9 @@
       "repeat": "Repeat the new password",
       "hint": "At least 12 characters, with an upper-case letter, a lower-case letter and a number.",
       "submit": "Change password",
-      "changed": "Password changed. Your other devices are signed out."
+      "changed": "Password changed. Your other devices are signed out.",
+      "cancelsEmailChange": "Changing your password now cancels your waiting email change to {email}, and you would need to request it again.",
+      "changedEmailCancelled": "Password changed, and your other devices are signed out. For safety, this cancelled your email change to {email}: please request it again."
     },
     "errors": {
       "usernameInvalid": "Use 3 to 32 letters, numbers, dots, hyphens or underscores, starting and ending with a letter or number.",
@@ -1305,7 +1310,7 @@
       "sameEmail": "That is already your email.",
       "emailTaken": "That email cannot be used. Try another one.",
       "emailNotSent": "The confirmation email could not be sent, because this website's email service reaches only approved addresses. The owner can set up email sending in Supabase, or change the address in the Supabase dashboard.",
-      "emailLimit": "Too many emails were sent just now. Please wait about an hour and try again.",
+      "emailLimit": "Too many emails were sent just now. Please wait and try again; it can take up to an hour.",
       "currentPasswordRequired": "Enter your current password.",
       "wrongPassword": "Your current password is not correct.",
       "passwordTooShort": "Use at least 12 characters.",

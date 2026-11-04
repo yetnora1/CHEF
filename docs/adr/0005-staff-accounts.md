@@ -59,6 +59,14 @@ and Redirect URLs must include the live site, and Supabase's built-in email serv
 organisation members and sends about two emails an hour, so other addresses need custom SMTP. Without
 that, the form says that the email could not be sent, and the owner can change the address in the dashboard.
 
+**A password change cancels a waiting email change.** This is Auth's rule, for safety: the old password may be
+what asked for the change. Auth clears the link and when it was sent, but keeps the new address, so a stored
+address does not mean a change is waiting (`emailChangeStatus` in `src/features/account/rules.ts`). The owner hit
+this on the first day: they requested a change, changed the password 81 seconds later, and the old address stayed
+with nothing to say why. The password form now warns first and says what it cancelled, the email form says the
+change did not finish and offers the address again, and while a link really is waiting every admin page says why
+the old address still shows. The change is not requested again automatically, which would undo Auth's rule.
+
 ## 4. Audit
 
 Usernames change in our own table, so a trigger records it. Passwords and email addresses live in Supabase

@@ -101,7 +101,15 @@ export function UsernameForm({ username }: { username: string | null }) {
   );
 }
 
-export function EmailForm({ email, pendingEmail }: { email: string | null; pendingEmail: string | null }) {
+export function EmailForm({
+  email,
+  pendingEmail,
+  lapsedEmail,
+}: {
+  email: string | null;
+  pendingEmail: string | null;
+  lapsedEmail: string | null;
+}) {
   const t = useTranslations("AdminAccount.email");
   const { state, pending, form, dispatch } = useAccountForm(changeEmailAction);
 
@@ -123,8 +131,16 @@ export function EmailForm({ email, pendingEmail }: { email: string | null; pendi
       <dl className="space-y-1 text-sm">
         <dt className="text-muted-foreground">{t("current")}</dt>
         <dd className="font-semibold break-all">{email}</dd>
-        {pendingEmail && pendingEmail !== email && (
-          <dd className="text-muted-foreground">{t("waiting", { email: pendingEmail })}</dd>
+        {pendingEmail && (
+          <dd className="pt-1 text-muted-foreground">
+            <span className="block font-semibold text-foreground">
+              {t("waiting", { email: pendingEmail })}
+            </span>
+            {t("waitingHelp")}
+          </dd>
+        )}
+        {lapsedEmail && (
+          <dd className="pt-1 font-medium text-terracotta">{t("lapsed", { email: lapsedEmail })}</dd>
         )}
       </dl>
       <Field id="account-email" label={t("new")} required hint={t("hint")}>
@@ -133,6 +149,7 @@ export function EmailForm({ email, pendingEmail }: { email: string | null; pendi
           name="email"
           type="email"
           inputMode="email"
+          defaultValue={lapsedEmail ?? ""}
           maxLength={254}
           autoComplete="email"
           required
@@ -156,7 +173,7 @@ export function EmailForm({ email, pendingEmail }: { email: string | null; pendi
   );
 }
 
-export function PasswordForm() {
+export function PasswordForm({ pendingEmail }: { pendingEmail: string | null }) {
   const t = useTranslations("AdminAccount");
   const { state, pending, form, dispatch } = useAccountForm(changePasswordAction);
 
@@ -196,9 +213,21 @@ export function PasswordForm() {
           hideLabel={t("hidePassword")}
         />
       </Field>
+      {pendingEmail && (
+        <p className="text-sm font-medium text-terracotta">
+          {t("password.cancelsEmailChange", { email: pendingEmail })}
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-3">
         <SubmitButton pending={pending}>{t("password.submit")}</SubmitButton>
-        <Status state={state} success={t("password.changed")} />
+        <Status
+          state={state}
+          success={
+            state.status === "passwordChanged" && state.cancelledEmail
+              ? t("password.changedEmailCancelled", { email: state.cancelledEmail })
+              : t("password.changed")
+          }
+        />
       </div>
     </form>
   );

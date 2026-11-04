@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { cache } from "react";
 import { z } from "zod";
+import { emailChangeStatus } from "@/features/account/rules";
 import { isAppPermission, isAppRole } from "@/lib/permissions/matrix";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { decideAdminAccess, type AccessDecision, type StaffSession } from "./access";
@@ -63,7 +64,7 @@ export const getStaffSession = cache(async (): Promise<StaffSession> => {
 
   return {
     status: "signed-in",
-    user: { id: user.id, email: user.email ?? null, pendingEmail: user.new_email ?? null },
+    user: { id: user.id, email: user.email ?? null, ...emailChangeStatus(user) },
     roles: parsed.data.roles,
     permissions: parsed.data.permissions,
   };

@@ -75,10 +75,14 @@ export async function AccountScreen({
           <UsernameForm username={username} />
         </Card>
         <Card icon={Mail} heading={t("email.heading")} intro={t("email.intro")}>
-          <EmailForm email={session.user.email} pendingEmail={session.user.pendingEmail} />
+          <EmailForm
+            email={session.user.email}
+            pendingEmail={session.user.pendingEmail}
+            lapsedEmail={session.user.lapsedEmail}
+          />
         </Card>
         <Card icon={KeyRound} heading={t("password.heading")} intro={t("password.intro")}>
-          <PasswordForm />
+          <PasswordForm pendingEmail={session.user.pendingEmail} />
         </Card>
       </div>
     </NextIntlClientProvider>

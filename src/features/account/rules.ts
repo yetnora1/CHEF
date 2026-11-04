@@ -26,3 +26,24 @@ export function passwordProblem(password: string): PasswordProblem | null {
   }
   return null;
 }
+
+// How long a confirmation link is worth waiting for: Auth's limit is shorter or equal.
+const EMAIL_LINK_LIFETIME_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Where an email change stands. Auth keeps the new address after its link can no
+ * longer work: links expire, and a password change cancels them, for safety, since
+ * the old password may be what asked for the change. So a stored address alone does
+ * not mean a change is waiting; only a link sent recently and not cancelled does.
+ */
+export function emailChangeStatus(
+  user: { email?: string; new_email?: string; email_change_sent_at?: string },
+  now = Date.now(),
+): { pendingEmail: string | null; lapsedEmail: string | null } {
+  const address = user.new_email && user.new_email !== user.email ? user.new_email : null;
+  if (!address) return { pendingEmail: null, lapsedEmail: null };
+  const sentAt = user.email_change_sent_at ? Date.parse(user.email_change_sent_at) : NaN;
+  return now - sentAt < EMAIL_LINK_LIFETIME_MS
+    ? { pendingEmail: address, lapsedEmail: null }
+    : { pendingEmail: null, lapsedEmail: address };
+}

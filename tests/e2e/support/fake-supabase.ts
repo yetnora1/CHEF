@@ -44,6 +44,7 @@ export const TEST_USERS = {
   // Only tests/e2e/staff.spec.ts changes this account's roles.
   newcomer: { email: "newcomer@example.test", role: null, name: "Newcomer Test" },
   // Only tests/e2e/account.spec.ts changes these accounts' sign-in details.
+  lapsedUser: { email: "lapsed-user@example.test", role: "content_editor", name: "Lapsed Test" },
   usernameUser: { email: "username-user@example.test", role: "content_editor", name: "Username Test" },
   passwordUser: { email: "password-user@example.test", role: "content_editor", name: "Password Test" },
   emailUser: { email: "email-user@example.test", role: "content_editor", name: "Email Test" },
@@ -54,8 +55,10 @@ export type TestUser = {
   email: string;
   /** Set once changed from TEST_PASSWORD. */
   password?: string;
-  /** An email change waiting for its link to be opened. */
+  /** An email change. Like Auth, the address stays after its link is cancelled. */
   newEmail?: string;
+  /** When its link was sent; cleared when the link is cancelled. */
+  emailChangeSentAt?: string;
 };
 
 const root = process.cwd();
@@ -125,6 +128,7 @@ function userJson(user: TestUser) {
     role: "authenticated",
     email: user.email,
     ...(user.newEmail ? { new_email: user.newEmail } : {}),
+    ...(user.emailChangeSentAt ? { email_change_sent_at: user.emailChangeSentAt } : {}),
     email_confirmed_at: "2026-01-01T00:00:00Z",
     app_metadata: { provider: "email", providers: ["email"] },
     user_metadata: {},
@@ -474,7 +478,7 @@ export async function startFakeSupabase(options: { seed?: FakeSupabaseSeed } = {
   // Signed link token → object, as a signed link is a capability of its own.
   const signedLinks = new Map<string, string>();
   // Email-change links by token, the latest link per address, and codes for the session.
-  const emailChanges = new Map<string, { user: TestUser; email: string; redirectTo: string | null }>();
+  const emailChanges = new Map<string, { user: TestUser; email: string }>();
   const emailLinks = new Map<string, string>();
   const authCodes = new Map<string, TestUser>();
   await options.seed?.({ db, files, users });
@@ -535,28 +539,45 @@ export async function startFakeSupabase(options: { seed?: FakeSupabaseSeed } = {
         for (const [token, holder] of refreshTokens) {
           if (holder.id === user.id) refreshTokens.delete(token);
         }
+        // Like Auth, cancels a waiting email change's links but keeps its address.
+        for (const [token, change] of emailChanges) {
+          if (change.user.id === user.id) emailChanges.delete(token);
+        }
+        delete user.emailChangeSentAt;
       }
       if (typeof body.email === "string") {
         if (users.has(body.email)) {
           return send(res, 422, { code: "email_exists", msg: "Email address already registered" });
         }
         const token = randomBytes(16).toString("hex");
-        emailChanges.set(token, { user, email: body.email, redirectTo: url.searchParams.get("redirect_to") });
-        emailLinks.set(body.email, `${FAKE_SUPABASE_URL}/auth/v1/verify?token=${token}&type=email_change`);
+        emailChanges.set(token, { user, email: body.email });
+        const redirectTo = encodeURIComponent(url.searchParams.get("redirect_to") ?? "");
+        emailLinks.set(
+          body.email,
+          `${FAKE_SUPABASE_URL}/auth/v1/verify?token=${token}&type=email_change&redirect_to=${redirectTo}`,
+        );
         user.newEmail = body.email;
+        user.emailChangeSentAt = new Date().toISOString();
       }
       return send(res, 200, userJson(user));
     }
 
     if (req.method === "GET" && url.pathname === "/auth/v1/verify") {
       const change = emailChanges.get(url.searchParams.get("token") ?? "");
-      if (!change) return send(res, 403, { code: "otp_expired", msg: "Email link is invalid or has expired" });
+      const redirectTo = url.searchParams.get("redirect_to");
+      if (!change) {
+        res.writeHead(302, {
+          Location: `${redirectTo}?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired`,
+        });
+        return res.end();
+      }
       emailChanges.delete(url.searchParams.get("token") ?? "");
-      const { user, email, redirectTo } = change;
+      const { user, email } = change;
       await db.query("update auth.users set email = $1 where id = $2", [email, user.id]);
       users.delete(user.email);
       user.email = email;
       delete user.newEmail;
+      delete user.emailChangeSentAt;
       users.set(email, user);
       const code = randomBytes(16).toString("hex");
       authCodes.set(code, user);

@@ -8,6 +8,7 @@ import { AdminLocaleSwitcher } from "./admin-locale-switcher";
 import { AdminMobileNav } from "./admin-mobile-nav";
 import type { AdminNavItem } from "./admin-nav";
 import { AdminSidebar, type AdminSidebarProps } from "./admin-sidebar";
+import { EmailChangeNotice } from "./email-change-notice";
 import { SidebarToggle } from "./sidebar-toggle";
 import { UserMenu } from "./user-menu";
 
@@ -104,6 +105,15 @@ export async function AdminShell({
           </div>
         </header>
         <main id="main-content" tabIndex={-1} className="flex-1 px-1 py-8 outline-none lg:py-10">
+          {session.user.pendingEmail && (
+            <EmailChangeNotice
+              message={t("emailChangeWaiting", {
+                current: session.user.email ?? "",
+                next: session.user.pendingEmail,
+              })}
+              linkLabel={t("account")}
+            />
+          )}
           {children}
         </main>
       </div>

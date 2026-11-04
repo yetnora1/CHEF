@@ -4,7 +4,12 @@ import { ROLE_PERMISSIONS, type AppRole } from "@/lib/permissions/matrix";
 
 const signedIn = (roles: AppRole[]): StaffSession => ({
   status: "signed-in",
-  user: { id: "00000000-0000-0000-0000-000000000001", email: "staff@example.test", pendingEmail: null },
+  user: {
+    id: "00000000-0000-0000-0000-000000000001",
+    email: "staff@example.test",
+    pendingEmail: null,
+    lapsedEmail: null,
+  },
   roles,
   permissions: [...new Set(roles.flatMap((role) => ROLE_PERMISSIONS[role]))],
 });
@@ -28,7 +33,7 @@ describe("decideAdminAccess", () => {
   it("requires admin.access in addition to the specific permission", () => {
     const session: StaffSession = {
       status: "signed-in",
-      user: { id: "x", email: null, pendingEmail: null },
+      user: { id: "x", email: null, pendingEmail: null, lapsedEmail: null },
       roles: [],
       permissions: ["bookings.read_all"],
     };

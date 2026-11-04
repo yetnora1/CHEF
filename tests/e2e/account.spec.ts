@@ -301,6 +301,78 @@ test.describe("changing the email", () => {
     await expectSignedIn(page);
   });
 
+  test("a password change cancels a waiting email change, says so, and a new request works", async ({
+    page,
+  }) => {
+    const lapsedAccount = TEST_USERS.lapsedUser.email;
+    const target = `lapsed.${Date.now().toString(36)}@example.test`;
+    const NEW_PASSWORD = "Fresh-Pantry-Thyme-58";
+    await signIn(page, lapsedAccount);
+    await expectSignedIn(page);
+    await openAccount(page);
+
+    const requestChange = async (password: string) => {
+      const form = card(page, "Email");
+      await form.getByLabel("New email").fill(target);
+      await form.getByLabel("Current password").fill(password);
+      await form.getByRole("button", { name: "Change email" }).click();
+      await expect(form.getByRole("status")).toContainText(`We sent a confirmation link to ${target}`);
+    };
+    const linkFor = async () => {
+      const response = await page.request.get(
+        `${FAKE_SUPABASE_URL}/__test/email-link?to=${encodeURIComponent(target)}`,
+      );
+      return ((await response.json()) as { link: string }).link;
+    };
+    const notice = () => page.getByRole("main").getByText(`Your email is still ${lapsedAccount}`);
+
+    await requestChange(TEST_PASSWORD);
+    const cancelledLink = await linkFor();
+
+    // While it waits, every admin page says why the old address still shows.
+    await page.goto("/admin/overview");
+    await expect(notice()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Account menu" })).toContainText(lapsedAccount);
+
+    await openAccount(page);
+    await expect(notice()).toHaveCount(0);
+    await expect(card(page, "Email")).toContainText(`Waiting for confirmation: ${target}`);
+    const passwordForm = card(page, "Password");
+    await expect(passwordForm).toContainText(`cancels your waiting email change to ${target}`);
+
+    await passwordForm.getByLabel("Current password").fill(TEST_PASSWORD);
+    await passwordForm.getByLabel(/^New password/).fill(NEW_PASSWORD);
+    await passwordForm.getByLabel("Repeat the new password").fill(NEW_PASSWORD);
+    await passwordForm.getByRole("button", { name: "Change password" }).click();
+    await expect(passwordForm.getByRole("status")).toContainText(
+      `this cancelled your email change to ${target}`,
+    );
+
+    // It no longer claims to be waiting: it says what happened and offers the address again.
+    await page.reload();
+    await waitForHydration(page);
+    const form = card(page, "Email");
+    await expect(form).not.toContainText("Waiting for confirmation");
+    await expect(form).toContainText(`Your change to ${target} did not finish`);
+    await expect(form.getByLabel("New email")).toHaveValue(target);
+    await page.goto("/admin/overview");
+    await expect(notice()).toHaveCount(0);
+
+    // The old link is dead, and says so.
+    await page.goto(cancelledLink);
+    await expect(page).toHaveURL(/\/admin\/account\?email=failed/);
+    await expect(page.getByRole("main").getByRole("alert")).toContainText("expired or was already used");
+    await expect(page.getByRole("button", { name: "Account menu" })).toContainText(lapsedAccount);
+    await waitForHydration(page);
+
+    // Asking again finishes the job.
+    await requestChange(NEW_PASSWORD);
+    await page.goto(await linkFor());
+    await expect(page).toHaveURL(/\/admin\/account\?email=done/);
+    await expect(page.getByRole("button", { name: "Account menu" })).toContainText(target);
+    await expect(card(page, "Email")).not.toContainText("did not finish");
+  });
+
   test("a failed or half-finished link says so, and shows nothing written into the link", async ({
     page,
   }) => {

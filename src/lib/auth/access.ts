@@ -5,6 +5,8 @@ export type StaffUser = {
   email: string | null;
   /** An email change waiting for its confirmation link to be opened. */
   pendingEmail: string | null;
+  /** An email change that did not finish: its link expired or was cancelled. */
+  lapsedEmail: string | null;
 };
 
 export type StaffSession =

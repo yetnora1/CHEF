@@ -40,7 +40,8 @@ export type AccountError =
 export type AccountActionState =
   | { status: "idle" }
   | { status: "error"; error: AccountError }
-  | { status: "saved" | "removed" | "passwordChanged"; at: number }
+  | { status: "saved" | "removed"; at: number }
+  | { status: "passwordChanged"; cancelledEmail: string | null; at: number }
   | { status: "emailSent" | "emailChanged"; email: string; at: number };
 
 const fail = (error: AccountError): AccountActionState => ({ status: "error", error });
@@ -133,7 +134,9 @@ export async function changePasswordAction(
   const refused = await confirmCurrentPassword(staff.supabase, staff.user, current);
   if (refused) return fail(refused);
 
-  // Auth keeps this session and ends the account's sessions on other devices.
+  // Auth keeps this session, ends the account's sessions on other devices and cancels
+  // any email change still waiting for its link. That is a safety rule (the old password
+  // may be what asked for it), so the change is not sent again without being asked.
   const { error } = await staff.supabase.auth.updateUser({ password: next });
   if (error) {
     if (error.code === "same_password") return fail("samePassword");
@@ -142,7 +145,7 @@ export async function changePasswordAction(
   }
   await staff.supabase.rpc("record_account_change", { p_kind: "password_changed" });
   refresh();
-  return { status: "passwordChanged", at: Date.now() };
+  return { status: "passwordChanged", cancelledEmail: staff.user.pendingEmail, at: Date.now() };
 }
 
 const emailSchema = z.email().max(254);

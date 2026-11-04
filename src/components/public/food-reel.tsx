@@ -14,6 +14,19 @@ type FoodReelProps = {
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 // Clips start buffering this far before they scroll into view, so they are ready when seen.
 const PRELOAD_MARGIN = "400px 0px";
+// A modest phone cannot decode many videos at once and everything else on it stutters:
+// there, only this many play, and the others keep their picture.
+const MAX_PLAYING_ON_MODEST_DEVICES = 2;
+
+type DeviceHints = Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+
+const isModestDevice = () => {
+  const { hardwareConcurrency, deviceMemory } = navigator as DeviceHints;
+  return hardwareConcurrency <= 4 || (deviceMemory !== undefined && deviceMemory <= 4);
+};
+const wantsLessData = () => (navigator as DeviceHints).connection?.saveData === true;
+
+const subscribeNever = () => () => {};
 
 function subscribeReducedMotion(onChange: () => void) {
   const query = window.matchMedia(REDUCED_MOTION);
@@ -25,9 +38,9 @@ function subscribeReducedMotion(onChange: () => void) {
  * A grid of short, silent food loops without captions. The tiles play light 640px
  * copies: nothing downloads until the reel is near the viewport (preload="none"
  * until then), and clips play only while visible. They stay paused for visitors
- * who ask for reduced motion, and one button pauses or plays them all (moving
- * content needs a way to stop it). Clicking a tile opens it full screen in the
- * VideoViewer at full quality; the tiles pause meanwhile.
+ * who ask for reduced motion or less data, and one button pauses or plays them all
+ * (moving content needs a way to stop it). Clicking a tile opens it full screen in
+ * the VideoViewer at full quality; the tiles pause meanwhile.
  */
 export function FoodReel({ clips, labels }: FoodReelProps) {
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
@@ -39,7 +52,8 @@ export function FoodReel({ clips, labels }: FoodReelProps) {
   // The visitor's own choice wins over the motion preference.
   const [choice, setChoice] = useState<"playing" | "paused" | null>(null);
   const [viewing, setViewing] = useState<number | null>(null);
-  const playing = choice ? choice === "playing" : !reducedMotion;
+  const lessData = useSyncExternalStore(subscribeNever, wantsLessData, () => false);
+  const playing = choice ? choice === "playing" : !reducedMotion && !lessData;
 
   useEffect(() => {
     const elements = videos.current.filter((video): video is HTMLVideoElement => video !== null);
@@ -60,11 +74,18 @@ export function FoodReel({ clips, labels }: FoodReelProps) {
       },
       { rootMargin: PRELOAD_MARGIN },
     );
+    const limit = isModestDevice() ? MAX_PLAYING_ON_MODEST_DEVICES : elements.length;
+    const onScreen = new Set<HTMLVideoElement>();
     const visible = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           const video = entry.target as HTMLVideoElement;
-          if (entry.isIntersecting) video.play().catch(() => {});
+          if (entry.isIntersecting) onScreen.add(video);
+          else onScreen.delete(video);
+        }
+        const allowed = elements.filter((video) => onScreen.has(video)).slice(0, limit);
+        for (const video of elements) {
+          if (allowed.includes(video)) video.play().catch(() => {});
           else video.pause();
         }
       },
@@ -107,7 +128,7 @@ export function FoodReel({ clips, labels }: FoodReelProps) {
               {/* Full-screen hint: on hover or focus, always on touch screens (no hover there). */}
               <span
                 aria-hidden
-                className="absolute right-2 bottom-2 flex size-8 items-center justify-center rounded-full border border-stage-foreground/25 bg-stage/40 text-stage-foreground opacity-0 backdrop-blur-md transition-opacity duration-200 group-hover/clip:opacity-100 group-focus-visible/clip:opacity-100 [@media(hover:none)]:opacity-100"
+                className="absolute right-2 bottom-2 flex size-8 items-center justify-center rounded-full border border-stage-foreground/25 bg-stage/55 text-stage-foreground opacity-0 transition-opacity duration-200 group-hover/clip:opacity-100 group-focus-visible/clip:opacity-100 [@media(hover:none)]:opacity-100"
               >
                 <Maximize2 className="size-4" />
               </span>

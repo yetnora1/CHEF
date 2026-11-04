@@ -158,7 +158,7 @@ describe("the website's media as they stand", () => {
     });
     const platter = clips.find((clip) => clip.key === "platter");
     expect(platter).toMatchObject({ src: "/videos/injera-platter.mp4", description: { en: "Edited" } });
-    expect(platter?.poster).toBe("/videos/injera-platter.jpg");
+    expect(platter?.poster).toBe("/videos/poster/injera-platter.webp");
   });
 
   it("credit a bundled sample only while it is the file on the site", () => {

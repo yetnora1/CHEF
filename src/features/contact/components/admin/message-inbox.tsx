@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Mail, Phone, Search } from "lucide-react";
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/ui/intent-link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/form-controls";

@@ -48,7 +48,7 @@ function Tile({ photo, label, sizes, fill, onOpen }: TileProps) {
       />
       <span
         aria-hidden
-        className="absolute right-2.5 bottom-2.5 flex size-8 items-center justify-center rounded-full border border-stage-foreground/25 bg-stage/40 text-stage-foreground opacity-0 backdrop-blur-md transition-opacity duration-200 group-hover/photo:opacity-100 group-focus-visible/photo:opacity-100 [@media(hover:none)]:opacity-100"
+        className="absolute right-2.5 bottom-2.5 flex size-8 items-center justify-center rounded-full border border-stage-foreground/25 bg-stage/55 text-stage-foreground opacity-0 transition-opacity duration-200 group-hover/photo:opacity-100 group-focus-visible/photo:opacity-100 [@media(hover:none)]:opacity-100"
       >
         <Maximize2 className="size-4" />
       </span>

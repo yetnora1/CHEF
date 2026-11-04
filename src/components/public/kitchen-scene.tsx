@@ -32,14 +32,21 @@ function Steam({ x, y, delay, scale = 1 }: { x: number; y: number; delay: string
   );
 }
 
+/*
+ * Each moving part costs the main thread on every frame, so parts that move together
+ * are one animated group: the flames flicker in three phases, the injera's holes open
+ * in six. Seen at this size, nothing is lost.
+ */
+const FLAMES = [656, 676, 696, 716, 736, 756, 776];
+const FLAME_PHASES = [0, 1, 2];
+const EYE_PHASES = [0, 1, 2, 3, 4, 5];
+
 /** A gas flame: blue at its base, warm at its tip. */
-function Flame({ x, delay }: { x: number; delay: string }) {
+function Flame({ x }: { x: number }) {
   return (
     <path
       d={`M${x} 251 C${x - 6} 247 ${x - 4} 241 ${x} 235 C${x + 4} 241 ${x + 6} 247 ${x} 251 Z`}
       fill="url(#k-flame)"
-      className="animate-kitchen-flame"
-      style={{ ...fromBase, animationDelay: delay }}
     />
   );
 }
@@ -51,7 +58,7 @@ const EYES = Array.from({ length: 24 }, (_, index) => {
   return {
     cx: Math.round((960 + Math.cos(angle) * radius * 90) * 10) / 10,
     cy: Math.round((224 + Math.sin(angle) * radius * 11) * 10) / 10,
-    delay: `${(-((index * 7) % 24) * 0.29).toFixed(2)}s`,
+    phase: (index * 7) % 6,
   };
 });
 
@@ -491,8 +498,16 @@ export function KitchenScene({ labels }: KitchenSceneProps) {
           fill="none"
           strokeLinecap="round"
         />
-        {[656, 676, 696, 716, 736, 756, 776].map((x, index) => (
-          <Flame key={x} x={x} delay={`${-(index % 3) * 0.17}s`} />
+        {FLAME_PHASES.map((phase) => (
+          <g
+            key={phase}
+            className="animate-kitchen-flame"
+            style={{ ...fromBase, animationDelay: `${-phase * 0.17}s` }}
+          >
+            {FLAMES.filter((_, index) => index % FLAME_PHASES.length === phase).map((x) => (
+              <Flame key={x} x={x} />
+            ))}
+          </g>
         ))}
 
         {/* Injera on a clay mitad, its holes opening as it cooks */}
@@ -510,17 +525,17 @@ export function KitchenScene({ labels }: KitchenSceneProps) {
         <ellipse cx="960" cy="232" rx="108" ry="15" fill={c("clay-dark")} />
         <ellipse cx="960" cy="227" rx="108" ry="15" fill="url(#k-clay)" />
         <ellipse cx="960" cy="225" rx="93" ry="12" fill="url(#k-injera)" />
-        {EYES.map(({ cx, cy, delay }) => (
-          <ellipse
-            key={`${cx}-${cy}`}
-            cx={cx}
-            cy={cy}
-            rx="2.3"
-            ry="1.1"
+        {EYE_PHASES.map((phase) => (
+          <g
+            key={phase}
             fill={c("injera-eye")}
             className="animate-kitchen-eye"
-            style={{ ...fromCentre, animationDelay: delay }}
-          />
+            style={{ animationDelay: `${(-phase * 7) / EYE_PHASES.length}s` }}
+          >
+            {EYES.filter((eye) => eye.phase === phase).map(({ cx, cy }) => (
+              <ellipse key={`${cx}-${cy}`} cx={cx} cy={cy} rx="2.3" ry="1.1" />
+            ))}
+          </g>
         ))}
 
         {/* A jebena of coffee */}

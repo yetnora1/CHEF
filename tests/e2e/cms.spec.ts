@@ -350,9 +350,10 @@ test.describe("every photo and video in the library", () => {
 
   test("lists the website's own files, each with Edit and Delete", async ({ page }) => {
     await signIn(page, TEST_USERS.editor.email);
-    await page.goto("/admin/media");
+    await page.goto("/admin/media?q=hall");
     await expect(page.getByRole("link", { name: "Edit Banquet hall" })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByRole("button", { name: "Delete Banquet hall" })).toBeVisible();
+    await page.goto("/admin/media?q=injera");
     await expect(page.getByRole("link", { name: "Edit Fresh injera" })).toBeVisible();
 
     await page.goto("/admin/media?filter=videos");

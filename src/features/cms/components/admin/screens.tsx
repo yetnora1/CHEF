@@ -1,5 +1,5 @@
 import { ArrowLeft, ChevronLeft, ChevronRight, ExternalLink, Eye, Plus, Search } from "lucide-react";
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/ui/intent-link";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";

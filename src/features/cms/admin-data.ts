@@ -18,7 +18,7 @@ import {
  */
 
 export const CMS_PAGE_SIZE = 20;
-export const MEDIA_PAGE_SIZE = 48;
+export const MEDIA_PAGE_SIZE = 24;
 
 export class CmsDataError extends Error {
   constructor(operation: string, cause: unknown) {

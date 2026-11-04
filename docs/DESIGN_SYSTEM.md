@@ -106,6 +106,17 @@ every page `h1` and `display-md` for section headings, so operational screens st
 - Grids fill whole rows for the usual counts (the homepage services grid uses 4, 3 or 2 columns
   depending on how many services are published).
 
+## Keeping it smooth
+
+Backdrop blur is redrawn for every element on every frame while the page moves. On the media library,
+with blur on every card and button, a frame took 31 ms to draw (under 30 frames a second); without it, 5 ms.
+So `glass` is a translucent fill with a lit rim and **no blur**: it is for cards in the page's flow, where
+only the smooth backdrop lies behind them, and it looks the same. Only what floats over moving content
+really blurs (`glass-thick`, `glass-sheet`). Do not add `backdrop-blur` to anything that repeats.
+
+Moving parts in the kitchen scene cost the main thread on every frame, so parts that move together are one
+animated group. Compositor hints and lower frame rates were measured and did not help.
+
 ## Images: ratios, cropping and descriptions
 
 | Slot                                     | Ratio         | Notes                                                |

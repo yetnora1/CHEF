@@ -10,7 +10,8 @@ import type { Localized } from "@/lib/localization/translations";
  * cut to 4-7 seconds, cropped to 16:10 (keeping bystanders out of frame), resized
  * to 960px and re-encoded without sound. The reel's tiles play lighter 640px copies
  * (public/videos/preview, under half the size) so they start quickly; the 960px
- * file plays full screen. Each poster is the clip's first frame at 640px.
+ * file plays full screen. Each poster (public/videos/poster) is the clip's first
+ * frame as a 480px WebP, half the weight of the 640px JPEG it replaced.
  *
  * Browsers cache /videos for a day (next.config.ts), so a changed clip needs a new
  * file name.
@@ -37,7 +38,7 @@ export const sampleVideos: SampleVideo[] = [
     key: "platter",
     src: "/videos/injera-platter.mp4",
     preview: "/videos/preview/injera-platter.mp4",
-    poster: "/videos/injera-platter.jpg",
+    poster: "/videos/poster/injera-platter.webp",
     description: {
       en: "A close look at a platter of injera topped with stews, vegetables and fresh cheese.",
     },
@@ -51,7 +52,7 @@ export const sampleVideos: SampleVideo[] = [
     key: "ceremony",
     src: "/videos/coffee-ceremony.mp4",
     preview: "/videos/preview/coffee-ceremony.mp4",
-    poster: "/videos/coffee-ceremony.jpg",
+    poster: "/videos/poster/coffee-ceremony.webp",
     description: {
       en: "A coffee ceremony: freshly roasted beans are shown in the pan above rows of small cups.",
     },
@@ -65,7 +66,7 @@ export const sampleVideos: SampleVideo[] = [
     key: "shared",
     src: "/videos/shared-platter.mp4",
     preview: "/videos/preview/shared-platter.mp4",
-    poster: "/videos/shared-platter.jpg",
+    poster: "/videos/poster/shared-platter.webp",
     description: { en: "A shared injera platter on a table, seen from above." },
     credit: {
       author: "kelly",
@@ -77,7 +78,7 @@ export const sampleVideos: SampleVideo[] = [
     key: "serving",
     src: "/videos/injera-service.mp4",
     preview: "/videos/preview/injera-service.mp4",
-    poster: "/videos/injera-service.jpg",
+    poster: "/videos/poster/injera-service.webp",
     description: { en: "A stew being spooned onto a platter of injera already topped with other dishes." },
     credit: {
       author: "kelly",
@@ -89,7 +90,7 @@ export const sampleVideos: SampleVideo[] = [
     key: "popcorn",
     src: "/videos/coffee-popcorn.mp4",
     preview: "/videos/preview/coffee-popcorn.mp4",
-    poster: "/videos/coffee-popcorn.jpg",
+    poster: "/videos/poster/coffee-popcorn.webp",
     description: {
       en: "Coffee beans roasting beside a tray of popcorn on a floor strewn with petals and fresh grass, seen from above.",
     },
@@ -103,7 +104,7 @@ export const sampleVideos: SampleVideo[] = [
     key: "coffee",
     src: "/videos/coffee-roasting.mp4",
     preview: "/videos/preview/coffee-roasting.mp4",
-    poster: "/videos/coffee-roasting.jpg",
+    poster: "/videos/poster/coffee-roasting.webp",
     description: { en: "Coffee beans roasting in a pan over charcoal, among fresh grass and flowers." },
     credit: {
       author: "kelly",

@@ -154,6 +154,31 @@ test.describe("locale routing", () => {
   });
 });
 
+test.describe("page weight", () => {
+  test("English pages download no Ethiopic web font, and Amharic pages do", async ({ page }) => {
+    const fonts: string[] = [];
+    page.on("request", (request) => {
+      if (request.resourceType() === "font") fonts.push(request.url());
+    });
+    await page.goto("/en", { waitUntil: "networkidle" });
+    expect(fonts).toEqual([]);
+    await page.goto("/am", { waitUntil: "networkidle" });
+    expect(fonts.length).toBeGreaterThan(0);
+  });
+
+  test("nothing in the page's flow blurs its backdrop, only what floats over it", async ({ page }) => {
+    await page.goto("/en");
+    const blurred = await page.evaluate(
+      () =>
+        [...document.querySelectorAll("main *")].filter((element) => {
+          const { backdropFilter } = getComputedStyle(element);
+          return backdropFilter && backdropFilter !== "none";
+        }).length,
+    );
+    expect(blurred).toBe(0);
+  });
+});
+
 test.describe("kitchen animation", () => {
   const scene = (page: Page) => page.getByRole("img", { name: /^Animation: a chef stirring a pot of stew/ });
   const animated = (page: Page) =>

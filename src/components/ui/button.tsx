@@ -55,7 +55,7 @@ export const buttonVariants = cva(
         ),
         // Raised glass over whatever is behind it; hover makes it more opaque.
         outline: cn(
-          "border border-border bg-glass-raised from-transparent to-transparent text-foreground backdrop-blur-md hover:border-border-strong hover:bg-glass-raised-hover active:bg-glass-raised",
+          "border border-border bg-glass-raised from-transparent to-transparent text-foreground hover:border-border-strong hover:bg-glass-raised-hover active:bg-glass-raised",
           sheen,
           lift,
         ),

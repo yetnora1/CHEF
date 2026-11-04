@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/ui/intent-link";
 import { usePathname } from "next/navigation";
 import { ADMIN_MODULE_ICONS } from "@/features/admin/module-icons";
 import { isModuleActive, type AdminModuleKey } from "@/features/admin/modules";

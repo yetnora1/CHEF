@@ -133,10 +133,10 @@
   }
   @keyframes kitchen-flame {
     from {
-      transform: scale(1.05, 0.82);
+      transform: scale(1, 0.82);
     }
     to {
-      transform: scale(0.95, 1.08);
+      transform: scale(1, 1.08);
     }
   }
   @keyframes kitchen-glow {
@@ -178,16 +178,13 @@
   /* Injera's "eyes": the little holes that open across it as it cooks. */
   @keyframes kitchen-eye {
     0% {
-      transform: scale(0);
       opacity: 0;
     }
     8%,
     88% {
-      transform: scale(1);
       opacity: 1;
     }
     100% {
-      transform: scale(1);
       opacity: 0;
     }
   }
@@ -501,9 +498,18 @@
   --font-display:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     var(--font-noto-sans-ethiopic), sans-serif;
+  /* Ethiopic side labels on English pages: the device's own font, no download. */
+  --font-system:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 @layer base {
+  /* English pages hold Ethiopic only in small labels (the language switch, dish names):
+   * the device's own Ethiopic font draws them, so these pages skip the 200 KB web font. */
+  html[lang="en"] [lang="am"] {
+    font-family: var(--font-system);
+  }
+
   html {
     background-color: var(--background);
     color: var(--foreground);
@@ -683,12 +689,18 @@
  *   glass-thick – sticky bars, menus and dialogs, which content moves behind
  *   glass-sheet – the phone menu sheets: clearer frost, more saturated, a sheen and a lit rim
  */
+/*
+ * Backdrop blur is redrawn for every element on every frame while the page moves. `glass`
+ * is for cards in the page's flow, over the smooth backdrop, where blurring shows nothing:
+ * it is a translucent fill with a lit rim, and costs nothing. Only what floats over moving
+ * content (`glass-thick`, `glass-sheet`) really blurs what passes behind it.
+ */
 @utility glass {
-  @apply bg-glass shadow-glass inset-shadow-glass backdrop-blur-xl backdrop-saturate-150;
+  @apply bg-glass shadow-glass inset-shadow-glass;
 }
 
 @utility glass-thick {
-  @apply bg-glass-thick shadow-glass inset-shadow-glass backdrop-blur-2xl backdrop-saturate-150;
+  @apply bg-glass-thick shadow-glass inset-shadow-glass backdrop-blur-lg backdrop-saturate-150;
 }
 
 @utility glass-sheet {

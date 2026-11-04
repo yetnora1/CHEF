@@ -566,21 +566,24 @@ export function DeleteMediaButton({
       ) : (
         <Message state={state} success={t("deleted")} />
       )}
-      <AlertDialog open={confirming} onOpenChange={setConfirming}>
-        <AlertDialogContent
-          title={compact ? t("media.deleteNamed", { title }) : label}
-          description={body}
-          cancelLabel={t("cancel")}
-          confirmLabel={label}
-          tone="danger"
-          onConfirm={() => {
-            const data = new FormData();
-            data.set("id", id);
-            if (compact) data.set("stay", "1");
-            startTransition(() => dispatch(data));
-          }}
-        />
-      </AlertDialog>
+      {/* Mounted only when asked for: a list holds dozens of these buttons. */}
+      {confirming && (
+        <AlertDialog open onOpenChange={setConfirming}>
+          <AlertDialogContent
+            title={compact ? t("media.deleteNamed", { title }) : label}
+            description={body}
+            cancelLabel={t("cancel")}
+            confirmLabel={label}
+            tone="danger"
+            onConfirm={() => {
+              const data = new FormData();
+              data.set("id", id);
+              if (compact) data.set("stay", "1");
+              startTransition(() => dispatch(data));
+            }}
+          />
+        </AlertDialog>
+      )}
     </div>
   );
 }

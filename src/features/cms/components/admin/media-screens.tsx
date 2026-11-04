@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { IntentLink } from "@/components/ui/intent-link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -104,7 +105,6 @@ function MediaThumb({
         src={bundled.src}
         alt=""
         sizes="(min-width: 80rem) 16rem, (min-width: 64rem) 22vw, (min-width: 40rem) 45vw, 92vw"
-        placeholder="blur"
         className={THUMB}
       />
     );
@@ -238,10 +238,11 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
               return (
                 <li
                   key={row.id}
-                  className="flex flex-col overflow-hidden rounded-2xl border border-border glass"
+                  className="flex flex-col overflow-hidden rounded-2xl border border-border glass [contain-intrinsic-size:auto_22rem] [content-visibility:auto]"
                 >
                   <Link
                     href={href}
+                    prefetch={false}
                     // A larger target for the mouse; keyboards and screen readers use Edit below.
                     aria-hidden
                     tabIndex={-1}
@@ -284,14 +285,14 @@ export async function MediaLibraryScreen({ filters }: { filters: MediaListFilter
                         <RestoreMediaButton id={row.id} title={row.title} compact />
                       ) : (
                         <>
-                          <Link
+                          <IntentLink
                             href={href}
                             aria-label={t("media.editNamed", { title: row.title })}
                             className={cn(buttonVariants({ variant: "outline", size: "sm" }), "flex-1")}
                           >
                             <Pencil aria-hidden />
                             {t("media.edit")}
-                          </Link>
+                          </IntentLink>
                           <DeleteMediaButton
                             id={row.id}
                             title={row.title}
